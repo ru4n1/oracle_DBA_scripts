@@ -1,0 +1,7 @@
+Truncate statements::
+ 
+Truncate is more drastic than delete as it is actually a DDL command and has an implicit commit as part of its execution, it cannot be rolled back. It operates within the data dictionary and affects the structure of the table.
+a truncation is fast, instantaneous and can annihilate billions of rows.
+ 
+SQL> truncate table employees;
+ 

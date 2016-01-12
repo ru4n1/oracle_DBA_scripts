@@ -1,0 +1,15 @@
+-- Show connected session users 
+
+spool show_all_connected_users
+
+set linesize 200
+set pagesize 90
+set feedback on 
+set heading on
+
+select username,sid || ',' || serial# "Sid,ID",status,last_call_et "Last Activity"
+from v$session
+where username is not null
+order by status desc, last_call_et desc;
+
+spool off

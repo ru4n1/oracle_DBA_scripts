@@ -1,0 +1,90 @@
+-bash-4.1$ sqlplus / as sysdba @$ORACLE_HOME/rdbms/admin/awrrpt.sql
+
+SQL*Plus: Release 11.2.0.1.0 Production on Sat Mar 8 07:20:25 2014
+
+Copyright (c) 1982, 2009, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+
+Current Instance
+~~~~~~~~~~~~~~~~
+
+   DB Id    DB Name      Inst Num Instance
+----------- ------------ -------- ------------
+ 4081594592 SANDPIT             1 sandpit
+
+1 row selected.
+
+
+Specify the Report Type
+~~~~~~~~~~~~~~~~~~~~~~~
+Would you like an HTML report, or a plain text report?
+Enter 'html' for an HTML report, or 'text' for plain text
+Defaults to 'html'
+Enter value for report_type: html
+
+Type Specified:  html
+
+
+Instances in this Workload Repository schema
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   DB Id     Inst Num DB Name      Instance     Host
+------------ -------- ------------ ------------ ------------
+* 4081594592        1 SANDPIT      sandpit      solaris11
+
+Using 4081594592 for database Id
+Using          1 for instance number
+
+
+Specify the number of days of snapshots to choose from
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Entering the number of days (n) will result in the most recent
+(n) days of snapshots being listed.  Pressing <return> without
+specifying a number lists all completed snapshots.
+
+
+Enter value for num_days: 3
+
+Listing the last 3 days of Completed Snapshots
+
+                                                        Snap
+Instance     DB Name        Snap Id    Snap Started    Level
+------------ ------------ --------- ------------------ -----
+sandpit      SANDPIT             68 07 Mar 2014 23:50      1
+                                 69 08 Mar 2014 01:00      1
+                                 70 08 Mar 2014 02:00      1
+                                 71 08 Mar 2014 03:00      1
+                                 72 08 Mar 2014 04:00      1
+                                 73 08 Mar 2014 05:00      1
+                                 74 08 Mar 2014 06:00      1
+                                 75 08 Mar 2014 07:00      1
+
+
+
+Specify the Begin and End Snapshot Ids
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Enter value for begin_snap: 70
+Begin Snapshot Id specified: 70
+
+Enter value for end_snap: 75
+End   Snapshot Id specified: 75
+
+
+
+Specify the Report Name
+~~~~~~~~~~~~~~~~~~~~~~~
+The default report file name is awrrpt_1_70_75.html.  To use this name,
+press <return> to continue, otherwise enter an alternative.
+
+Enter value for report_name: TestAWR_report
+
+Using the report name TestAWR_report
+.....
+End of Report
+</body></html>
+Report written to TestAWR_report

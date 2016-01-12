@@ -1,0 +1,129 @@
+SYS @ sandpit > list
+  1  select name, dbid, created,
+  2  log_mode, checkpoint_change#, controlfile_type, controlfile_created, controlfile_sequence#, controlfile_change#, current_scn, open_mode
+  3* from v$database
+SYS @ sandpit > /
+
+NAME               DBID CREATED   LOG_MODE     CHECKPOINT_CHANGE# CONTROL CONTROLFI CONTROLFILE_SEQUENCE# CONTROLFILE_CHANGE# CURRENT_SCN OPEN_MODE
+------------ ---------- --------- ------------ ------------------ ------- --------- --------------------- ------------------- ----------- --------------------
+SANDPIT      4081594592 15-FEB-14 ARCHIVELOG              3918529 CURRENT 15-FEB-14                 10669             3929672     3929824 READ WRITE
+
+1 row selected.
+
+
+
+
+
+
+SYS @ sandpit > list
+  1* select * from v$controlfile
+SYS @ sandpit > /
+
+STATUS  NAME                                     IS_ BLOCK_SIZE FILE_SIZE_BLKS
+------- ---------------------------------------- --- ---------- --------------
+        /u01/oradata/sandpit/control01.ctl       NO       16384            600
+        /u02/oradata/sandpit/control02.ctl       NO       16384            600
+        /u03/oradata/sandpit/control03.ctl       NO       16384            600
+
+3 rows selected.
+
+
+
+
+
+
+
+  1* select name, status, block_size, file_size_blks from v$controlfile
+SYS @ sandpit > /
+
+NAME                                     STATUS  BLOCK_SIZE FILE_SIZE_BLKS
+---------------------------------------- ------- ---------- --------------
+/u01/oradata/sandpit/control01.ctl                    16384            600
+/u02/oradata/sandpit/control02.ctl                    16384            600
+/u03/oradata/sandpit/control03.ctl                    16384            600
+
+
+
+
+
+SYS @ sandpit > select * from v$log; 
+
+    GROUP#    THREAD#  SEQUENCE#      BYTES  BLOCKSIZE    MEMBERS ARC STATUS           FIRST_CHANGE# FIRST_TIM NEXT_CHANGE# NEXT_TIME
+---------- ---------- ---------- ---------- ---------- ---------- --- ---------------- ------------- --------- ------------ ---------
+         1          1         16   52428800        512          2 YES INACTIVE               3895086 28-AUG-14      3918529 28-AUG-14
+         2          1         17   52428800        512          2 NO  CURRENT                3918529 28-AUG-14   2.8147E+14
+         3          1         15   52428800        512          2 YES INACTIVE               3884227 27-AUG-14      3895086 28-AUG-14
+
+
+
+
+SYS @ sandpit > list
+  1* select * from v$logfile where group# = 1
+SYS @ sandpit > run
+  1* select * from v$logfile where group# = 1
+
+    GROUP# STATUS  TYPE    MEMBER                                   IS_RECOVERY_DEST_FILE
+---------- ------- ------- ---------------------------------------- ------------------------------
+         1         ONLINE  /u01/oradata/sandpit/redo01a.log         NO
+         1         ONLINE  /u01/oradata/sandpit/redo01b.log         NO
+
+2 rows selected
+
+
+SYS @ sandpit > run
+  1  select l.group#, l.bytes, l.status, f.group#, f.type, f.member
+  2  from v$log l, v$logfile f
+  3* where l.group#=f.group#
+
+    GROUP#      BYTES STATUS               GROUP# TYPE    MEMBER
+---------- ---------- ---------------- ---------- ------- ----------------------------------------
+         3   52428800 INACTIVE                  3 ONLINE  /u03/oradata/sandpit/redo03a.log
+         2   52428800 CURRENT                   2 ONLINE  /u02/oradata/sandpit/redo02a.log
+         1   52428800 INACTIVE                  1 ONLINE  /u01/oradata/sandpit/redo01a.log
+         3   52428800 INACTIVE                  3 ONLINE  /u03/oradata/sandpit/redo03b.log
+         2   52428800 CURRENT                   2 ONLINE  /u02/oradata/sandpit/redo02b.log
+         1   52428800 INACTIVE                  1 ONLINE  /u01/oradata/sandpit/redo01b.log
+
+6 rows selected.
+
+
+SYS @ sandpit > select * from v$tablespace;
+
+       TS# NAME                                     INC BIG FLA ENC
+---------- ---------------------------------------- --- --- --- ---
+         0 SYSTEM                                   YES NO  YES
+         1 SYSAUX                                   YES NO  YES
+         2 UNDOTBS1                                 YES NO  YES
+         4 USERS                                    YES NO  YES
+         3 TEMP                                     NO  NO  YES
+         6 EXAMPLE                                  YES NO  YES
+        10 UNDO2                                    YES NO  YES
+
+7 rows selected.
+
+
+
+
+
+SYS @ sandpit > select file#, creation_time, status, bytes/1024/1024 "MB", block_size, name from v$datafile; 
+
+     FILE# CREATION_ STATUS          MB BLOCK_SIZE NAME
+---------- --------- ------- ---------- ---------- ----------------------------------------
+         1 20-NOV-09 SYSTEM         750       8192 /u02/oradata/sandpit/system01.dbf
+         2 20-NOV-09 ONLINE         810       8192 /u02/oradata/sandpit/sysaux01.dbf
+         3 20-NOV-09 ONLINE          60       8192 /u02/oradata/sandpit/undotbs01.dbf
+         4 20-NOV-09 ONLINE        6.25       8192 /u02/oradata/sandpit/users01.dbf
+         5 15-FEB-14 ONLINE         100       8192 /u02/oradata/sandpit/example01.dbf
+         6 12-MAR-14 ONLINE         250       8192 /u02/oradata/sandpit/undo2tbs01.dbf
+
+6 rows selected.
+
+SYS @ sandpit > host ls -lrt /u02/oradata/sandpit/system01.dbf
+-rw-r-----   1 oracle   oinstall 786440192 Aug 28 08:34 /u02/oradata/sandpit/system01.dbf
+
+
+
+
+
+:w
+

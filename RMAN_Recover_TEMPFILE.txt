@@ -1,0 +1,8 @@
+-- You actually dont need RMAN to get back from a situation whereby your TEMP file has gone missing 
+
+SQL> select file#, name from v$tempfile;
+SQL> alter tablespace temp add tempfile '/u01/app/oracle/product/oradata/temp02.dbf' size 200M; 
+SQL> alter tablespace temp drop tempfile '/u01/app/oracle/product/oradata/temp01.dbf'; -- this is the OLD missing file
+SQL> select file#, name from v$tempfile; 
+
+-- Even if this occurs, the database will liekly automatically recreate a TEMPfile for you upon restart. 

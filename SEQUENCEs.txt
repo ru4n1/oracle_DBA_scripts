@@ -1,0 +1,42 @@
+
+
+#Example:
+SQL> create sequence seq1 start with 10 increment by 2 maxvalue 16;
+
+Sequence created.
+
+SQL> select seq1.nextval from dual;
+   NEXTVAL
+----------
+        10
+
+SQL> select seq1.nextval from dual;
+   NEXTVAL
+----------
+        12
+
+SQL> select seq1.currval from dual;
+   CURRVAL
+----------
+        12
+
+SQL> select seq1.currval from dual;
+   CURRVAL
+----------
+        12
+
+SQL> select seq1.nextval from dual;
+   NEXTVAL
+----------
+        14
+
+SQL> select seq1.nextval from dual;
+   NEXTVAL
+----------
+        16
+
+SQL> select seq1.nextval from dual;
+select seq1.nextval from dual
+*
+ERROR at line 1:
+ORA-08004: sequence SEQ1.NEXTVAL exceeds MAXVALUE and cannot be instantiated

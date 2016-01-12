@@ -1,0 +1,14 @@
+-- To set the local listener parameter 
+
+SQL> alter system set local_listener='(ADDRESS = (PROTOCOL = TCP)(HOST = solaris11)(PORT = 1522))';
+
+System altered.
+
+SQL> show parameter local_listener 
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+local_listener                       string      (ADDRESS = (PROTOCOL = TCP)(HO
+                                                 ST = solaris11)(PORT = 1522))
+SQL> 
+

@@ -1,0 +1,50 @@
+-------------------------------------------------
+---    ***Training purposes only***
+---    ***Not appropriate for production use***
+---    version 1.4   last updated January 2011
+-------------------------------------------------
+
+-------------------------------------------------
+---    SUMMARY OF AWR command line intf
+---    user must have select _catalog_role privilege
+-------------------------------------------------
+
+connect / as sysdba
+set lines 1000
+
+----------------------------------------------------------------
+--- AWR BASIC REPORT   
+----------------------------------------------------------------
+start ?/rdbms/admin/awrrpt.sql 
+
+----------------------------------------------------------------
+--- AWR COMPARE PERIODS REPORT   
+----------------------------------------------------------------
+start ?/rdbms/admin/awrddrpt.sql 
+
+----------------------------------------------------------------
+--- ADDM SNAPSHOT-bASED RECOMMENDATIONS REPORT   
+----------------------------------------------------------------
+start ?/rdbms/admin/addmrpt.sql 
+
+----------------------------------------------------------------
+--- ASH BASIC (or fairly basic) REPORT
+----------------------------------------------------------------
+start ?/rdbms/admin/ashrpt.sql
+or 
+start ?/rdbms/admin/ashrpti.sql
+
+----------------------------------------------------------------
+--- SYSAUX/AWR DISK USAGE/PREDITION REPORT
+----------------------------------------------------------------
+start ?/rdbms/admin/awrinfo.sql 
+or
+start ?/rdbms/admin/utlsyxsz.sql 
+
+----------------------------------------------------------------
+--- ++++  C O M P L E T E D  
+----------------------------------------------------------------
+
+
+
+

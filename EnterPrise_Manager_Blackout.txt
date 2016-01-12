@@ -1,0 +1,26 @@
+You can create a blackout of an agent via the command line, useful for scripting purposes...
+
+
+-bash-4.1$ emctl start blackout test_blackout 
+Oracle Enterprise Manager 11g Database Control Release 11.2.0.1.0 
+Copyright (c) 1996, 2009 Oracle Corporation.  All rights reserved.
+Blackout test_blackout added successfully
+EMD reload completed successfully
+-bash-4.1$ emctl status blackout              
+Oracle Enterprise Manager 11g Database Control Release 11.2.0.1.0 
+Copyright (c) 1996, 2009 Oracle Corporation.  All rights reserved.
+Blackoutname = test_blackout
+Targets = (solaris11:host,)
+Time = ({2014-08-28|07:57:21,|} )
+Expired = False
+
+-bash-4.1$ emctl stop blackout test_blackout 
+Oracle Enterprise Manager 11g Database Control Release 11.2.0.1.0 
+Copyright (c) 1996, 2009 Oracle Corporation.  All rights reserved.
+Blackout test_blackout stopped successfully
+EMD reload completed successfully
+-bash-4.1$ emctl status blackout             
+Oracle Enterprise Manager 11g Database Control Release 11.2.0.1.0 
+Copyright (c) 1996, 2009 Oracle Corporation.  All rights reserved.
+No Blackout registered. 
+-bash-4.1$

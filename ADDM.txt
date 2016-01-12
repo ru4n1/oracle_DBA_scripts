@@ -1,0 +1,12 @@
+The database comes preconfigured with a set of advisors, see advisor central in Enterprise Manager.
+First among these is the ADDM or Automatic Database Diagnostic Monitor. ADDM reports are generated automatically whenever an AWR snapshot is tajen. 
+The automatically generated ADDM reports cover the period between the current snapshot and the last one. You can invoke the ADDm naually in order to span a greater period between snapshots if neccessary. Reports are purged after 30 days. 
+
+The ADDM usually will make reccomendations around for further performance analysis and problem resolution including directing to other advisors.
+
+E.g 
+Memory Advisors : to predict the effect of varying sizes of memory structures
+SQL Advisors : SQL Tuning advisor can analyze individual SQL statements in order to suggest rewriting inefficiences. 
+UNDO Advisor : this will observe the rate of of undo data generation and the length of queries being run to reccomend a minimum size for the undo tablespace.
+MTTR : mean time to recover advisor estimates the period for crash recovery if neccessary
+

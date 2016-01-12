@@ -1,0 +1,30 @@
+SYS @ sandpit > select sysdate from dual; 
+
+SYSDATE
+---------
+23-FEB-14
+
+1 row selected.
+
+SYS @ sandpit > alter session set nls_date_format ='ddmmyyy';
+
+Session altered.
+
+SYS @ sandpit > select sysdate from dual; 
+
+SYSDATE
+-------
+2302014
+
+
+HR @ sandpit > alter session set nls_date_format='dd-mm-yy hh24:mi:ss'
+  2  ;
+
+Session altered.
+
+HR @ sandpit > select sysdate from dual;
+
+SYSDATE
+-----------------
+12-03-14 13:49:58
+

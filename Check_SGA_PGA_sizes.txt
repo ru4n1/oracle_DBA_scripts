@@ -1,0 +1,65 @@
+SYS @ sandpit > column component format a40
+SYS @ sandpit > set linesize 400 
+SYS @ sandpit > select * from v$sga_dynamic_components;
+
+COMPONENT                                CURRENT_SIZE   MIN_SIZE   MAX_SIZE USER_SPECIFIED_SIZE OPER_COUNT LAST_OPER_TYP LAST_OPER LAST_OPER GRANULE_SIZE
+---------------------------------------- ------------ ---------- ---------- ------------------- ---------- ------------- --------- --------- ------------
+shared pool                                 268435456  268435456  268435456                   0          0 STATIC                                16777216
+large pool                                   16777216   16777216   16777216                   0          0 STATIC                                16777216
+java pool                                    16777216   16777216   16777216                   0          0 STATIC                                16777216
+streams pool                                        0          0          0                   0          0 STATIC                                16777216
+DEFAULT buffer cache                        335544320  335544320  335544320                   0          0 INITIALIZING                          16777216
+KEEP buffer cache                                   0          0          0                   0          0 STATIC                                16777216
+RECYCLE buffer cache                                0          0          0                   0          0 STATIC                                16777216
+DEFAULT 2K buffer cache                             0          0          0                   0          0 STATIC                                16777216
+DEFAULT 4K buffer cache                             0          0          0                   0          0 STATIC                                16777216
+DEFAULT 8K buffer cache                             0          0          0                   0          0 STATIC                                16777216
+DEFAULT 16K buffer cache                            0          0          0                   0          0 STATIC                                16777216
+DEFAULT 32K buffer cache                            0          0          0                   0          0 STATIC                                16777216
+Shared IO Pool                                      0          0          0                   0          0 STATIC                                16777216
+ASM Buffer Cache                                    0          0          0                   0          0 STATIC                                16777216
+
+14 rows selected.
+
+SYS @ sandpit > show sga
+
+Total System Global Area 1085640704 bytes
+Fixed Size                  2210208 bytes
+Variable Size             738199136 bytes
+Database Buffers          335544320 bytes
+Redo Buffers                9687040 bytes
+SYS @ sandpit > select * from v$sga;
+
+NAME                      VALUE
+-------------------- ----------
+Fixed Size              2210208
+Variable Size         738199136
+Database Buffers      335544320
+Redo Buffers            9687040
+
+4 rows selected.
+
+
+
+
+
+
+
+SYS @ sandpit > select name,value from v$pgastat
+  2  where name in ('maximum PGA allocated','total PGA allocated'); 
+
+NAME                                                                  VALUE
+---------------------------------------------------------------- ----------
+total PGA allocated                                               137700352
+maximum PGA allocated                                             139469824
+
+2 rows selected.
+
+SYS @ sandpit > show parameter pga
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+pga_aggregate_target                 big integer 0
+
+-- The above is not set as I have already set memory_target parameter which will
+-- manage both sga and pga sizes dynamically.

@@ -1,0 +1,23 @@
+# The below will perform a recovery of the control file for a DB 
+# Then start the DB up to mount mode
+# The it will go ahead and perform a restore of the Database and initiate recovery 
+
+-bash-4.1$ rmanconn 
+Recovery Manager: Release 11.2.0.1.0 - Production on Sun Sep 7 17:09:09 2014
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+
+connected to target database: SANDPIT (DBID=4081594592, not open)
+connected to recovery catalog database
+
+RMAN> run 
+{
+restore controlfile;
+
+alter database mount;
+
+SET UNTIL TIME "TO_DATE ('22/11/2014 18:00:00', 'DD/MM/YYYY HH24:MI:SS')";
+restore database ;
+recover database ;
+
+alter database open resetlogs;
+}

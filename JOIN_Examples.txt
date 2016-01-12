@@ -1,0 +1,121 @@
+Joins using three different syntaxes...
+Same output from each. 
+
+#####################
+# Join USING syntax #
+#####################
+SQL> select ename, job, dname 
+  2  from emp join dept using (deptno)
+  3  where deptno=10;
+
+ENAME      JOB       DNAME
+---------- --------- --------------
+CLARK      MANAGER   ACCOUNTING
+KING       PRESIDENT ACCOUNTING
+MILLER     CLERK     ACCOUNTING
+
+
+##################
+# Join ON syntax #
+##################
+SQL> select ename, job, dname 
+  2  from emp join dept on (emp.deptno=dept.deptno)
+  3  where emp.deptno=10;
+
+ENAME      JOB       DNAME
+---------- --------- --------------
+CLARK      MANAGER   ACCOUNTING
+KING       PRESIDENT ACCOUNTING
+MILLER     CLERK     ACCOUNTING
+
+
+########################
+# Join Oracle = Syntax #
+########################
+
+SQL> select ename, job, dname      
+  2  from emp, dept
+  3  where emp.deptno=10 
+  4  and emp.deptno=dept.deptno;
+ENAME      JOB       DNAME
+---------- --------- --------------
+CLARK      MANAGER   ACCOUNTING
+KING       PRESIDENT ACCOUNTING
+MILLER     CLERK     ACCOUNTING
+
+
+#####################
+# Inner Join Syntax #
+#####################
+
+SQL> select ename, job, dname 
+  2  from emp inner join dept on (emp.deptno=dept.deptno)
+  3  where dept.deptno=10;
+ENAME      JOB       DNAME
+---------- --------- --------------
+CLARK      MANAGER   ACCOUNTING
+KING       PRESIDENT ACCOUNTING
+MILLER     CLERK     ACCOUNTING
+
+
+
+Useful for looking at columns to match?
+-----------------------------------------
+SQL> select owner, constraint_name, table_name, r_owner, r_constraint_name status from user_constraints;
+OWNER        CONSTRAINT_NAME                TABLE_NAME                     R_OWNER                        STATUS
+------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------
+SCOTT        PK_DEPT                        DEPT
+SCOTT        PK_EMP                         EMP
+SCOTT        FK_DEPTNO                      EMP                            SCOTT                          PK_DEPT
+Elapsed: 00:00:00.71
+
+SQL> select * from user_cons_columns;
+OWNER        CONSTRAINT_NAME                TABLE_NAME                     COLUMN_NAME              POSITION
+------------ ------------------------------ ------------------------------ ---------------------- ----------
+SCOTT        PK_DEPT                        DEPT                           DEPTNO                          1
+SCOTT        FK_DEPTNO                      EMP                            DEPTNO                          1
+SCOTT        PK_EMP                         EMP                            EMPNO                           1
+Elapsed: 00:00:00.22
+
+
+
+
+Example:
+  1  SELECT  s.SID,s.SERIAL#, s.username, s.SQL_ID, s.paddr, p.addr,  s.terminal, s.program, p.username, p.program, p.pname
+  2  FROM    v$session s  /*LEFT OUTER*/ JOIN  v$process p
+  3* ON     s.paddr=p.addr
+SQL> /
+
+       SID    SERIAL# USERNAME       SQL_ID        PADDR            ADDR             TERMINAL                       PROGRAM                        USERNAME       PROGRAM                        PNAME
+---------- ---------- -------------- ------------- ---------------- ---------------- ------------------------------ ------------------------------ -------------- ------------------------------ -----
+         1          1                              0000000395479CA0 0000000395479CA0 UNKNOWN                        oracle@solaris11 (PMON)        oracle         oracle@solaris11 (PMON)        PMON
+       126          1                              000000039547ACD8 000000039547ACD8 UNKNOWN                        oracle@solaris11 (VKTM)        oracle         oracle@solaris11 (VKTM)        VKTM
+         2          1                              000000039547BD10 000000039547BD10 UNKNOWN                        oracle@solaris11 (GEN0)        oracle         oracle@solaris11 (GEN0)        GEN0
+       127          1                              000000039547CD48 000000039547CD48 UNKNOWN                        oracle@solaris11 (DIAG)        oracle         oracle@solaris11 (DIAG)        DIAG
+         3          1                              000000039547DD80 000000039547DD80 UNKNOWN                        oracle@solaris11 (DBRM)        oracle         oracle@solaris11 (DBRM)        DBRM
+       128          1                              000000039547EDB8 000000039547EDB8 UNKNOWN                        oracle@solaris11 (PSP0)        oracle         oracle@solaris11 (PSP0)        PSP0
+         4          1                              000000039547FDF0 000000039547FDF0 UNKNOWN                        oracle@solaris11 (DIA0)        oracle         oracle@solaris11 (DIA0)        DIA0
+       129          1                              0000000395480E28 0000000395480E28 UNKNOWN                        oracle@solaris11 (MMAN)        oracle         oracle@solaris11 (MMAN)        MMAN
+         5          1                              0000000395481E60 0000000395481E60 UNKNOWN                        oracle@solaris11 (DBW0)        oracle         oracle@solaris11 (DBW0)        DBW0
+       130          1                              0000000395482E98 0000000395482E98 UNKNOWN                        oracle@solaris11 (LGWR)        oracle         oracle@solaris11 (LGWR)        LGWR
+         6          1                              0000000395483ED0 0000000395483ED0 UNKNOWN                        oracle@solaris11 (CKPT)        oracle         oracle@solaris11 (CKPT)        CKPT
+       131          1                              0000000395484F08 0000000395484F08 UNKNOWN                        oracle@solaris11 (SMON)        oracle         oracle@solaris11 (SMON)        SMON
+         7          1                              0000000395485F40 0000000395485F40 UNKNOWN                        oracle@solaris11 (RECO)        oracle         oracle@solaris11 (RECO)        RECO
+       132          1                              0000000395486F78 0000000395486F78 UNKNOWN                        oracle@solaris11 (MMON)        oracle         oracle@solaris11 (MMON)        MMON
+         8          1                              0000000395487FB0 0000000395487FB0 UNKNOWN                        oracle@solaris11 (MMNL)        oracle         oracle@solaris11 (MMNL)        MMNL
+       140       5347 SYS            6p81havajbqs8 000000039548B058 000000039548B058 pts/1                          sqlplus@solaris11 (TNS V1-V3)  oracle         oracle@solaris11 (TNS V1-V3)
+         9          5                              000000039548C090 000000039548C090 UNKNOWN                        oracle@solaris11 (ARC0)        oracle         oracle@solaris11 (ARC0)        ARC0
+       135          3                              000000039548D0C8 000000039548D0C8 UNKNOWN                        oracle@solaris11 (ARC1)        oracle         oracle@solaris11 (ARC1)        ARC1
+        10          2                              000000039548E100 000000039548E100 UNKNOWN                        oracle@solaris11 (ARC2)        oracle         oracle@solaris11 (ARC2)        ARC2
+       136          2                              000000039548F138 000000039548F138 UNKNOWN                        oracle@solaris11 (ARC3)        oracle         oracle@solaris11 (ARC3)        ARC3
+        29        868                              0000000395490170 0000000395490170 UNKNOWN                        oracle@solaris11 (W000)        oracle         oracle@solaris11 (W000)        W000
+       143       6086                              00000003954911A8 00000003954911A8 UNKNOWN                        oracle@solaris11 (J000)        oracle         oracle@solaris11 (J000)        J000
+        25        854                              00000003954921E0 00000003954921E0 UNKNOWN                        oracle@solaris11 (Q002)        oracle         oracle@solaris11 (Q002)        Q002
+       152       3316                              0000000395493218 0000000395493218 UNKNOWN                        oracle@solaris11 (J001)        oracle         oracle@solaris11 (J001)        J001
+        16          1                              0000000395494250 0000000395494250 UNKNOWN                        oracle@solaris11 (QMNC)        oracle         oracle@solaris11 (QMNC)        QMNC
+       125       1143                              0000000395495288 0000000395495288 UNKNOWN                        oracle@solaris11 (VKRM)        oracle         oracle@solaris11 (VKRM)        VKRM
+        19          2                              00000003954962C0 00000003954962C0 UNKNOWN                        oracle@solaris11 (Q000)        oracle         oracle@solaris11 (Q000)        Q000
+       133          5                              00000003954972F8 00000003954972F8 UNKNOWN                        oracle@solaris11 (Q001)        oracle         oracle@solaris11 (Q001)        Q001
+       146          1                              0000000395499368 0000000395499368 UNKNOWN                        oracle@solaris11 (CJQ0)        oracle         oracle@solaris11 (CJQ0)        CJQ0
+       139          3                              000000039549B3D8 000000039549B3D8 UNKNOWN                        oracle@solaris11 (SMCO)        oracle         oracle@solaris11 (SMCO)        SMCO
+Elapsed: 00:00:00.01

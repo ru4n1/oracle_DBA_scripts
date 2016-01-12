@@ -1,0 +1,19 @@
+Insert statements::
+ 
+-- simplest form of the insert statement inserts one row into a table using the values provided
+insert into hr.regions values (10, ‘Great Britain’);
+insert into hr.regions (region_id, region_name) values (11, ‘Ireland’);
+ 
+Above, the first statement relies upon positional notation and would fail if there was a third column in that regions table.
+You should try to avoid relying on positional notation as if columns are added to a table, this may invalidate your code statement!
+It is better practice to list the columns to be inserted into as it makes the code self-documenting and more resilient.
+ 
+* Often an insert will include functions to do type casting of data types.
+insert into employees (employee_id, last_name, hire_date)
+values
+(1000, upper (‘Watson’), to_date (’03-NOV-07’, ‘DD-MON-YY’));
+ 
+ 
+-- To insert many rows using just one insert command, the values for the rows must come from a query. The syntax is as follows…
+insert into regions_backup select * from regions;
+Here you could also use “create table regions_backup as select * from regions” which avoids presupposing that regions_backup already exists.

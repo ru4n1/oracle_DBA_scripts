@@ -1,0 +1,6 @@
+Delete statements::
+ 
+the delete command removes rows from a single table.
+delete from employees where employee_id=206;
+delete from employees where department_id is NULL;
+-- this is the simplest form of the command and if the where condition is omitted, all rows will be impacted.

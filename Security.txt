@@ -1,0 +1,60 @@
+Oracle follows the principle of least priviege when determining access to computer systems. No user can cannot or d anything at all until they are granted access. 
+
+PUBLIC Privileges:
+There is a role called public, which is implicitly granted to every user. Any privileges granted to public have in effect been granted to everyone who can connect to the database. And by default public has a large enough number of privileges, In particular, he/she has access to execute a number of PL/SSQL utility packages. 
+
+E.g.
+UTL_FILE - this allows users to read nad write to any file or directory that is accessible to the operating systems oracle owner. i.e. all database files and ORACLE_HOME. 
+UTL_TCP - this allows users to open tcp ports on the server machine for connections to any accessible address on the network. 
+UTL_HTTP - this allows users to send and recieve responses in effect converting your database into a web browser. 
+
+
+REMOTE_OS_AUTHENT: this parameter defaults to false, this controls whether a user can connect to the database from a remote computer wihtout the need for a password. It applies the external authentication mechanism to be implemented from a remote node. So a user 'JON' who is externally identiifed by the OS for logging into oracle on the server machine, could also you a PC he has and create a JON account on that to be able to log in remotely without providing a passowrd. It is generally considered bad practice to enable remote operating system authentication.
+
+07_DICTIONARY_ACCESSIBILITY: this parameter controls the granting of object privileges with the ANY keyword.
+So if you grant JON: SQL> GRANT SELECT ANY TABLE TO JON;
+This does mean that JON can query anyd table including all the data dictionary tables which may not be desirable? The parameter defaults to false.
+
+REMOTE_LOGIN_PASSWORDFILE: This instance parameter controls whether it is possible to connect to the instance as a user with the SYSDBA or SYSOPER privilege. over the network. With this prameter in its default position of NONE, it is only possible to get a SYSDBA connection is via logging onto the operating system of the server machine as a member of the group that owns the oracle software. Setting this to EXCLUSIVE OR SHARED will allow the password file to be used for only one instance or for all. To add users to the password file, grant them sysdba or sysoper privilege. The V$pwfile_users view shows you which users have their passwords contained in the password file. 
+
+
+You can always look to restrain of curtail some of the PUBLIC roles access by issuing revokes along the lines of the below example.
+
+SYSTEM @ sandpit > set heading off
+SYSTEM @ sandpit > set feedback off
+SYSTEM @ sandpit > spool Revoke_Public_Privs
+SYSTEM @ sandpit > select 'revoke execute on '||table_name||' from public;'
+  2  from dba_tab_privs where table_name like 'UTL%'; 
+
+revoke execute on UTL_ALL_IND_COMPS from public;
+revoke execute on UTL_URL from public;
+revoke execute on UTL_TCP from public;
+revoke execute on UTL_SMTP from public;
+revoke execute on UTL_REF from public;
+revoke execute on UTL_RAW from public;
+revoke execute on UTL_NLA_ARRAY_INT from public;
+revoke execute on UTL_NLA_ARRAY_FLT from public;
+revoke execute on UTL_NLA_ARRAY_DBL from public;
+revoke execute on UTL_NLA from public;
+revoke execute on UTL_MATCH from public;
+revoke execute on UTL_LMS from public;
+revoke execute on UTL_INADDR from public;
+revoke execute on UTL_IDENT from public;
+revoke execute on UTL_I18N from public;
+revoke execute on UTL_HTTP from public;
+revoke execute on UTL_GDK from public;
+revoke execute on UTL_FILE from public;
+revoke execute on UTL_ENCODE from public;
+revoke execute on UTL_COMPRESS from public;
+revoke execute on UTL_COLL from public;
+revoke execute on UTL_CHARACTEROUTPUTSTREAM from public;
+revoke execute on UTL_CHARACTERINPUTSTREAM from public;
+revoke execute on UTL_BINARYOUTPUTSTREAM from public;
+revoke execute on UTL_BINARYINPUTSTREAM from public;
+revoke execute on UTL_FILE from public;
+revoke execute on UTL_FILE from public;
+revoke execute on UTL_FILE from public;
+revoke execute on UTL_SMTP from public;
+revoke execute on UTL_HTTP from public;
+revoke execute on UTL_FILE from public;
+SYSTEM @ sandpit > spool off

@@ -1,0 +1,125 @@
+SQL> PRO JOIN or INNER JOIN
+JOIN or INNER JOIN
+SQL> list
+  1  select t.table_name, t.tablespace_name, t.status, t.pct_free, t.num_rows, c.column_name, c.data_type, c.data_precision
+  2   from user_tables t JOIN user_tab_cols c
+  3* ON (t.table_name=c.table_name)
+SQL> /
+TABLE_NAME                     TABLESPACE_NAME                STATUS     PCT_FREE   NUM_ROWS COLUMN_NAME                    DATA_TYPE            DATA_PRECISION
+------------------------------ ------------------------------ -------- ---------- ---------- ------------------------------ -------------------- --------------
+DEPT                           USERS                          VALID            10          4 DEPTNO                         NUMBER                            2
+DEPT                           USERS                          VALID            10          4 DNAME                          VARCHAR2
+DEPT                           USERS                          VALID            10          4 LOC                            VARCHAR2
+EMP                            USERS                          VALID            10         14 EMPNO                          NUMBER                            4
+EMP                            USERS                          VALID            10         14 ENAME                          VARCHAR2
+EMP                            USERS                          VALID            10         14 JOB                            VARCHAR2
+EMP                            USERS                          VALID            10         14 MGR                            NUMBER                            4
+EMP                            USERS                          VALID            10         14 HIREDATE                       DATE
+EMP                            USERS                          VALID            10         14 SAL                            NUMBER                            7
+EMP                            USERS                          VALID            10         14 COMM                           NUMBER                            7
+EMP                            USERS                          VALID            10         14 DEPTNO                         NUMBER                            2
+BONUS                          USERS                          VALID            10          0 ENAME                          VARCHAR2
+BONUS                          USERS                          VALID            10          0 JOB                            VARCHAR2
+BONUS                          USERS                          VALID            10          0 SAL                            NUMBER
+BONUS                          USERS                          VALID            10          0 COMM                           NUMBER
+SALGRADE                       USERS                          VALID            10          5 GRADE                          NUMBER
+SALGRADE                       USERS                          VALID            10          5 LOSAL                          NUMBER
+SALGRADE                       USERS                          VALID            10          5 HISAL                          NUMBER
+18 rows selected.
+
+
+SQL> PRO LEFT OUTER JOIN (deos not extract additional records not fulfilled by the join from the LEFTMOST table)    
+LEFT OUTER JOIN (Extracts additional records not fulfilled by the join from the LEFTMOST table) - nothing in the case below 
+SQL> list
+  1  select t.table_name, t.tablespace_name, t.status, t.pct_free, t.num_rows, c.column_name, c.data_type, c.data_precision
+  2   from user_tables t LEFT OUTER JOIN user_tab_cols c
+  3* ON (t.table_name=c.table_name)
+SQL> /
+
+TABLE_NAME                     TABLESPACE_NAME                STATUS     PCT_FREE   NUM_ROWS COLUMN_NAME                    DATA_TYPE            DATA_PRECISION
+------------------------------ ------------------------------ -------- ---------- ---------- ------------------------------ -------------------- --------------
+SALGRADE                       USERS                          VALID            10          5 HISAL                          NUMBER
+SALGRADE                       USERS                          VALID            10          5 LOSAL                          NUMBER
+SALGRADE                       USERS                          VALID            10          5 GRADE                          NUMBER
+BONUS                          USERS                          VALID            10          0 COMM                           NUMBER
+BONUS                          USERS                          VALID            10          0 SAL                            NUMBER
+BONUS                          USERS                          VALID            10          0 JOB                            VARCHAR2
+BONUS                          USERS                          VALID            10          0 ENAME                          VARCHAR2
+EMP                            USERS                          VALID            10         14 DEPTNO                         NUMBER                            2
+EMP                            USERS                          VALID            10         14 COMM                           NUMBER                            7
+EMP                            USERS                          VALID            10         14 SAL                            NUMBER                            7
+EMP                            USERS                          VALID            10         14 HIREDATE                       DATE
+EMP                            USERS                          VALID            10         14 MGR                            NUMBER                            4
+EMP                            USERS                          VALID            10         14 JOB                            VARCHAR2
+EMP                            USERS                          VALID            10         14 ENAME                          VARCHAR2
+EMP                            USERS                          VALID            10         14 EMPNO                          NUMBER                            4
+DEPT                           USERS                          VALID            10          4 LOC                            VARCHAR2
+DEPT                           USERS                          VALID            10          4 DNAME                          VARCHAR2
+DEPT                           USERS                          VALID            10          4 DEPTNO                         NUMBER                            2
+18 rows selected.
+
+
+SQL> PRO RIGHT OUTER JOIN to extract non-matching records from the right most table (see additional two records)
+RIGHT OUTER JOIN to extract non-matching records from the right most table (see additional two records)
+SQL> list
+  1  select t.table_name, t.tablespace_name, t.status, t.pct_free, t.num_rows, c.column_name, c.data_type, c.data_precision
+  2   from user_tables t RIGHT OUTER JOIN user_tab_cols c
+  3* ON (t.table_name=c.table_name)
+SQL> /
+TABLE_NAME                     TABLESPACE_NAME                STATUS     PCT_FREE   NUM_ROWS COLUMN_NAME                    DATA_TYPE            DATA_PRECISION
+------------------------------ ------------------------------ -------- ---------- ---------- ------------------------------ -------------------- --------------
+DEPT                           USERS                          VALID            10          4 DEPTNO                         NUMBER                            2
+DEPT                           USERS                          VALID            10          4 DNAME                          VARCHAR2
+DEPT                           USERS                          VALID            10          4 LOC                            VARCHAR2
+EMP                            USERS                          VALID            10         14 EMPNO                          NUMBER                            4
+EMP                            USERS                          VALID            10         14 ENAME                          VARCHAR2
+EMP                            USERS                          VALID            10         14 JOB                            VARCHAR2
+EMP                            USERS                          VALID            10         14 MGR                            NUMBER                            4
+EMP                            USERS                          VALID            10         14 HIREDATE                       DATE
+EMP                            USERS                          VALID            10         14 SAL                            NUMBER                            7
+EMP                            USERS                          VALID            10         14 COMM                           NUMBER                            7
+EMP                            USERS                          VALID            10         14 DEPTNO                         NUMBER                            2
+BONUS                          USERS                          VALID            10          0 ENAME                          VARCHAR2
+BONUS                          USERS                          VALID            10          0 JOB                            VARCHAR2
+BONUS                          USERS                          VALID            10          0 SAL                            NUMBER
+BONUS                          USERS                          VALID            10          0 COMM                           NUMBER
+SALGRADE                       USERS                          VALID            10          5 GRADE                          NUMBER
+SALGRADE                       USERS                          VALID            10          5 LOSAL                          NUMBER
+SALGRADE                       USERS                          VALID            10          5 HISAL                          NUMBER
+                                                                                             ENAME                          VARCHAR2
+                                                                                             JOB                            VARCHAR2
+20 rows selected.
+
+
+SQL> PRO - a full OUTER JOIN returns all rows from the left table and from the right table 
+- a full OUTER JOIN returns all rows from the left table and from the right table
+SQL> list 
+  1  select t.table_name, t.tablespace_name, t.status, t.pct_free, t.num_rows, c.column_name, c.data_type, c.data_precision
+  2  from user_tables t FULL OUTER JOIN user_tab_cols c
+  3* ON t.table_name=c.table_name
+SQL> /
+
+TABLE_NAME                     TABLESPACE_NAME                STATUS     PCT_FREE   NUM_ROWS COLUMN_NAME                    DATA_TYPE            DATA_PRECISION
+------------------------------ ------------------------------ -------- ---------- ---------- ------------------------------ -------------------- --------------
+DEPT                           USERS                          VALID            10          4 LOC                            VARCHAR2
+DEPT                           USERS                          VALID            10          4 DNAME                          VARCHAR2
+DEPT                           USERS                          VALID            10          4 DEPTNO                         NUMBER                            2
+EMP                            USERS                          VALID            10         14 DEPTNO                         NUMBER                            2
+EMP                            USERS                          VALID            10         14 COMM                           NUMBER                            7
+EMP                            USERS                          VALID            10         14 SAL                            NUMBER                            7
+EMP                            USERS                          VALID            10         14 HIREDATE                       DATE
+EMP                            USERS                          VALID            10         14 MGR                            NUMBER                            4
+EMP                            USERS                          VALID            10         14 JOB                            VARCHAR2
+EMP                            USERS                          VALID            10         14 ENAME                          VARCHAR2
+EMP                            USERS                          VALID            10         14 EMPNO                          NUMBER                            4
+BONUS                          USERS                          VALID            10          0 COMM                           NUMBER
+BONUS                          USERS                          VALID            10          0 SAL                            NUMBER
+BONUS                          USERS                          VALID            10          0 JOB                            VARCHAR2
+BONUS                          USERS                          VALID            10          0 ENAME                          VARCHAR2
+SALGRADE                       USERS                          VALID            10          5 HISAL                          NUMBER
+SALGRADE                       USERS                          VALID            10          5 LOSAL                          NUMBER
+SALGRADE                       USERS                          VALID            10          5 GRADE                          NUMBER
+                                                                                             ENAME                          VARCHAR2
+                                                                                             JOB                            VARCHAR2
+
+20 rows selected.

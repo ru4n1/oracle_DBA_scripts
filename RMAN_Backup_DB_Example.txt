@@ -1,0 +1,16 @@
+# The below commands connet to the target and catalog for metadata
+# Will log the output to a file of the session details
+# Allocates two channels of type disk in the designated location
+# Backs up the database and archivelogs, then deletes the archive logs 
+
+rman target / catalog rcat/rcat@cartman log '/tmp/RMAN_sess.txt'
+
+
+run
+      {
+        ALLOCATE CHANNEL d1 DEVICE TYPE DISK FORMAT '/export/home/oracle/BKP/%U'; 
+        ALLOCATE CHANNEL d2 DEVICE TYPE DISK FORMAT '/export/home/oracle/BKP/%U'; 
+        BACKUP DATABASE;
+        BACKUP ARCHIVELOG ALL DELETE INPUT;
+      }
+quit

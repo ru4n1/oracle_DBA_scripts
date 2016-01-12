@@ -1,0 +1,40 @@
+# 
+
+oracle@solaris11:/ora/work/data$ sqlplus / as sysdba
+SQL*Plus: Release 11.2.0.1.0 Production on Sun Nov 16 02:33:54 2014
+
+Copyright (c) 1982, 2009, Oracle.  All rights reserved.
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SQL> select file_name from dba_data_files;
+FILE_NAME
+--------------------------------------------------------------------------------
+/ora/work/data/SANDPIT/datafile/o1_mf_users_b4c344g0_.dbf
+/ora/work/data/SANDPIT/datafile/o1_mf_undotbs1_b4c344dr_.dbf
+/ora/work/data/SANDPIT/datafile/o1_mf_sysaux_b4c344co_.dbf
+/ora/work/data/SANDPIT/datafile/o1_mf_system_b4c34452_.dbf
+/ora/work/data/SANDPIT/datafile/repo_01.dbf
+
+SQL> host rm /ora/work/data/SANDPIT/datafile/o1_mf_users_b4c344g0_.dbf
+
+
+----- You must take this tablespace offline firstly.... 
+
+SQL> alter tablespace users offline immediate ;
+
+----- Now you can go and recover this datafile to a new filename location 
+
+connected to target database: SANDPIT (DBID=4103520783)
+connected to recovery catalog database
+
+RMAN> run
+2> {
+3> set newname for datafile '/ora/work/data/SANDPIT/datafile/o1_mf_users_b4c344g0_.dbf' to
+4> '/ora/work/data/SANDPIT/datafile/o1_mf_users_b4c344g0_new1.dbf';
+5> restore tablespace users;
+6> switch datafile all;
+7> recover tablespace users; 
+8> }
+

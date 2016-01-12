@@ -1,0 +1,92 @@
+=============================
+To grant and Revoke Privileges
+=============================
+By default no-one can do anything in oracle even if they have a user account. A user cannot connect without being granted a privilege. And even once this is done, he/she can not do anything else remotely useful until they are granted more privileges. Privileges are assigned to user acocunts with a GRANT command and withdrawn using the REVOKE command. Addiitonal syntax can allow the user to grant any privileges he.she has onto others. Only the adminisistrator accounts have the ability to grant any but the most limited privileges. 
+
+Privileges come in two groups:
+1) SYSTEM PRIVILEGES
+ - these apply to actions that impact the data dictionary such as creating users or tables. Others affect the database or instance, such as creating tablespaces, adjusting instance parameters or establishing a session. 
+For example :
+= CREATE SESSION - this lets the user connect
+= ALTER DATABASE - allows modification of physical structures
+= ALTER SYSTEM - gives control over instance parameters
+= CREATE TABLESPACE - lets a user mnaage tablepsaces
+= CREATE TABLE - lets the granetee create tables in his/her own schema. inclues ability to alter/drop/select and manipulate indexes on these tables by association
+= DROP ANY TABLE  - the grantee can drop tables belonging to other users
+= SELECT ANY TABLE - the grantee can select from tables belonging to other users
+
+The syntax for granting a system privilege is 
+
+bash-4.1$ sqlplus scott/scott@sandpit
+SQL*Plus: Release 11.2.0.1.0 Production on Fri Feb 28 04:14:15 2014
+Copyright (c) 1982, 2009, Oracle.  All rights reserved.
+ERROR:
+ORA-01045: user scott lacks CREATE SESSION privilege; logon denied
+
+-bash-4.1$ sp
+SQL*Plus: Release 11.2.0.1.0 Production on Fri Feb 28 04:14:20 2014
+Copyright (c) 1982, 2009, Oracle.  All rights reserved.
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+SYS @ sandpit > GRANT CREATE SESSION, CREATE TABLE, CREATE VIEW, CREATE SEQUENCE, CREATE PROCEDURE TO scott;
+Grant succeeded.
+SYS @ sandpit > quit
+Disconnected from Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+-bash-4.1$ sqlplus scott/scott@sandpit
+SQL*Plus: Release 11.2.0.1.0 Production on Fri Feb 28 04:14:29 2014
+Copyright (c) 1982, 2009, Oracle.  All rights reserved.
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+scott @ sandpit >
+
+You can also allow a grantee to pass on thieir privilege to others if neccesary. 
+e.g. GRANT CREATE TABLE TO scott WITH ADMIN OPTION;
+This allows the user to now grant the same privilege to others. 
+* if this privilege is revoked from scott, then any users to which scott passed on the privilege will remain intact as it does not cascade back. 
+
+2) OBJECT PROVILEGES
+ - Object privileges give the ability to perform select , update , delete and insert commands against tables and related objects. This is not neccessary for the users own schema i.e. if a user has the CREATE TABLE system privilege, then he / she can perform the normal select and DML operations aginst the tables he / she creates naturally.  
+The object privileges are SELECT, INSERT, UPDATE, DELETE, ALTER, EXECUTE
+For example:
+scott @ sandpit > grant select on scott.t1 to scott; 
+Grant succeeded.
+
+This will let scott query all columns of scott's t1 table.
+
+The use of the WITH GRANT syntax option also allows the user to pass the object privilege onto others. 
+* However for an object privilege - oracle maintains a record of who granted what to whom so this allows a revoke of an object grant to cascade all the way back up to chain. 
+
+ 1*  grant insert on scott.t1 to scott with grant option
+SYS @ sandpit > /
+Grant succeeded.
+
+You can query system privilges via the Data dictionary view: DBA_SYS_PRIVS
+SYS @ sandpit > /
+GRANTEE                        PRIVILEGE                                ADM
+------------------------------ ---------------------------------------- ---
+scott                           CREATE PROCEDURE                         NO
+scott                           CREATE SESSION                           NO
+scott                           CREATE SEQUENCE                          NO
+scott                           CREATE VIEW                              NO
+scott                           CREATE TABLE                             NO
+
+You can also search for object privileges for a table which is nice!
+  1* select * from dba_tab_privs where grantee in ('SCOTT','scott')
+SYS @ sandpit > /
+GRANTEE                        who                  TABLE_ GRANTOR     PRIVILEGE                                GRA HIE
+------------------------------ -------------------- ------ ----------- ---------------------------------------- --- ---
+SCOTT                          scott                 T1     scott        FLASHBACK                                NO  NO
+SCOTT                          scott                 T1     scott        DEBUG                                    NO  NO
+SCOTT                          scott                 T1     scott        QUERY REWRITE                            NO  NO
+SCOTT                          scott                 T1     scott        ON COMMIT REFRESH                        NO  NO
+SCOTT                          scott                 T1     scott        REFERENCES                               NO  NO
+SCOTT                          scott                 T1     scott        UPDATE                                   NO  NO
+SCOTT                          scott                 T1     scott        INSERT                                   YES NO
+SCOTT                          scott                 T1     scott        INDEX                                    NO  NO
+SCOTT                          scott                 T1     scott        DELETE                                   NO  NO
+SCOTT                          scott                 T1     scott        ALTER                                    NO  NO
+SCOTT                          scott                 T1     scott        SELECT                                   NO  NO

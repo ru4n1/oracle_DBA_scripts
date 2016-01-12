@@ -1,0 +1,8 @@
+alias amiup='echo "select * from dual" | sqlplus / as sysdba'
+alias db='cd /export/home/oracle/database'
+alias gohome='cd /export/home/ru4n1/'
+alias ll='ls -lrta'
+alias lstat='lsnrctl status'
+alias scripts='cd /export/home/oracle/DBscripts'
+alias sp='sqlplus / as sysdba'
+alias stuff='cd /stuff'

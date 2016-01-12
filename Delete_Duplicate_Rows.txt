@@ -1,0 +1,4 @@
+## Duplicates removal
+
+delete from course
+where rowid NOT IN (select MIN(ROWID) from course group by course_name, period);

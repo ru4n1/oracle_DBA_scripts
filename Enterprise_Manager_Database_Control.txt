@@ -1,0 +1,9 @@
+The configuration of database control is done at database creation. If there are several database instances running off the same $ORACLE_HOME then each instance will have its own database control instance. To start database control - use the emctl utility. 
+
+emctl start dbconsole 
+emctl status dbconsole 
+emctl stop dbconsole 
+
+To connect
+
+https://hostname:port:/em

@@ -1,0 +1,10 @@
+-- simple example of a PLSQL loop construct to insert rows into a table 
+
+
+SQL> create or replace procedure insert_integers(var1 in number)
+ as begin 
+for i in 1..var1 loop
+insert into integers_table values (i);
+end loop;
+end insert_integers;
+/

@@ -1,0 +1,106 @@
+Ampersand Substitution
+---------------------
+
+Oracle offers the functionality to input variable placeholders in the form or ampersand substitution.
+
+Single ampersand substituion is the most popular form o substitution to designate a variable into a statement. When a statement is excuted, the oracle server proceses the statement notices a substitution variable and attempts to resolve this in two ways:
+First it checks whether a variable is defined (DEFINE command) in the users session
+Second it will prompt for an input value. 
+This ampersand substitution will always be resolved at execution time (run time binding).
+
+HR @ sandpit > run
+  1  select employee_id, last_name, phone_number from employees
+  2  where last_name = &LASTNAME
+  3  or
+  4* employee_id = &EMPNO
+Enter value for lastname: 'King'
+old   2: where last_name = &LASTNAME
+new   2: where last_name = 'King'
+Enter value for empno: 180
+old   4: employee_id = &EMPNO
+new   4: employee_id = 180
+
+EMPLOYEE_ID LAST_NAME                 PHONE_NUMBER
+----------- ------------------------- --------------------
+        100 King                      515.123.4567
+        156 King                      011.44.1345.429268
+        180 Taylor                    650.507.9876
+
+* note in the above that single quotes might be better served around the &LASTNAME input to avoid the need for the user to ensure they put quotes around their input. 
+
+
+Double Ampersand Substitution
+-----------------------------
+There may be occasions when you you will be required to perform a variable substitution multiple times in the same query. In such a situation above, oracle will prompt you every time to supply your input. This can be inefficient and complex, 
+
+In situations where a variable substitution is referenced multiple times, and and your intention is that the variable will have the same value at each occurrence, it is preferable to make use of a double ampersand substitution.  When oracle encounters a double ampersand substitution variable, a session variable is defined for that variable and you will not be prompted to enter a value for subsequent references.
+
+  1  select * from jobs
+  2  where job_id ='&&ENTER'
+  3* or job_id='&&ENTER'
+HR @ sandpit > /
+old   2: where job_id ='&&ENTER'
+new   2: where job_id ='AD_VP'
+old   3: or job_id='&&ENTER'
+new   3: or job_id='AD_VP'
+
+JOB_ID     JOB_TITLE                           MIN_SALARY MAX_SALARY
+---------- ----------------------------------- ---------- ----------
+AD_VP      Administration Vice President            15000      30000
+
+* To unset a substitution variable, you must use the undefine command. 
+
+You can use substitution for almost any aspect of the select query.
+
+HR @ sandpit > select &enter_column from employees;
+Enter value for enter_column: first_name
+old   1: select &enter_column from employees
+new   1: select first_name from employees
+
+FIRST_NAME
+--------------------
+Ellen
+Sundar
+Mozhe
+
+## The set verify off/on command will allow SQLPLUS control whether subsituted elements are echeod back to screen before being executed. 
+
+Double ampersand subsitution is used to avoid repetitive input when the same variable occurs multiple times in a statement. When a double ampersand is used, the variable is stored as a session variable. 
+UNDEFINE <variable_name> can be used to unset a variable sub
+HR @ sandpit > select &&rest_of_text;
+D
+-
+X
+1 row selected.
+HR @ sandpit > undefine rest_of_text
+HR @ sandpit > select &&rest_of_text;
+Enter value for rest_of_text:
+
+DEFINE
+The define command is useful as it will retrieve a list of all variables currently in the SQL session. 
+HR @ sandpit > define
+DEFINE _DATE           = "06-APR-14" (CHAR)
+DEFINE _CONNECT_IDENTIFIER = "sandpit" (CHAR)
+DEFINE _USER           = "HR" (CHAR)
+DEFINE _PRIVILEGE      = "" (CHAR)
+DEFINE _SQLPLUS_RELEASE = "1102000100" (CHAR)
+DEFINE _EDITOR         = "vi" (CHAR)
+DEFINE _O_VERSION      = "Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options" (CHAR)
+DEFINE _O_RELEASE      = "1102000100" (CHAR)
+DEFINE ENTER           = "AD_VP" (CHAR)
+DEFINE _RC             = "0" (CHAR)
+DEFINE ENTER_COLUMN    = "last_name" (CHAR)
+DEFINE REST_OF_STETEMENT = "* from dual;" (CHAR)
+DEFINE REST_OF_TEXT    = "* from dual;'" (CHAR)
+
+To "define" a variable:
+HR @ sandpit > define myinput='user_tables'
+HR @ sandpit > select * from &myinput;
+
+You can set define on/off per the session persistent variables. 
+SET DEFINE OFF # this will turn off ampersand substitution completely
+
+
+
+

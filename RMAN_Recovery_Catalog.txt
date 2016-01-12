@@ -1,0 +1,88 @@
+The RMAN recovery catalog is a database schema that holds the metadata detailing RMAN backup operations performed on a target database. The metadataa includes the following info : db structure, rman config, data file and archive log backups, backup sets, pieces and copies, archived redo logs and copies. 
+
+To create a RMAN recovery catalog - follow the below steps:
+
+# First create a tablespace to house the recovery catalog schema
+
+SYS @ catalog > create tablespace catalog_TS 
+  2  datafile '/u02/oradata/catalog/catalog_TS01.dbf' size 100M autoextend off
+  3  logging 
+  4  online 
+  5  permanent 
+  6  extent management local uniform size 1M
+  7  segment space management auto;
+
+Tablespace created.
+
+SYS @ catalog > select tablespace_name from dba_tablespaces;
+
+TABLESPACE_NAME
+------------------------------
+SYSTEM
+SYSAUX
+UNDOTBS1
+TEMP
+USERS
+CATALOG_TS
+
+
+# Next create the catalog owner - this cannot be SYS
+SYS @ catalog > list
+  1  create user rcat identified by rcat
+  2    default tablespace catalog_TS
+  3    quota unlimited on catalog_TS
+  4*   temporary tablespace temp
+
+SYS @ catalog > /
+User created.
+
+# Grant this user the special recovery catalog owner priviliges.
+SYS @ catalog > grant recovery_catalog_owner to rcat ;
+Grant succeeded.
+
+# Now the user should have all it needs in order to manage the manage and maintain the recovery catalog.
+SYS @ catalog > select privilege from dba_sys_privs where grantee='RECOVERY_CATALOG_OWNER';
+PRIVILEGE
+----------------------------------------
+CREATE SYNONYM
+CREATE CLUSTER
+ALTER SESSION
+CREATE DATABASE LINK
+CREATE PROCEDURE
+CREATE SEQUENCE
+CREATE TABLE
+CREATE SESSION
+CREATE TYPE
+CREATE VIEW
+CREATE TRIGGER
+
+
+# The actual creation of the recovery catalog is performed in rman whilst connected to the database in which the catalog is to live. The create catalog command will create the catalog in the default tablespace of the user.
+
+The connect is important:
+-bash-4.1$ rman target / catalog rcat@catalog 
+Recovery Manager: Release 11.2.0.1.0 - Production on Fri Feb 28 02:53:10 2014
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+connected to target database: CATALOG (DBID=688029662)
+recovery catalog database Password: 
+connected to recovery catalog database
+
+# And finally to create the catalog.
+RMAN> create catalog ;
+recovery catalog created
+
+# Lastly - you need to register each database with the recovery catalog similar to below...
+bash-4.1$ rman 
+Recovery Manager: Release 11.2.0.1.0 - Production on Fri Feb 28 02:56:04 2014
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+
+RMAN> connect target /
+connected to target database: SANDPIT (DBID=4081594592)
+
+RMAN> connect catalog rcat/rcat@catalog 
+connected to recovery catalog database
+
+RMAN> register database;
+database registered in recovery catalog
+starting full resync of recovery catalog
+full resync complete

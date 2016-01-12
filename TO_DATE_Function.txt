@@ -1,0 +1,25 @@
+#TO_DATE
+HR @ sandpit > select to_date ('25-DEC-1975') from dual;
+TO_DATE('25-DEC-1975
+--------------------
+25-DEC-1975 00:00:00
+
+HR @ sandpit > select to_date ('12-JAN-2014 14:15:16') from dual;
+TO_DATE('12-JAN-2014
+--------------------
+12-JAN-2014 14:15:16
+
+  1  select first_name, hire_date from employees
+  2* where hire_date > to_date('01-JAN-2006')
+HR @ sandpit > /
+FIRST_NAME           HIRE_DATE
+-------------------- --------------------
+Donald               21-JUN-2007 00:00:00
+Douglas              13-JAN-2008 00:00:00
+Alexander            03-JAN-2006 00:00:00
+
+
+select to_date('01/01/2014','dd/mm/yyyy') from dual;
+TO_DATE('01/01/2014
+-------------------
+01-01-2014 00:00:00

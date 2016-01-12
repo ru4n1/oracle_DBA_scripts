@@ -1,0 +1,9 @@
+Merge statements::
+ 
+The merge command is often ignored but can be useful in that in one pass through, it can carry out all three (updated, insert, delete) operations.
+ 
+merge into employees using new_employees
+on (employees.employee_id = new_employees.employee_id
+when matched then update set employees.salary = new_ employees.salary
+when not matched then insert (employee_id, last_name, salary) values (new_ employees.employee_id, new_ employees.last_name, new_ employees.salary);
+ 

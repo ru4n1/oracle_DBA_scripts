@@ -1,0 +1,81 @@
+RMAN> list backup of spfile;
+
+List of Backup Sets
+===================
+
+BS Key  Type LV Size       Device Type Elapsed Time Completion Time
+------- ---- -- ---------- ----------- ------------ ---------------
+4091    Full    10.05M     DISK        00:00:04     28-NOV-14      
+        BP Key: 4094   Status: AVAILABLE  Compressed: NO  Tag: TAG20141128T033743
+        Piece Name: /FRA/SANDPIT/backupset/2014_11_28/o1_mf_ncsnf_TAG20141128T033743_b7hvpfvy_.bkp
+  SPFILE Included: Modification time: 28-NOV-14
+  SPFILE db_unique_name: SANDPIT
+
+RMAN> 
+RMAN> restore spfile from autobackup; 
+
+Starting restore at 29-NOV-14
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=151 device type=DISK
+
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-03002: failure of restore command at 11/29/2014 08:05:13
+RMAN-06564: must use the TO clause when the instance is started with SPFILE
+
+RMAN> restore spfile to '/tmp/spfile.txt' from autobackup; 
+
+Starting restore at 29-NOV-14
+using channel ORA_DISK_1
+
+recovery area destination: /FRA
+database name (or database unique name) used for search: SANDPIT
+channel ORA_DISK_1: no AUTOBACKUPS found in the recovery area
+channel ORA_DISK_1: looking for AUTOBACKUP on day: 20141129
+channel ORA_DISK_1: looking for AUTOBACKUP on day: 20141128
+channel ORA_DISK_1: looking for AUTOBACKUP on day: 20141127
+channel ORA_DISK_1: looking for AUTOBACKUP on day: 20141126
+channel ORA_DISK_1: looking for AUTOBACKUP on day: 20141125
+channel ORA_DISK_1: looking for AUTOBACKUP on day: 20141124
+channel ORA_DISK_1: looking for AUTOBACKUP on day: 20141123
+channel ORA_DISK_1: no AUTOBACKUP in 7 days found
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-03002: failure of restore command at 11/29/2014 08:05:38
+RMAN-06172: no AUTOBACKUP found or specified handle is not a valid copy or piece
+
+RMAN> restore spfile from tag='TAG20141128T033743' ;
+
+Starting restore at 29-NOV-14
+using channel ORA_DISK_1
+
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-03002: failure of restore command at 11/29/2014 08:06:00
+RMAN-06564: must use the TO clause when the instance is started with SPFILE
+
+RMAN> restore spfile to '/tmp/spfile.txt' from tag='TAG20141128T033743' ;
+
+Starting restore at 29-NOV-14
+using channel ORA_DISK_1
+
+channel ORA_DISK_1: starting datafile backup set restore
+channel ORA_DISK_1: restoring SPFILE
+output file name=/tmp/spfile.txt
+channel ORA_DISK_1: reading from backup piece /FRA/SANDPIT/backupset/2014_11_28/o1_mf_ncsnf_TAG20141128T033743_b7hvpfvy_.bkp
+channel ORA_DISK_1: piece handle=/FRA/SANDPIT/backupset/2014_11_28/o1_mf_ncsnf_TAG20141128T033743_b7hvpfvy_.bkp tag=TAG20141128T033743
+channel ORA_DISK_1: restored backup piece 1
+channel ORA_DISK_1: restore complete, elapsed time: 00:00:03
+Finished restore at 29-NOV-14
+
+RMAN> restore spfile to '/tmp/spfile.txt.2' from '/FRA/SANDPIT/backupset/2014_11_28/o1_mf_ncsnf_TAG20141128T033743_b7hvpfvy_.bkp' ;
+
+Starting restore at 29-NOV-14
+using channel ORA_DISK_1
+
+channel ORA_DISK_1: restoring spfile from AUTOBACKUP /FRA/SANDPIT/backupset/2014_11_28/o1_mf_ncsnf_TAG20141128T033743_b7hvpfvy_.bkp
+channel ORA_DISK_1: SPFILE restore from AUTOBACKUP complete
+Finished restore at 29-NOV-14

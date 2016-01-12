@@ -1,0 +1,50 @@
+ 
+First alter your time display format to include seconds...
+
+
+HR @ sandpit > alter session set nls_date_format='dd-mm-yy hh24:mi:ss'
+  2  ;
+Session altered.
+
+
+@ sandpit > select * from regions;
+ REGION_ID REGION_NAME
+---------- -------------------------
+         5 Coachford
+         1 Europe
+         2 Americas
+         3 Asia
+         4 Middle East and Africa
+5 rows selected.
+
+HR @ sandpit > select sysdate from dual;
+SYSDATE
+-----------------
+12-03-14 13:52:41
+1 row selected.
+
+HR @ sandpit > delete from regions where region_id=5;
+1 row deleted.
+
+HR @ sandpit > commit;
+Commit complete.
+
+HR @ sandpit > select * from regions;
+ REGION_ID REGION_NAME
+---------- -------------------------
+         1 Europe
+         2 Americas
+         3 Asia
+         4 Middle East and Africa
+4 rows selected.
+
+HR @ sandpit > select * from regions
+  2  as of timestamp to_timestamp ('12-03-14 13:52:41','dd-mm-yy hh24:mi:ss'); 
+ REGION_ID REGION_NAME
+---------- -------------------------
+         5 Coachford
+         1 Europe
+         2 Americas
+         3 Asia
+         4 Middle East and Africa
+

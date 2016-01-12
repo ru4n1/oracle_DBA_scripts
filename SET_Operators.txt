@@ -1,0 +1,89 @@
+All select statements return a set of rows. These set operators take as their input the results of two or more select statements and from these generate a single result set. This is known as a compound query. Oracle provides three set operators:
+
+UNION - returns the combined rows from two queries, sorting and removing duplicates
+UNION ALL - returns combined rows from two queries without sorting or removing duplicates
+INTERSECT - returns only rows that occur in both queries result sets, sorting and removing duplicates
+MINUS - returns only rows in the first result set that do not appear in the second set, sorting and removing dupes
+
+
+These are equivalent to VENN diagrams...
+
+
+-- query the regions table...
+HR @ sandpit > select region_name from regions;
+
+REGION_NAME
+-------------------------
+Europe
+Americas
+Asia
+Middle East and Africa
+
+4 rows selected.
+
+-- now query the regions table, this time using UNION
+HR @ sandpit > select region_name from regions
+  2  union
+  3  select region_name from regions;
+
+REGION_NAME
+-------------------------
+Americas
+Asia
+Europe
+Middle East and Africa
+
+4 rows selected.
+#### looks the same doesnt it, however note that UNION has sorted the output alphabetically
+
+
+
+UNION ALL will avoid sorting and removing duplicates
+HR @ sandpit > select region_name from regions
+  2  union
+  3  all
+  4  select region_name from regions; 
+
+REGION_NAME
+-------------------------
+Europe
+Americas
+Asia
+Middle East and Africa
+Europe
+Americas
+Asia
+Middle East and Africa
+
+8 rows selected.
+
+===============================================
+
+* Result sets in general must select the same number of columns and the corresponding columns of the two queries must be of the same data type group(they do not need the same names)...
+
+INTERSECT gives the intersection of two sets which are rows common to both sets. 
+
+MINUS runs both queries, sorts the results and returns only rows from the first set, that do not appear in the second result set.
+
+
+
+
+## Example showing how UNION removes duplicate rows...
+SQL> select * from ports
+  2  union
+  3  select * from ports;
+   PORT_ID PORT_NAME                      PORT_DESCRIPTION
+---------- ------------------------------ ---------------------------
+         1 Cork                           N/A
+         2 Dublin                         luvly
+
+
+SQL> select * from ports 
+  2  UNION ALL
+  3  select * from ports;
+   PORT_ID PORT_NAME                      PORT_DESCRIPTION
+---------- ------------------------------ ---------------------------
+         1 Cork                           N/A
+         2 Dublin                         luvly
+         1 Cork                           N/A
+         2 Dublin                         luvly

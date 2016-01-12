@@ -1,0 +1,16 @@
+-- Show session info, along with process info 
+-- and map them together where possible
+
+spool user_session_information
+
+set linesize 200
+set pagesize 90
+set feedback on 
+set heading on
+
+select s.sid || ',' || s.serial# "SID/SERIAL",s.username,s.osuser,p.spid "OS PID",s.program
+from v$session s,v$process p
+Where s.paddr = p.addr
+order by to_number(p.spid);
+
+spool off

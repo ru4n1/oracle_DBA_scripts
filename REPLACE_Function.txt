@@ -1,0 +1,13 @@
+## REPLACE
+-- replace function replaces all occurrences of a search term in a source string with a replacement term and returns the modified version.
+HR @ sandpit > select sysdate, replace(sysdate, 'APR','APRIl BOYO!') as When from dual;
+SYSDATE   WHEN
+--------- ---------------------------------------------------------------------------------------------------
+06-APR-14 06-APRIl BOYO!-14
+
+
+  1* select replace(sysdate,'NOV','November babay') from dual
+SQL> /
+REPLACE(SYSDATE,'NOV','NOVEMBERBABAY')
+------------------------------------------------------------------------------------------------------------------------------
+30-November babay-14

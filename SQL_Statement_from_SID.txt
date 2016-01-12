@@ -1,0 +1,16 @@
+-- and then you can plug the sid into this script to find the sql text in question
+
+spool find_sql_text_from_session_id
+set linesize 100
+set pagesize 60
+set feedback on 
+set heading on
+
+select
+a.sid,
+a.serial#,
+b.sql_text
+from v$session a, v$sqlarea b where a.sql_address=b.address and a.sid = 38;
+
+spool off
+

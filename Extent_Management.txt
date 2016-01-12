@@ -1,0 +1,37 @@
+Space management occurs at a number of different levels. First space is assigned to a tablespace; this is done by sizing the datafiles. Second, space is assigned to segments within the tablespace; this is done by allocating extents. Third, space wihtin a segment is assigned to rows; this is done by maintaining bitmaps that track how much space is used within each block. 
+
+Extent Management
+-----------------
+Extent management method is set per tablespace and aplies to all segments within the tablespace. Local management should always be used. It uses bitmaps stored in each datafile header. Each bit in the bitmap covers a range of blocks and when space is allocated. the appropriate bits are changed from zero to one to reflect they are now in use. This is far more efficient than the older data dictionary extent management. 
+
+When creating a locally managed tablespace, an important option is uniform size, if uniform is specified then every extent ever allocated in the tablespace will be of the same size. This can make space management highly efficient because the block ranges covered by each bit can be larger, i.e. only one bit per extent.
+
+Consider this:
+
+create tablespace TS1
+datafile '/tmp/oradata/TS01.dbf' size 1g
+extent management local 
+uniform size 150m;
+
+Now every extent allocated in this tablespace will be 150m so there will be about 6 of them  therefore the bitmap only needs 6 bits?! However this is good if the segments required were large; if the segments required only a few rows it would still get an extent of 150m which is wastage. 
+
+An alternative to this would be autoallocate :
+
+create table TS2
+datafile '/tmp/oradata/T202.dbf; size 1g
+extent management local
+autoallocate;
+
+This means that oracle will allocate a 64KB extent as segments are created in this tablespace. As a segments grows and requires more extents, oracle will allocate extents of 64KB up to 16 extents. from which point it will allocate progressively larger extent chunks (thus supplying fast-growing segments with space in ever increasing chunks - nice!)
+
+
+SYS @ sandpit > select tablespace_name, extent_management from dba_tablespaces; 
+
+TABLESPACE_NAME                EXTENT_MAN
+------------------------------ ----------
+SYSTEM                         LOCAL
+SYSAUX                         LOCAL
+UNDOTBS1                       LOCAL
+TEMP                           LOCAL
+USERS                          LOCAL
+EXAMPLE                        LOCAL

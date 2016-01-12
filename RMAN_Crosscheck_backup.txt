@@ -1,0 +1,108 @@
+connected to target database: SANDPRD (DBID=479009792)
+connected to recovery catalog database
+
+RMAN> crosscheck backup;
+
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=106 device type=DISK
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_annnn_TAG20150530T212823_bpn7c86q_.bkp RECID=1 STAMP=881098104
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_nnnd0_TAG20150530T212827_bpn7cd0n_.bkp RECID=2 STAMP=881098107
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_ncsn0_TAG20150530T212827_bpn7k25c_.bkp RECID=3 STAMP=881098288
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_annnn_TAG20150530T213140_bpn7kglr_.bkp RECID=4 STAMP=881098302
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_ncnnf_TAG20150530T213144_bpn7klb9_.bkp RECID=5 STAMP=881098306
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_nnsnf_TAG20150530T213152_bpn7krgk_.bkp RECID=6 STAMP=881098312
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_annnn_TAG20150530T215054_bpn8oh5s_.bkp RECID=7 STAMP=881099455
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_nnnd0_TAG20150530T215058_bpn8olp8_.bkp RECID=8 STAMP=881099458
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_ncsn0_TAG20150530T215058_bpn8t761_.bkp RECID=9 STAMP=881099607
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_annnn_TAG20150530T215330_bpn8tblk_.bkp RECID=10 STAMP=881099610
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_ncnnf_TAG20150530T215332_bpn8tfrd_.bkp RECID=11 STAMP=881099613
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_nnsnf_TAG20150530T215335_bpn8thqw_.bkp RECID=12 STAMP=881099615
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_annnn_TAG20150530T225433_bpnddt6j_.bkp RECID=13 STAMP=881103274
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_nnnd1_TAG20150530T225442_bpndf40y_.bkp RECID=14 STAMP=881103283
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_ncsn1_TAG20150530T225442_bpndhvsd_.bkp RECID=15 STAMP=881103371
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_annnn_TAG20150530T225615_bpndhzgb_.bkp RECID=16 STAMP=881103375
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_ncnnf_TAG20150530T225617_bpndj2ok_.bkp RECID=17 STAMP=881103378
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_nnsnf_TAG20150530T225620_bpndj4wf_.bkp RECID=18 STAMP=881103380
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_annnn_TAG20150530T233020_bpnghwx0_.bkp RECID=19 STAMP=881105420
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_nnnd1_TAG20150530T233024_bpngj11w_.bkp RECID=20 STAMP=881105425
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_ncsn1_TAG20150530T233024_bpngkk9f_.bkp RECID=21 STAMP=881105473
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_annnn_TAG20150530T233116_bpngknok_.bkp RECID=22 STAMP=881105476
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_annnn_INCR1_bpngrnkk_.bkp RECID=23 STAMP=881105700
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_nnnd1_TAG20150530T233542_bpngt7cs_.bkp RECID=24 STAMP=881105750
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_ncsn1_TAG20150530T233542_bpnh0cfx_.bkp RECID=25 STAMP=881105947
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_annnn_INCR1_bpnh0mjd_.bkp RECID=26 STAMP=881105955
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_ncnnf_TAG20150530T233918_bpnh0sps_.bkp RECID=27 STAMP=881105961
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_nnsnf_TAG20150530T233925_bpnh0y8f_.bkp RECID=28 STAMP=881105966
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_annnn_TAG20150530T235319_bpnhv06c_.bkp RECID=29 STAMP=881106800
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_30/o1_mf_annnn_ARCHIVES_bpnj27om_.bkp RECID=30 STAMP=881107031
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_annnn_INCR0_bpnj90to_.bkp RECID=31 STAMP=881107248
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_nnnd0_TAG20150531T000050_bpnj9fjl_.bkp RECID=32 STAMP=881107261
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_ncsn0_TAG20150531T000050_bpnjf3nc_.bkp RECID=33 STAMP=881107379
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_annnn_INCR0_bpnjf6ys_.bkp RECID=34 STAMP=881107382
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_ncnnf_TAG20150531T000305_bpnjfb9x_.bkp RECID=35 STAMP=881107386
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_nnsnf_TAG20150531T000308_bpnjfdo1_.bkp RECID=36 STAMP=881107388
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_annnn_INCR0_bpnn8zpp_.bkp RECID=37 STAMP=881111343
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_nnnd0_TAG20150531T010905_bpnn92sb_.bkp RECID=38 STAMP=881111346
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_ncsn0_TAG20150531T010905_bpnntnld_.bkp RECID=39 STAMP=881111908
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_annnn_INCR0_bpnnv0kg_.bkp RECID=40 STAMP=881111920
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_ncnnf_TAG20150531T011850_bpnnvwj8_.bkp RECID=41 STAMP=881111948
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_nnsnf_TAG20150531T011914_bpnnw3j9_.bkp RECID=42 STAMP=881111954
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_annnn_INCR1_bpnnxgj1_.bkp RECID=43 STAMP=881111998
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_nnnd1_TAG20150531T012000_bpnnxp0c_.bkp RECID=44 STAMP=881112005
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_ncsn1_TAG20150531T012000_bpno1b83_.bkp RECID=45 STAMP=881112121
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_annnn_INCR1_bpno1hom_.bkp RECID=46 STAMP=881112127
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_ncnnf_TAG20150531T012210_bpno1mq8_.bkp RECID=47 STAMP=881112131
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_nnsnf_TAG20150531T012215_bpno1qoq_.bkp RECID=48 STAMP=881112135
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/backupset/2015_05_31/o1_mf_annnn_ARCHIVES_bpntsb05_.bkp RECID=49 STAMP=881118007
+crosschecked backup piece: found to be 'AVAILABLE'
+backup piece handle=/FRA/SANDPRD/autobackup/2015_05_31/o1_mf_s_881118022_bpntsyg5_.bkp RECID=50 STAMP=881118030
+Crosschecked 50 objects

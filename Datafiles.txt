@@ -1,0 +1,39 @@
+Datafiles are the repository for data (11G requires tow by default, for the SYSTEM tablespace for the data dictionary and for SYSAUX for data that is auxillairy to the daat dictonary.These are the repositories for the segments containing user data. A segment is a storage structure for data and typical segments are tables and indexes. Datafiles can be resized, moved, dropped, added or renamed at any time. 
+
+At the operating system level - the datafiles consist of a number of operating system blocks. Internally within, the datafiles are formatted into oracle blocks - These blocks are of a fixed size and in most circumstances will be the same throughout the entire database. 8KB block size is default...
+
+Within a block - there is a header section and a data seciton and likely some free space. Header contains information such as the row directory and locking information. The data area contains the data itself such as the row if it is part of a table segment.  
+
+
+SYS @ sandpit > column file_name format a37
+SYS @ sandpit > column tablespace_name format a18
+SYS @ sandpit > select * from dba_data_files;
+
+FILE_NAME                                FILE_ID TABLESPACE_NAME         BYTES     BLOCKS STATUS    RELATIVE_FNO AUT   MAXBYTES  MAXBLOCKS INCREMENT_BY USER_BYTES USER_BLOCKS ONLINE_
+------------------------------------- ---------- ------------------ ---------- ---------- --------- ------------ --- ---------- ---------- ------------ ---------- ----------- -------
+/u02/oradata/sandpit/users01.dbf               4 USERS                 5242880        640 AVAILABLE            4 YES 3.4360E+10    4194302          160    4194304         512 ONLINE
+/u02/oradata/sandpit/undotbs01.dbf             3 UNDOTBS1             57671680       7040 AVAILABLE            3 YES 3.4360E+10    4194302          640   56623104        6912 ONLINE
+/u02/oradata/sandpit/sysaux01.dbf              2 SYSAUX              534773760      65280 AVAILABLE            2 YES 3.4360E+10    4194302         1280  533725184       65152 ONLINE
+/u02/oradata/sandpit/system01.dbf              1 SYSTEM              713031680      87040 AVAILABLE            1 YES 3.4360E+10    4194302         1280  711983104       86912 SYSTEM
+/u02/oradata/sandpit/example01.dbf             5 EXAMPLE             104857600      12800 AVAILABLE            5 YES 3.4360E+10    4194302           80  103809024       12672 ONLINE
+
+5 rows selected.
+
+You can check the amount of bytes contained in a datafile and the corresponding number of oracle blocks contained within.
+
+SYS @ sandpit > select file_name, tablespace_name, bytes BYTES, blocks NumBlocks, bytes/blocks Blocksize from dba_data_files;
+
+FILE_NAME                             TABLESPACE_NAME         BYTES  NUMBLOCKS  BLOCKSIZE
+------------------------------------- ------------------ ---------- ---------- ----------
+/u02/oradata/sandpit/users01.dbf      USERS                 5242880        640       8192
+/u02/oradata/sandpit/undotbs01.dbf    UNDOTBS1             57671680       7040       8192
+/u02/oradata/sandpit/sysaux01.dbf     SYSAUX              534773760      65280       8192
+/u02/oradata/sandpit/system01.dbf     SYSTEM              713031680      87040       8192
+/u02/oradata/sandpit/example01.dbf    EXAMPLE             104857600      12800       8192
+
+5 rows selected.
+
+As per above - you can see the number of bytes divided by blocks and it demonstartes the block size.
+
+If a datafile is damaged - it can be restored from backup and the "recovered" - this means to bring it up to date by by reapplying all the redo generated since the backup was made.
+The neccessary redo is extracted and applied from the change vectors in the archive and then the online redo logs. 

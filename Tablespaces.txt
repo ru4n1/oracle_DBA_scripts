@@ -1,0 +1,206 @@
+Data is stored logically in holders called segments which is physically contained in datafiles. The tablespace entity abstracts the two, any tablespace can have many segments and be made up of many datafiles. There is no direct relationship between a segment and a datafile. 
+
+Logical View 
+------------
+- Tablespace
+
+- Segment 
+
+- Extent
+
+- Oracle Data Block 
+
+
+Physical View
+-------------
+- Datafile
+
+- Operating System Block
+
+
+
+SYS @ sandpit > select tablespace_name, block_size, status, contents from dba_tablespaces;
+
+TABLESPACE_NAME                BLOCK_SIZE STATUS    CONTENTS
+------------------------------ ---------- --------- ---------
+SYSTEM                               8192 ONLINE    PERMANENT
+SYSAUX                               8192 ONLINE    PERMANENT
+UNDOTBS1                             8192 ONLINE    UNDO
+TEMP                                 8192 ONLINE    TEMPORARY
+USERS                                8192 ONLINE    PERMANENT
+EXAMPLE                              8192 ONLINE    PERMANENT
+
+6 rows selected.
+
+SYS @ sandpit > select * from v$tablespace;
+
+       TS# NAME                           INC BIG FLA ENC
+---------- ------------------------------ --- --- --- ---
+         0 SYSTEM                         YES NO  YES
+         1 SYSAUX                         YES NO  YES
+         2 UNDOTBS1                       YES NO  YES
+         4 USERS                          YES NO  YES
+         3 TEMP                           NO  NO  YES
+         6 EXAMPLE                        YES NO  YES
+
+6 rows selected.
+
+Tablespaces are repositories for schema data inclduing the data dictionary which is the SYS schema. All databases must have a SYSTEM and a SYSAUX tablespace and for practical purposes, a TEMP tablespace and an UNDO tablespace.
+
+When using local extent management as all tablespaces should, it is possible to enforce a rule that all extents can be a uniform set size. This is setting the extent to a uniform size. 
+
+TEMP tablespaces are used for storing temporary objects and are different from datafiles. Tempfiles are listed in the vee dollar views such as v$tempfile and dba_temp_files, whereas datafiles are listed in the views v$datafile and dba_data_files. 
+
+You can also rename a tablespace name if neccessary.
+SYS @ sandpit > alter tablespace data1 rename to data; 
+
+Tablespace altered.
+
+SYS @ sandpit > select name from v$tablespace; 
+
+NAME
+------------------------------
+SYSTEM
+SYSAUX
+UNDOTBS1
+USERS
+TEMP
+EXAMPLE
+DATA
+
+7 rows selected.
+
+You can also rename a datafile but the tablespace must be taken offline for this process:
+
+SYS @ sandpit > alter tablespace data offline;
+Tablespace altered.
+
+SYS @ sandpit > select tablespace_name, status from dba_tablespaces;
+TABLESPACE_NAME                STATUS
+------------------------------ ---------
+SYSTEM                         ONLINE
+SYSAUX                         ONLINE
+UNDOTBS1                       ONLINE
+TEMP                           ONLINE
+USERS                          ONLINE
+EXAMPLE                        ONLINE
+DATA                           OFFLINE
+
+7 rows selected.
+
+ 1* select file_name from dba_data_files where tablespace_name ='DATA'
+SYS @ sandpit > /
+FILE_NAME
+--------------------------------------------------
+/u02/oradata/sandpit/data01.dbf
+
+SYS @ sandpit > host mv /u02/oradata/sandpit/data01.dbf /u02/oradata/sandpit/data02.dbf 
+
+SYS @ sandpit > alter database rename file '/u02/oradata/sandpit/data01.dbf' to '/u02/oradata/sandpit/data02.dbf' ;
+Database altered.
+
+SYS @ sandpit > alter tablespace data online; 
+Tablespace altered.
+
+SYS @ sandpit > select tablespace_name, status from dba_tablespaces;
+TABLESPACE_NAME                STATUS
+------------------------------ ---------
+SYSTEM                         ONLINE
+SYSAUX                         ONLINE
+UNDOTBS1                       ONLINE
+TEMP                           ONLINE
+USERS                          ONLINE
+EXAMPLE                        ONLINE
+DATA                           ONLINE
+
+7 rows selected.
+
+SYS @ sandpit > select file_name from dba_data_files where tablespace_name ='DATA';
+FILE_NAME
+--------------------------------------------------
+/u02/oradata/sandpit/data02.dbf
+
+
+You can also mark a tablespace as read only for a period:
+SYS @ sandpit > alter tablespace data read only ; 
+Tablespace altered.
+
+SYS @ sandpit > select tablespace_name, status from dba_tablespaces;
+
+
+RESIZING A TABLESPACE
+=====================
+  1* select file_name, bytes/1024/1024 Mbytes from dba_data_files where tablespace_name = 'DATA'
+SYS @ sandpit > /
+FILE_NAME                                              MBYTES
+-------------------------------------------------- ----------
+/u02/oradata/sandpit/data02.dbf                           100
+
+1 row selected.
+
+SYS @ sandpit > alter database datafile '/u02/oradata/sandpit/data02.dbf'  resize 105M;
+Database altered.
+
+select file_name , bytes/1024/1024 Mbytes from dba_data_files where tablespace_name='DATA'
+SYS @ sandpit > /
+FILE_NAME                                              MBYTES
+-------------------------------------------------- ----------
+/u02/oradata/sandpit/data02.dbf                           105
+
+1 row selected.
+
+The resize in this manner - you do not neccessarily know if the file is being made larger or smaller. An upward resize can only succeed if there is enough space available in the filesystem; a downward resize can only suceed if the space in the file has not been already used by extents allocated to a segment. 
+
+You can also instead optionally add another data file to a tablespace instead of a resize:
+SYS @ sandpit > select file_name , bytes/1024/1024 Mbytes from dba_data_files where tablespace_name='DATA';
+FILE_NAME                                              MBYTES
+-------------------------------------------------- ----------
+/u02/oradata/sandpit/data02.dbf                           105
+
+1 row selected.
+
+SYS @ sandpit > alter tablespace DATA add datafile '/u02/oradata/sandpit/data03.dbf'  size 10M; 
+Tablespace altered.
+
+SYS @ sandpit > select file_name , bytes/1024/1024 Mbytes from dba_data_files where tablespace_name='DATA';
+FILE_NAME                                              MBYTES
+-------------------------------------------------- ----------
+/u02/oradata/sandpit/data02.dbf                           105
+/u02/oradata/sandpit/data03.dbf                            10
+
+2 rows selected.
+
+
+DROPPING A TABLESPACE
+=====================
+
+To drop a tablespace - you the drop command...
+SYS @ sandpit > select tablespace_name from dba_tablespaces;
+TABLESPACE_NAME
+------------------------------
+SYSTEM
+SYSAUX
+UNDOTBS1
+TEMP
+USERS
+EXAMPLE
+DATA
+
+7 rows selected.
+SYS @ sandpit > drop tablespace DATA including contents and datafiles;
+Tablespace dropped.
+
+SYS @ sandpit > select tablespace_name from dba_tablespaces;
+TABLESPACE_NAME
+------------------------------
+SYSTEM
+SYSAUX
+UNDOTBS1
+TEMP
+USERS
+EXAMPLE
+
+6 rows selected.
+
+
+

@@ -1,0 +1,8 @@
+#TO_CHAR
+HR @ sandpit > select to_char(sysdate)|| ' is todays date' from dual;
+
+TO_CHAR(SYSDATE)||'ISTODAYSDATE'
+----------------------------------
+06-APR-2014 15:01:34 is todays date
+
+

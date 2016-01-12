@@ -1,0 +1,24 @@
+SAVEPOINT::
+
+
+The use of savepoints is to allow a programmer the ability to set a marker within a transaction that can be used to control the effect of a rollback i.e. to a certain point only. 
+
+SAVEPOINT namegoeshere;
+
+This creates a point in the transaction that can be used in subsequent rollback commands. 
+
+
+truncate table TAB;
+insert into TAB values ('one');
+savepoint first;
+insert into TAB values ('two');
+savepoint second;
+insert into TAB values ('three');
+savepoint third;
+rollback to savepoint first;
+commit;
+
+-- in this case, the tAB table will be left with only one row inserted in it.
+
+
+

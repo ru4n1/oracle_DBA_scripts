@@ -1,0 +1,11 @@
+Oracle's mechanism for assuring transactional integrity is the combination of undo segments with redo log files. This is to ensure their relational database must be able to pass the ACID test - to guarantee automicity, consistency, isolation and durability. 
+
+Automicity = states that either all parts of a transaction must complete or none. The rollback of an incomplete transaction is the reversal process but it must be unstoppable in the event of an error. it is through undo segments that oracle guarantees atomicity absolute. 
+
+Consistency = consistency states that the results of a query must be consistent with the state of the database at the time the query started. I.e. if a simple query calculates the averages of a column value (if there are mnay thousands of row records, then this may take some time) - even if users are in the process of updating records during the next few minutes [while the query is running] - the results of the calculation of the average is taken from when the query started, no matter how long it takes or what other activity takes place concurrently. 
+Oracle achieves this through the use of undo segments. 
+
+Isolation = states that an imcomplete transaciton (that is uncommitted) - must be invisible to the rest of the world. while the transaction is in progress, only the executing session is llowed to see the changes; all other sessions see the unchanged data. 
+Oracle gaurantees transaction isolation through the use of undo segments. 
+
+Durable = principle of durability states that once a transaction completes, it must be impossible for the database to lose it. Oracle fulfils this requirement through redo log files (and archive log files). 

@@ -1,0 +1,23 @@
+# The below commands connect to the target and catalog for metadata
+# Will log the output to a file of the session details
+# Allocates one channel of type disk in the designated location 
+# Shuts down the target DB , backs it up and then starts it again...
+# COLD Backup , no need for archivelogs then. 
+
+rman log '/tmp/RMAN_sess.txt'
+
+connect catalog rcat/rcat@catalog
+connect target sys/sandpit@sandpit
+
+log '/tmp/offline_backup.txt'
+
+run
+      {
+        shutdown immediate;
+	startup mount;
+	ALLOCATE CHANNEL d1 DEVICE TYPE DISK;
+	FORMAT '/export/home/oracle/BKP/%U'; 
+        BACKUP DATABASE;
+        alter database open;
+      }
+quit

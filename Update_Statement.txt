@@ -1,0 +1,36 @@
+Update statements::
+
+-- The update statement command changes column values in one or more existing rows in a single table.
+update employees set salary=1000 where employee_id=206;
+* Note if the where claus is omitted entirely, all rows will be updated!
+
+
+# UPDATE statement Example:
+# Update statement below can update multiple values per row...  
+UPDATE CRUISES
+          SET  CRUISE_NAME = 'Bahamas',
+          START_DATE  = '01-DEC-11'
+WHERE  CRUISE_ID = 1;
+
+
+ 
+You can also use sub queries to determine the value to which a column will be updated?
+update employees
+set salary = (select salary from employees where employee_id = 206);
+There is a rigid restriction that the subqueries as part of the update above must return a scalar value. i.e. a single value.
+Even if the subquery does not retrieve a row, as would be the case if there were no employee 206, the query still returns a scalar (NULL) which will be passed to the update…
+ 
+update employees
+set salary = (select salary from employees where last_name=’Smith’);
+The second example uses an equality predicate on the last_name which is not guaranteed to be unique. The statement subquery will need to return a scalar value therefore, if there are more than one employee
+with a last name of Smith, then the statement will fail indicating – “”ORA-01427 – single-row subquery returns more than one row”.  
+ 
+-- Sub queries can also be used in the where clause, and they must also adhere to the scalar requirement if using the equality predicate .
+update employees
+set salary = 10000
+where department_id = (select department_id from departments where department_ID =  10);
+ 
+-- you can use the IN clause also like below.
+update employees
+set salary = 10000
+where department_id in (select department_id from departments where department_name like ‘%IT%’);

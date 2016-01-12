@@ -1,0 +1,32 @@
+-bash-4.1$ opatch lsinventory 
+Invoking OPatch 11.1.0.6.6
+
+Oracle Interim Patch Installer version 11.1.0.6.6
+Copyright (c) 2009, Oracle Corporation.  All rights reserved.
+
+
+Oracle Home       : /u01/app/oracle/product/11.2.0/db_1
+Central Inventory : /u01/app/oracle/product/oraInventory
+   from           : /var/opt/oracle/oraInst.loc
+OPatch version    : 11.1.0.6.6
+OUI version       : 11.2.0.1.0
+OUI location      : /u01/app/oracle/product/11.2.0/db_1/oui
+Log file location : /u01/app/oracle/product/11.2.0/db_1/cfgtoollogs/opatch/opatch2014-03-23_02-05-46AM.log
+
+Patch history file: /u01/app/oracle/product/11.2.0/db_1/cfgtoollogs/opatch/opatch_history.txt
+
+Lsinventory Output file location : /u01/app/oracle/product/11.2.0/db_1/cfgtoollogs/opatch/lsinv/lsinventory2014-03-23_02-05-46AM.txt
+
+--------------------------------------------------------------------------------
+Installed Top-level Products (1): 
+
+Oracle Database 11g                                                  11.2.0.1.0
+There are 1 products installed in this Oracle Home.
+
+
+There are no Interim patches installed in this Oracle Home.
+
+
+--------------------------------------------------------------------------------
+
+OPatch succeeded

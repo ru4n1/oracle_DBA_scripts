@@ -1,0 +1,44 @@
+
+
+-- Enable block change tracking 
+
+SQL> alter database enable block change tracking; 
+
+SQL> select filename, status bytes from v$block_change_tracking; 
+
+-- To see the benefits of block change tracking 
+-- to calculate the percentage of blocks read and backed up during 
+-- an incremental backup
+
+-- This view contains one row for each datafile backed up using rman
+
+select file#,
+ avg(datafile_blocks) blocks,
+ avg(blocks_read) blocks_read,
+ avg(blocks_read/datafile_blocks)*100 pct_read,
+ avg(blocks) blocks_backed_up
+from v$backup_datafile
+ where used_change_tracking='YES'
+   and incremental_level=1
+group by file#
+order by file#
+;
+
+
+-- incremental backups
+
+run {
+backup incremental level 0 database;
+}
+
+
+-- incremental level 1 backup 
+run {
+backup incremental level 1 database;
+}
+
+or 
+
+run {
+backup incremental level 1 cumulative database;
+}

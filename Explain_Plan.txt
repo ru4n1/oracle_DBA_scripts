@@ -1,0 +1,47 @@
+# how to do an explain plan 
+
+SQL> select p.emp_id, p.pay_date , e.name, e.county, e.hire_date, 
+  2  CASE when e.fire_date IS NULL then 'Unemployed' ELSE 'still with us' END
+  3  from paycheck p INNER JOIN employee_expected e ON (p.emp_id=e.ID); 
+
+    EMP_ID PAY_DATE  NAME		  COUNTY	       HIRE_DATE CASEWHENE.FIR
+---------- --------- -------------------- -------------------- --------- -------------
+	 1 30-JUN-03 Andrew Sears	  Alger 	       10-JUN-03 Unemployed
+	 2 31-JAN-03 Jeff Gennick	  Alger 	       01-JAN-03 still with us
+	 3 31-JUL-03 Heidi Murphy	  Marquette	       02-JUL-03 Unemployed
+	 4 30-JUN-03 John Doe		  Luce		       30-JUL-03 Unemployed
+
+SQL> EXPLAIN PLAN for select p.emp_id, p.pay_date , e.name, e.county, e.hire_date, 
+  2  CASE when e.fire_date IS NULL then 'Unemployed' ELSE 'still with us' END
+  3  from paycheck p INNER JOIN employee_expected e ON (p.emp_id=e.ID); 
+
+Explained.
+
+SQL> SELECT * FROM TABLE(dbms_xplan.display);
+
+PLAN_TABLE_OUTPUT
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Plan hash value: 762193990
+
+----------------------------------------------------------------------------------------
+| Id  | Operation	   | Name	       | Rows  | Bytes | Cost (%CPU)| Time     |
+----------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT   |		       |     4 |   308 |     6	 (0)| 00:00:01 |
+|*  1 |  HASH JOIN	   |		       |     4 |   308 |     6	 (0)| 00:00:01 |
+|   2 |   TABLE ACCESS FULL| PAYCHECK	       |     4 |    88 |     3	 (0)| 00:00:01 |
+|   3 |   TABLE ACCESS FULL| EMPLOYEE_EXPECTED |     6 |   330 |     3	 (0)| 00:00:01 |
+----------------------------------------------------------------------------------------
+
+
+PLAN_TABLE_OUTPUT
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   1 - access("P"."EMP_ID"="E"."ID")
+
+Note
+-----
+   - dynamic sampling used for this statement (level=2)
+
+19 rows selected.

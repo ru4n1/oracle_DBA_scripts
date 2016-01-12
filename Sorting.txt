@@ -1,0 +1,68 @@
+ORDER BY
+Order by clause is always the last clause in a select statement 
+
+Ascedning order is the deafult :
+HR @ sandpit > select last_name from employees order by last_name;
+
+LAST_NAME
+-------------------------
+Abel
+Ande
+Atkinson
+Austin
+Baero
+
+
+or you can order in reverse by 
+HR @ sandpit > select first_name, last_name from employees order by last_name desc;
+
+FIRST_NAME           LAST_NAME
+-------------------- -------------------------
+Eleni                Zlotkey
+Jennifer             Whalen
+Matthew              Weiss
+Alana                Walsh
+Shanta               Vollman
+Clara                Vishney
+Peter                Vargas
+
+
+* Oracle offers a little shorthand mechanim called positional sorting in order to efectively sort by column or expression instead of specifying the column name. 
+Instead of:
+HR @ sandpit > select * from regions order by region_id desc;
+
+ REGION_ID REGION_NAME
+---------- -------------------------
+         4 Middle East and Africa
+         3 Asia
+         2 Americas
+         1 Europe
+You can use...
+HR @ sandpit > select * from regions order by 1 desc;
+
+ REGION_ID REGION_NAME
+---------- -------------------------
+         4 Middle East and Africa
+         3 Asia
+         2 Americas
+         1 Europe
+
+Composite sorting is also possible so you can sort by one column and then subsort by another column...
+  1  select first_name, last_name from employees
+  2* order by first_name asc, last_name desc
+HR @ sandpit > /
+
+FIRST_NAME           LAST_NAME
+-------------------- -------------------------
+Adam                 Fripp
+Alana                Walsh
+Alberto              Errazuriz
+Alexander            Khoo
+Alexander            Hunold
+Alexis               Bull
+Allan                McEwen
+Alyssa               Hutton
+Amit                 Banda
+Anthony              Cabrio
+
+

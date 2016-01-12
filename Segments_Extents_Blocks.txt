@@ -1,0 +1,77 @@
+SEGMENTS:
+The segment entity represents any database object that stores data and therefore requires space in a tablespace. Tables are typically segments, but there are other types such as index segments and undo segments. 
+
+A segment can exist in only one tablespace, but the tablespace can spread this segment out across multiple data files making up the tablespace. Segments are schema objects identified by the segment name qualified by the owning schema name. 
+
+* Note that progammatic objects, such as PL/SQL objects are not segments as they exist within the data dictionary. 
+
+ORACLE BLOCKS:
+The oracle block is the I/O unit for the database. Datafiles are formatted into Oracle blocks consecutively numbered. The size of the oracle blocks are fixed for a tablespace and by default generally speaking the same for the entirety of the database - the default is 8KB or 8192 bytes. A row might only be a couple of hundred bytes and so there might be many rows in one block but when a session wants the row, the entire block will be read from disk into the database buffer cache.
+
+SYS @ sandpit > show parameter block_size
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+db_block_size                        integer     8192
+SYS @ sandpit > 
+
+
+The block size parameter can not be changed after database creation because it is used to format the SYSTEM tablespace. 
+
+Managing space one block at a time would be a crippling taks therefore all blocks are grouped into extents. An extent is a set of consecutively numbered Oracle blocks withone one datafile. Every segments consists of one or more extents. These extents may be in any and all of the datafiles that make up a tablespace. 
+
+A datafile is physically made up of a number of operating system blocks.
+
+Data is stored in segments - check out DBA_SEGMENTS which describes every segment in the database. 
+
+SYS @ sandpit > select segment_type, count (segment_type) from dba_segments 
+  2  group by segment_type;
+
+SEGMENT_TYPE       COUNT(SEGMENT_TYPE)
+------------------ -------------------
+LOBINDEX                           723
+INDEX PARTITION                    340
+NESTED TABLE                        33
+TABLE PARTITION                    182
+ROLLBACK                             1
+LOB PARTITION                        1
+LOBSEGMENT                         723
+TABLE                             1616
+INDEX                             2359
+CLUSTER                             10
+TYPE2 UNDO                          10
+
+Typical segments are tables, indexes, undo segments, etc. 
+
+Every segment has one or more extents. When a table segment is created oracle will allocate an extent to it in whatever tablespace is specified. Eventually as data is entered the extent will fill; Oracle will then allocate a second extent in the same tablespace. If you know a segment is going to need more space, you can actually allocate an extent manually. The below shows how to identify where exactly a segment is located:
+
+  1  select segment_name Name, tablespace_name TS, file_id, extent_id, block_id, blocks, bytes from dba_extents
+  2* where owner ='SCOTT'
+SYS @ sandpit > /
+
+NAME           TS                                FILE_ID  EXTENT_ID   BLOCK_ID     BLOCKS      BYTES
+-------------- ------------------------------ ---------- ---------- ---------- ---------- ----------
+T1             USERS                                   4          0        528          8      65536
+
+1 row selected.
+
+The above demonstates that the table 'T1' stored in the users tablespace consists of just one extent, extent number 0. The extent is in file number 4 and is 8 blocks long.  The first of these 8 blocks is block number 528.  The size of the extent is 64KB which confirms that the block size is 8KB.
+
+bytes / blocks = blocksize
+65536 / 8 = 8192
+
+
+if you were to manually allocate extents to a table, you can see that the extents are added and the block ids are in order...
+And that as extents are manually added [alter table t1 allocate extent;] the block_id jumps in lengths of 8 blocks long (i.e. one extent)
+
+SYS @ sandpit > select segment_name Name, tablespace_name TS, file_id, extent_id, block_id, blocks, bytes from dba_extents where owner='SCOTT'; 
+
+NAME                 TS                                FILE_ID  EXTENT_ID   BLOCK_ID     BLOCKS      BYTES
+-------------------- ------------------------------ ---------- ---------- ---------- ---------- ----------
+T1                   USERS                                   4          0        568          8      65536
+T1                   USERS                                   4          1        576          8      65536
+T1                   USERS                                   4          2        584          8      65536
+
+An extent consists of a number of consecutively numbered oracle blocks. Each block will have a header and a data area. The header contains things like a row directory and row locking information. The data area fills from the bottom up - between the two areas, there may or may not be free space. The data area will initially be empty and will grow as rows are inserted. 
+
+

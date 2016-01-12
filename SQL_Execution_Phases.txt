@@ -1,0 +1,16 @@
+The execution of a SQL statement goes through four phases. 
+
+PARSE 
+BIND
+EXECUTE
+FETCH
+
+In the parse phase, the server works out what the statement means and how it is going to execute it. Parsing involves interaction with the shared pool of the instance such as the library cache or pl/sql cache. 
+
+In the bind phase, any variables are expanded to literal values. 
+
+Then the execute phase will require more use of the instance SGA. During the execution , data in the buffer cache will be read, or changed and changes written to the redo log buffer in terms of change vectors. If blocks needed are not resident in the database buffer cache, the server process will read them in from the datafiles. 
+
+The fetch phase of the execution cycle is where the server process itself sends the result set generated back to the user process.
+
+

@@ -1,0 +1,39 @@
+Constraint Syntax Summary:
+--------------------------
+
+In-line unnamed --> 
+CREATE TABLE table_name ( column_name datatype
+inline_constraint, ...
+);
+
+ALTER TABLE table_name ADD|MODIFY (column_name ...
+inline_constraint, ...
+);
+
+
+In-line named --> 
+CREATE TABLE table_name ( column_name datatype
+CONSTRAINT constraint_name
+inline_constraint, ...
+);
+
+ALTER TABLE table_name ADD|MODIFY (column_name ... CONSTRAINT constraint_name
+inline_constraint, ...
+);
+
+
+
+
+
+Out-of-line --> 
+CREATE TABLE table_name ( column_name datatype,
+...,
+CONSTRAINT constraint_name
+outOfLine_constraint, ...
+);
+
+
+ALTER TABLE table_name
+ADD|MODIFY (
+CONSTRAINT constraint_name outOfLine_constraint,
+... );

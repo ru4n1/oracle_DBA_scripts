@@ -1,0 +1,19 @@
+
+- There are some view you can check for recovery statuses such as...
+
+SQL> select * from v$recovery_log;
+no rows selected
+
+SQL> select * from v$recover_file; 
+no rows selected
+
+This may help you identify a damaged or missing datafile as part of an event.
+Also check the alert log and inspect the file system too. 
+
+
+- You can join the below in order to identify what is affected 
+SQL> select file# , d.name d_name, t.name t_name, status, error
+from v$recover_file r
+join v$datafile d using (file#) 
+join v$tablespace t using (ts#)
+; 

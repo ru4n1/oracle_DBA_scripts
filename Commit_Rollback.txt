@@ -1,0 +1,20 @@
+COMMIT::
+
+syntacttically, COMMIT is the simplest SQL command.
+
+Commit;
+
+This will end the current transaction which has the dual effect of making the changes committed to the database permanently and visible to other sessions. Until a transaction is committed , it cannot be seen by other sessions. 
+
+ROLLBACK;
+
+While a transaction is in progress - oracle keeps an image of the data as it was before the transaction. This image is presented to other sessions that query the data while the transaction is in progress. It is also used to rollback the transaction automatically if anything goes wrong or deliberately if the session requests it. 
+
+A commit is instantaneous because it doesn't really have to do anything, a rollback can be very slow - it will usually take much longer to reverse a transaction than it took to make the changes in the first place. 
+
+
+
+* Note , it is possible to set SQLPLUS up so that it auto commits after each DML statement, and if this is the case, ROLLBACK will never be able to have any effect .
+
+SET AUTOCOMMIT ON
+SET AUTOCOMMIT OFF

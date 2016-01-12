@@ -1,0 +1,25 @@
+The redo log stores a continuous replayable history in chronological order of every change vector applied to the database.
+This will then be used if neccessary to reconstruct or redo all the work that has been done.
+if a datafile or whole database is damaged - then the redo log and these change vectors can be applied to redo the work bringing them forward in time unitl the moment the damege occurred. 
+
+Oracle requires that you have at least tow groups of online redo log files - with each goroup having at least one member.
+
+SYS @ sandpit > select * from v$logfile; 
+
+    GROUP# STATUS  TYPE    MEMBER                                   IS_
+---------- ------- ------- ---------------------------------------- ---
+         3         ONLINE  /u03/oradata/sandpit/redo03.log          NO
+         2         ONLINE  /u02/oradata/sandpit/redo02.log          NO
+         1         ONLINE  /u01/oradata/sandpit/redo01.log          NO
+
+SYS @ sandpit > select * from v$log;
+
+    GROUP#    THREAD#  SEQUENCE#      BYTES  BLOCKSIZE    MEMBERS ARC STATUS           FIRST_CHANGE# FIRST_TIM NEXT_CHANGE# NEXT_TIME
+---------- ---------- ---------- ---------- ---------- ---------- --- ---------------- ------------- --------- ------------ ---------
+         1          1         10   52428800        512          1 YES INACTIVE               1053396 15-FEB-14      1053627 15-FEB-14
+         2          1         11   52428800        512          1 YES ACTIVE                 1053627 15-FEB-14      1053783 15-FEB-14
+         3          1         12   52428800        512          1 NO  CURRENT                1053783 15-FEB-14   2.8147E+14
+
+Changes are written to the current log group above (#2 with only one member) by LGWR. Once this log of a fixed size eventually fills up, LGWR performs a log switch ; this makes the next group current and starts writing to that. The ARCn process will come along then and back up the log file member (i know just one member!) of making up group 2. You should have multiple members per group and LGWR will worry about keeping them synchronised so you don;t have to!
+
+ 

@@ -1,0 +1,5 @@
+ROLLBACK baby
+
+If anything goes wrong (PC crashes / network link dies) - rollback of transactions in progress is completely automatic. and is carried out by the background processes. PMON will detect that there is a problem with a session and roll back a transaction.
+
+A manual rollback requires the user to execute the ROLLBACK ccomand. In the case of this, (for example in the case of an updated transaction which is 'rolled back').... the preupdated versions of the column data as stored in the undo segments blocks are used to reconstruct another update command that will set the columns of the rows back to their original values. Thus oracles implementation of the ROLLBACK command is to use undo data to construct and execute another statement that reverses the effect of the first statement. The oracle will actually issue a commit that commits both the original and the rolled back change, as one transaction. 

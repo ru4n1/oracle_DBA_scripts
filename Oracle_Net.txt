@@ -1,0 +1,26 @@
+Oracle NET - Oracle's proprietary communications protocol. Oracle NET is a layered protocol running over TCP/IP. It can run on top of whatever communications protocol is supported by your operating system.
+It is the enabling technology for Oracle's client server architecture. It is the mechanism for establishing sessions against a database instance. Oracle NET is responsible for the establishing of s session and then for the ongoing communications between the user process and the server process.
+
+DEDICATED SERVER
+The default Oracle Net Configuration is 'dedicated server'. In a dedicated server environment, each user process is connected to its own server process. 
+
+SHARED SERVER
+An alternative is shared server: where a number of user processes make use of a pool of server processes that are shared by all sessions.
+
+A user interacts with a user process, software such as toad or sqlplus. This constructs and validates user input and submits it off to the server process.
+
+The server process is a process running on a database server machine that executes the SQL it receives from the user process. This is your basic client server split; a user process generating SQL, a server process executing it.
+
+* IPC * 
+It is also worth noting that all operating systems have an inter process communication (of IPC) protocol proprietary to the operating system - this is also available to Oracle NET for local connections where the user process is on the same machine as the server.
+Even when you connect to an instance running on your local machine, you still use Oracle NET but for a local connection, the protocol is IPC.
+
+
+Name Resolution:
+---------------
+When connecting using oracle net, the first stage is to work out exactly what it is you want to connect to. This is the process of name resolution. if your connect string includes "@orcl" - then Oracle Net has to work out is meant by "@orcl". The string has to be broken down into certain pieces of information such as the protocol, the IP address of the database listener, the port the listener is listening on and the name of the instance which need not be the same name as the connect string. 
+
+Rather than specifying the name of an instance, the connect string can include the name of a service which could be made up of a number of instances. In a single instance environment, servies can bstill be used. You can configure a number of ways of resolving connect strings to addresses and instances, but by one way or another, the name resolution process resolves a number of bits of info to hit a database listener and request a connection to a particular instance. 
+
+DEDICATED SERVER
+The database listener uses one or more protocols to monitor ports on one or more network interfaces for connection requests. You can further complicate things by running multiple listeners on one machine. When it receives a connection request, the listener must first validate that the instance requested is actually available. Assuming it is , the listener will launch a new server side process to handle the user process. So if you have a thousand users logging on, you will spawn a 1000 server processes. This is know as the deidcated server architecture. 

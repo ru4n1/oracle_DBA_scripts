@@ -1,0 +1,102 @@
+##########################################################################################
+-- Example # 1
+/*
+The below creates a table with a primary key constraint (out of line) named and defined on the cruise_id column,
+with status having a default value of DOCK and with captain_id having a NOT NULL constraint (system generated name).
+/*
+CREATE TABLE cruises
+                ( cruise_id			NUMBER,
+                  cruise_type_id	NUMBER,
+                  cruise_name		varchar2(20),
+                  captain_id		NUMBER NOT NULL,
+                  start_date		DATE,
+                  end_date			DATE,
+                  status			VARCHAR2(5) DEFAULT 'DOCK'
+                  CONSTRAINT cruise_pk PRIMARY KEY (cruise_id) 
+                  );
+                  
+-- Example # 1A
+/*
+The below creates the same table with an INLINE syntax for the primary key constraint creation.
+/*
+CREATE TABLE cruises
+                ( cruise_id			NUMBER CONSTRAINT cruise_pk PRIMARY KEY,
+                  cruise_type_id	NUMBER,
+                  cruise_name		varchar2(20),
+                  captain_id		NUMBER NOT NULL,
+                  start_date		DATE,
+                  end_date			DATE,
+                  status			VARCHAR2(5) DEFAULT 'DOCK'
+                  );
+                  
+##########################################################################################                  
+-- Example # 2
+/*
+The below creates a table with two named constraints in an inline fashion. If you do not name the constraints, then 
+they will be system generated name such as : SYS_C009981. 
+/*
+CREATE TABLE VENDORS
+  (VENDOR_ID    NUMBER  CONSTRAINT vendor_pk  PRIMARY KEY,
+   VENDOR_NAME  VARCHAR2(20),
+   STATUS       NUMBER(1) CONSTRAINT status_nnull NOT NULL,
+   CATEGORY     VARCHAR2(5)
+   );
+   
+##########################################################################################
+-- Example # 3
+/*
+The below creates a table with a primary key in an out-of-place fashion.
+Note that out of place syntax requires you to indicate the column(s) affected...
+*/
+CREATE TABLE PORTS
+  (PORT_ID    NUMBER,
+   PORT_NAME  VARCHAR2(20),
+   PRIMARY KEY (PORT_ID) 
+   );
+
+-- Example # 3A
+/*
+The below creates the same table but names the primary key constraint 
+*/
+CREATE TABLE PORTS
+  (PORT_ID    NUMBER,
+   PORT_NAME  VARCHAR2(20),
+   CONSTRAINT PORT_ID_PK PRIMARY KEY (PORT_ID) 
+   );
+
+##########################################################################################
+-- Example # 4
+/*
+You can also create a table with no constraints and then after creation modify the table with constraints appropriately.
+The below modifies the (named) primary key constraint 
+*/
+CREATE TABLE PORTS
+  (PORT_ID    NUMBER,
+   PORT_NAME  VARCHAR2(20)
+   );
+-- Then you can alter the makeup of the table by adding a named Primary Key
+ALTER TABLE PORTS
+    MODIFY PORT_ID CONSTRAINT PORT_ID_PK PRIMARY KEY;
+   
+-- Example # 4A
+/*
+So you can also create a table with no constraints and then after creation modify the table with constraints appropriately.
+The below adds on the (named) primary key constraint 
+*/
+CREATE TABLE PORTS
+  (PORT_ID    NUMBER,
+   PORT_NAME  VARCHAR2(20)
+   );
+-- Then you can alter the makeup of the table by adding a named Primary Key
+ALTER TABLE PORTS
+    ADD CONSTRAINT PORT_ID_PK PRIMARY KEY(PORT_ID);
+-- Alternatively you could've also added the primary key in an un-named fashion. 
+ALTER TABLE PORTS
+    ADD PRIMARY KEY (PORT_ID);
+   
+
+* Reminder that a NOT NULL constraint cannot be created in an "out of line" manner. 
+An out of line declaration i.e. ALTER TABLE PORTS ADD... will not work but in-line will as per below...
+ALTER TABLE PORTS
+    MODIFY PORT_NAME CONSTRAINT PORT_NAME_NN NOT NULL;
+##########################################################################################

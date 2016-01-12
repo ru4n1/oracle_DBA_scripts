@@ -1,0 +1,159 @@
+
+-- Equality operator
+HR @ sandpit > select * from regions where region_id=1;
+
+ REGION_ID REGION_NAME
+---------- -------------------------
+         1 Europe
+
+HR @ sandpit > select last_name, salary "How Much?!" from employees
+  2  where job_id='SA_REP';
+
+LAST_NAME                 How Much?!
+------------------------- ----------
+Tucker                         10000
+Bernstein                       9500
+
+
+
+-- Inequality operator
+-- not equal to
+HR @ sandpit > select * from regions where region_id <> 1;
+
+ REGION_ID REGION_NAME
+---------- -------------------------
+         2 Americas
+         3 Asia
+         4 Middle East and Africa
+-- you can also use != instead
+
+
+-- less than 
+  1  select last_name, salary from employees
+  2* where salary < 2500
+HR @ sandpit > /
+
+LAST_NAME                     SALARY
+------------------------- ----------
+Landry                          2400
+Markle                          2200
+
+  1  select last_name, hire_date from employees
+  2* where hire_date < '20-FEB-05'
+HR @ sandpit > /
+
+LAST_NAME                 HIRE_DATE
+------------------------- ---------
+Whalen                    17-SEP-03
+Hartstein                 17-FEB-04
+
+
+-- note you can also specify less than or equal to - <=
+
+
+-- greater than
+HR @ sandpit > select last_name, salary from employees
+  2  where salary > 5000;
+
+LAST_NAME                     SALARY
+------------------------- ----------
+Hartstein                      13000
+Fay                             6000
+-- note you can also specify greater than or equal to - >=
+
+
+-- between
+HR @ sandpit > select first_name || ' ' || last_name, salary from employees
+  2  where salary between 2000 and 2500;
+
+FIRST_NAME||''||LAST_NAME                          SALARY
+---------------------------------------------- ----------
+Karen Colmenares                                     2500
+James Landry                                         2400
+
+  1  select last_name, hire_date from employees
+  2* where hire_date between '01-JAN-05' and '31-DEC-05'
+HR @ sandpit > /
+
+LAST_NAME                 HIRE_DATE
+------------------------- ---------
+Fay                       17-AUG-05
+Kochhar                   21-SEP-05
+
+
+-- in operator
+  1  select last_name , salary from  employees
+  2* where salary in (1000,2000,3000,4000)
+HR @ sandpit > /
+
+LAST_NAME                     SALARY
+------------------------- ----------
+Cabrio                          3000
+Bell                            4000
+Feeney                          3000
+
+* This is equivalent to...
+  1  select last_name , salary from  employees
+  2  where salary=1000
+  3  or
+  4  salary=2000
+  5  or
+  6  salary=3000
+  7  or
+  8* salary=4000
+HR @ sandpit > /
+LAST_NAME                     SALARY
+------------------------- ----------
+Cabrio                          3000
+Bell                            4000
+Feeney                          3000
+
+--LIKe operator
+Like is designed exclusively for charcter data and provides a powerful mechanism for searching for letters and words.
+It is accompanied by two wildcard characters ; the percentage symbol and the underscore.
+% will specify zero or more wildcard characters
+_ will specify one wildcard character.
+
+  1* select first_name || ' ; ' || last_name from employees where last_name like 'O%' or last_name like '_i%'
+HR @ sandpit > /
+
+FIRST_NAME||';'||LAST_NAME
+------------------------------------------------
+Laura ; Bissot
+Jennifer ; Dilly
+William ; Gietz
+Shelley ; Higgins
+Guy ; Himuro
+Janette ; King
+
+Like can always be used for equality testing 
+i.e. the below statements will return the same:
+select first_name, last_name from employees where last_name like 'King'
+select first_name, last_name from employees where last_name = 'King'
+
+But what it you need to search for a literal value of underscore or percentage.
+In this case you need to escape the naturally occuring character.
+The below will neutralise the special value meaning of the underscore character.
+
+ 1  select * from jobs
+  2* where job_id like 'SA\_%' escape '\'
+HR @ sandpit > /
+
+JOB_ID     JOB_TITLE                           MIN_SALARY MAX_SALARY
+---------- ----------------------------------- ---------- ----------
+SA_MAN     Sales Manager                            10000      20080
+SA_REP     Sales Representative                      6000      12008
+
+
+
+
+-- IS NULL
+  1* select last_name from employees where commission_pct is null
+HR @ sandpit > /
+
+LAST_NAME
+-------------------------
+OConnell
+Grant
+Whalen
+Hartstein

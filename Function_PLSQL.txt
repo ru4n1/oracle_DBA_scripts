@@ -1,0 +1,24 @@
+-- the below is a simple function to check an input parameter and 
+-- return whether it is an odd/even number
+
+SQL> create or replace function odd_even(var1 number) return varchar2
+as begin 
+if 
+ mod(var1,2)=0
+then 
+ return 'even';
+else 
+ return 'odd;
+end if;
+end odd_even;
+/
+
+Function created 
+
+SQL> select odd_even(10) from dual;
+
+even
+
+SQL> select odd_even(7) from dual;
+
+odd

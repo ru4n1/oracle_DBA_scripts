@@ -1,0 +1,8 @@
+- AVG -
+The AVG function calculates the average value of a numeric column or expression in a group. 
+select AVG(DISTINCT expr)
+When AVG (distinct) is used, the distinct values or expr are summed and divided by the number of unique occurrences. 
+AVG(SALARY)
+-----------
+ 6461.83178
+

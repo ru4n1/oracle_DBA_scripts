@@ -1,0 +1,102 @@
+The background proceses act as the link between the memory structures of an instance and the database files...
+
+# Generate a listing of background processes and their descriptions
+SQL> select sid, serial#, process, name, description 
+from v$session JOIN v$gbprocess USING (paddr);
+
+-bash-4.1$ ps -ef | grep ora | grep $ORACLE_SID | grep -v grep 
+  oracle 18027     1   0 11:05:46 ?           0:00 ora_qmnc_sandpit
+  oracle 18672     1   0 11:20:53 ?           0:00 ora_w000_sandpit
+  oracle 17991     1   0 11:05:36 ?           0:00 ora_mman_sandpit
+  oracle 18019     1   0 11:05:42 ?           0:00 ora_arc0_sandpit
+  oracle 17983     1   0 11:05:35 ?           0:00 ora_diag_sandpit
+  oracle 17999     1  14 11:05:36 ?           0:01 ora_smon_sandpit 
+  oracle 18674     1  22 11:20:55 ?           0:00 ora_j000_sandpit
+  oracle 17987     1   0 11:05:35 ?           0:00 ora_psp0_sandpit
+  oracle 18095     1   0 11:05:56 ?           0:00 ora_q001_sandpit
+  oracle 17997     1   0 11:05:36 ?           0:01 ora_ckpt_sandpit
+  oracle 18093     1   0 11:05:56 ?           0:00 ora_q000_sandpit
+  oracle 17993     1   0 11:05:36 ?           0:00 ora_dbw0_sandpit
+  oracle 17995     1   0 11:05:36 ?           0:01 ora_lgwr_sandpit
+  oracle 18001     1   0 11:05:36 ?           0:00 ora_reco_sandpit
+  oracle 18003     1   0 11:05:36 ?           0:01 ora_mmon_sandpit
+  oracle 18064     1   0 11:05:47 ?           0:01 ora_cjq0_sandpit
+    root 18011     1   0 11:05:36 ?           0:01 ora_dism_sandpit
+  oracle 18023     1   0 11:05:44 ?           0:00 ora_arc2_sandpit
+  oracle 18005     1   0 11:05:36 ?           0:01 ora_mmnl_sandpit
+  oracle 18021     1   0 11:05:43 ?           0:00 ora_arc1_sandpit
+  oracle 18007     1   0 11:05:36 ?           0:00 ora_d000_sandpit
+  oracle 17981     1   0 11:05:35 ?           0:00 ora_gen0_sandpit
+  oracle 17977     1   0 11:05:35 ?           0:03 ora_vktm_sandpit
+  oracle 18083     1   0 11:05:50 ?           0:03 ora_vkrm_sandpit
+  oracle 18009     1   0 11:05:36 ?           0:00 ora_s000_sandpit
+  oracle 17985     1   0 11:05:35 ?           0:00 ora_dbrm_sandpit
+  oracle 18346     1   0 11:10:47 ?           0:00 ora_smco_sandpit
+  oracle 18676     1  22 11:20:55 ?           0:00 ora_j001_sandpit
+  oracle 17975     1   0 11:05:35 ?           0:00 ora_pmon_sandpit
+  oracle 18025     1   0 11:05:44 ?           0:00 ora_arc3_sandpit
+  oracle 17989     1   0 11:05:35 ?           0:01 ora_dia0_sandpit
+
+
+SMON - has the initial responsibility of mounting and opening a database, locates and validates the database controlfile. crucial to the database - instance terminates if killed inadvertently...
+
+PMON - monitors all server processes and detects any session problems to clean up; destroys any defunct server processes, returns its PGA memory to the operating system and rolls back any incomplete transactions. Crucial to the database - will die if killed...
+
+DBWRn - Remember that sessions to not write to disk - they write or change data in buffers in the database buffer cache. It is the the DBWR which subsequently writes the buffers back to disk. There can be a number of DBWR processes which write dirty buffers to the datafiles. It writes as few buffers as it can get away with. The algorithm DBWR uses to select dirty buffers for writing to disk will select only buffers that have not been recently used. It writes according to a very lazy algorithi " as little as possible as rarely as possible".
+It writes when there are no free buffers ( a free buffer is neither dirty [updated and not yet written back to disk], nor pinned [in use by a session at that moment]). 
+It writes when there are too many dirty buffers (interanlly threshold set by oracle).
+It writes upon a three second timeout - DBWR will clean a few buffers. 
+It writes upon a checkpoint request - (checkpoint means all dirty buffers are written).
+
+LGWR - writes the contents of the redo log buffer to the redo log on disk, a write of the log buffer is referred to as flushing the log buffer. When a session modifies blocks in the database buffer cache, before it applies the change to the blocks, it writes out the change it is about to apply to the log buffer; in order that no work can be lost - these change vectors must be written to disk with no delay - LGWR streams the contents of the log buffer out to online redo log files in very nearly real time. the session hangs while LGWR writes the buffer to disk. Only then is the transaction recorded as committed. 
+
+CKPT - in brief , after a crash - all chenage vectors referring to dirty buffers (which had not yet been written to datafiles on disk at the time of failure) must be extracted from the redo log and applied to the data blocks. This is the recovery process. In recent releases , checkpointing changed whereby rather than letting DBWR get a long way behind and then signalling a checkpoint with a dip in performance while all dirty buffers are written out to disk, there are incremental checkpoints which instruct DBWR to write out buffers at a constant rate which results in much smoother performance and more predictable recovery times. 
+
+MMON - manageability monitor - is the process for self monitoring and self tuning capabilities. The database instance gatehrs a vast amount of statistics about activity and performance which accumulate in the SGA ; and their current values can be interrogated by issuing SQL queries. MMON reguarly (by default every hour) capy=tures statistics from the SGA and writes them to the data dictionary (kept by default for 8 days); each set of statistics is known as a snapshot. Each snapshot is followed by a launch of the Automatic database diagnostic monitor which analyses activity and makes observations and reccomendations.Performs many tasks related to the automatic workload repository...  Advisor central in Enterprise manager??
+
+MMNL - manageability monitor light assists the MMON
+
+MMAN - Memory manager since 10G observes the the demand for PGA memory and SGA memory and dynamically allocates meomry to sessions and to SGA structures as needed while keeping the toal allocated memory within a limit set by the DBA. PGAs can grow and shrink, and SGA components can be resized (assuming you are setting the sga_target or memory_target initialisation parameters? MMAN does it better than trying to individually define or size components.
+
+ARCn - The archiver process; all change vectors are written out to the log buffer and then out to the online redo logs by the LGWR. The online redo log files are of a fixed size and number, once they have been filled , LGWR will overwrite them with more data - in order to preserve a complete history - the online redo log files must be copied off as they are filled before they are reused - ARCn does this... Providing all archive logs are available - it will always be possible to recover from any damage to the database by restoring datafile backups and applying change vectors to them extracted from the archive log files generated since the backups. Then the final recovery is to bring the database right back up to date and this comes from the online redo log files...
+
+RECO -  recoverer process responsilbe for ensuring two phased commit is withheld in a distributed transaction (two transactions against two remote databases followed by a global commit).
+
+SYS @ sandpit > select program from v$process;
+
+PROGRAM
+------------------------------------------------
+PSEUDO
+oracle@solaris11 (PMON)
+oracle@solaris11 (VKTM)
+oracle@solaris11 (GEN0)
+oracle@solaris11 (DIAG)
+oracle@solaris11 (DBRM)
+oracle@solaris11 (PSP0)
+oracle@solaris11 (DIA0)
+oracle@solaris11 (MMAN)
+oracle@solaris11 (DBW0)
+oracle@solaris11 (LGWR)
+oracle@solaris11 (CKPT)
+oracle@solaris11 (SMON)
+oracle@solaris11 (RECO)
+oracle@solaris11 (MMON)
+oracle@solaris11 (MMNL)
+oracle@solaris11 (D000)
+oracle@solaris11 (S000)
+oracle@solaris11 (VKRM)
+oracle@solaris11 (SMCO)
+oracle@solaris11 (W000)
+oracle@solaris11 (ARC0)
+oracle@solaris11 (ARC1)
+oracle@solaris11 (ARC2)
+oracle@solaris11 (ARC3)
+oracle@solaris11 (QMNC)
+oracle@solaris11 (CJQ0)
+oracle@solaris11 (J000)
+oracle@solaris11 (J001)
+oracle@solaris11 (Q000)
+oracle@solaris11 (Q001)
+oracle@solaris11 (TNS V1-V3)
+
+

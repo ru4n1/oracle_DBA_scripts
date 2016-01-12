@@ -1,0 +1,31 @@
+ 1  select employee_id ID, job_id Role, start_date, end_date, (end_date-start_date)+1 Days
+  2* from job_history
+HR @ sandpit > /
+
+        ID ROLE       START_DAT END_DATE        DAYS
+---------- ---------- --------- --------- ----------
+       102 IT_PROG    13-JAN-01 24-JUL-06       2019
+       101 AC_ACCOUNT 21-SEP-97 27-OCT-01       1498
+       101 AC_MGR     28-OCT-01 15-MAR-05       1235
+       201 MK_REP     17-FEB-04 19-DEC-07       1402
+       114 ST_CLERK   24-MAR-06 31-DEC-07        648
+       122 ST_CLERK   01-JAN-07 31-DEC-07        365
+       200 AD_ASST    17-SEP-95 17-JUN-01       2101
+       176 SA_REP     24-MAR-06 31-DEC-06        283
+       176 SA_MAN     01-JAN-07 31-DEC-07        365
+       200 AC_ACCOUNT 01-JUL-02 31-DEC-06       1645
+
+-- you can perform some nice maths with arithemtic expressions also
+-- note the order of precedence of the operators follwos along the BOMDAS lines
+
+HR @ sandpit > select 100/5 +20 * 10 - (10-5) from dual;
+
+100/5+20*10-(10-5)
+------------------
+               215
+
+1 row selected.
+brackets firstly, results in 5
+20 is multiplied by 10 first = 200
+then 100 is divided by 5 = 10
+leading to 20 + 200 - 5

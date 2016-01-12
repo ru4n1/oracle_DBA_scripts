@@ -1,0 +1,58 @@
+--- example of various timestamp queries against an updated table
+
+SQL> insert into tab1 values (1) ;
+
+1 row created.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> select * from tab1;
+
+      COL1
+----------
+         1
+
+SQL> select * from tab1 as of timestamp sysdate-1/48; 
+
+no rows selected
+
+SQL> select * from tab1 as of timestamp sysdate-1/24;
+
+no rows selected
+
+SQL> select * from tab1 as of timestamp sysdate-5/1440;
+
+no rows selected
+
+SQL> select * from tab1 as of timestamp sysdate-1/1440;
+
+      COL1
+----------
+         1
+
+SQL> commit;
+
+Commit complete.
+
+SQL> select * from tab1 as of timestamp sysdate-1/48; 
+
+no rows selected
+
+SQL> select * from tab1 as of timestamp sysdate-1/24;
+
+no rows selected
+
+SQL> select * from tab1 as of timestamp sysdate-5/1440;
+
+no rows selected
+
+SQL> select * from tab1 as of timestamp sysdate-1/1440;
+
+      COL1
+----------
+         1
+
+SQL> 
+

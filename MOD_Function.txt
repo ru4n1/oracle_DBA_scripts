@@ -1,0 +1,6 @@
+## MOD
+Mod returns the remainder of a division  operation
+HR @ sandpit > select mod (14,6) from dual;
+ MOD(14,6)
+----------
+         2

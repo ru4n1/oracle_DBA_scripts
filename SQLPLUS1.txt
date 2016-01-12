@@ -1,0 +1,78 @@
+SET TERM      OFF 
+-- TERM = ON will display on terminal screen (OFF = show in LOG only)
+
+SET ECHO      ON 
+-- ECHO = ON will Display the command on screen (+ spool)
+-- ECHO = OFF will Display the command on screen but not in spool files.
+-- Interactive commands are always echoed to screen/spool.
+
+SET TRIMOUT   ON 
+-- TRIMOUT = ON will remove trailing spaces from output
+
+SET TRIMSPOOL ON 
+-- TRIMSPOOL = ON will remove trailing spaces from spooled output
+
+SET HEADING   OFF 
+-- HEADING = OFF will hide column headings
+
+SET FEEDBACK  OFF 
+-- FEEDBACK = ON will count rows returned
+
+SET PAUSE     OFF 
+-- PAUSE = ON .. press return at end of each page
+
+SET PAGESIZE  0   
+-- PAGESIZE = height 54 is 11 inches (0 will supress all headings and page brks)
+
+SET LINESIZE  80 
+-- LINESIZE = width of page (80 is typical)
+
+SET VERIFY    OFF 
+-- VERIFY = ON will show before and after substitution variables
+
+-- Start spooling to a log file
+SPOOL C:\TEMP\MY_LOG_FILE.LOG
+
+--
+-- The rest of the SQL commands go here
+--
+SELECT * FROM GLOBAL_NAME;
+
+SPOOL OFF
+==========================================================================================
+
+SQL> define
+DEFINE _DATE           = "24-NOV-14" (CHAR)
+DEFINE _CONNECT_IDENTIFIER = "sandpit" (CHAR)
+DEFINE _USER           = "SYS" (CHAR)
+DEFINE _PRIVILEGE      = "AS SYSDBA" (CHAR)
+DEFINE _SQLPLUS_RELEASE = "1102000100" (CHAR)
+DEFINE _EDITOR         = "ed" (CHAR)
+DEFINE _O_VERSION      = "Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options" (CHAR)
+DEFINE _O_RELEASE      = "1102000100" (CHAR)
+
+SQL> select &input from dual;
+Enter value for input: 'scott'
+old   1: select &input from dual
+new   1: select 'scott' from dual
+
+'SCOTT
+----
+scott
+
+SQL> set verify off
+SQL> select '&input' from dual;
+Enter value for input: scott
+
+'SCOTT
+----
+scott
+
+SQL> set define off
+SQL> select '&input' from dual;
+
+'&INPU
+------
+&input
+

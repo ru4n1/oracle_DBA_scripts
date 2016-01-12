@@ -1,0 +1,13 @@
+These two guys sysdba and sysoper are special priviliges with special capabilities. They can only be enabled when users are connecting with external authentication via etiehr operating system or password file. 
+
+SYSOPE privilige has the ability to issue a certain suite of commands such as
+
+STARTUP
+SHUTDOWN
+ALTER DATABASE MOUNT, OPEN, CLOSE, DISMOUNT
+ALTER DATABASE, TABLESPACE, BEGIN BACKUP, END BACKUP
+RECOVER
+
+The SYSDBA all-powerful privilige includes all of these but in addition has the ability to create a database, to perform an incomplete recovery and to create other SYSDBA users. 
+
+Remember, sysdba and sysoper are not users pbut priviliges which can be granted to users. By default only user sys has these priviliges until they are deliberately and cautiously granted to other users. Notably, use of the SYSDBA privilige logs you into the instance as user SYS the most powerful user in the database and owner of the data dictionary. 

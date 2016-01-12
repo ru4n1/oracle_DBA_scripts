@@ -1,0 +1,80 @@
+# Use the set until clause to pick a point of recovery in the redo log stream for a DB
+
+RMAN> run
+{
+allocate channel dev1 type disk;
+set until time “to_date(’2010-30-12:00:00:00′, ‘yyyy-dd-mm:hh24:mi:ss’)”;
+restore database;
+recover database; }
+}
+
+
+You can also use the below...
+
+SET UNTIL TIME 'Nov 15 2004 09:00:00';
+SET UNTIL SEQUENCE 9923;
+SET UNTIL RESTORE POINT before_update;
+
+
+==================================================================
+Example demonstrated below..
+==================================================================
+RMAN> run
+2> {
+3> set until sequence 13;
+4> restore database ; 
+5> recover database ;
+6> sql 'alter database open resetlogs';
+7> }
+
+executing command: SET until clause
+
+Starting restore at 23-NOV-14
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=133 device type=DISK
+
+channel ORA_DISK_1: starting datafile backup set restore
+channel ORA_DISK_1: specifying datafile(s) to restore from backup set
+channel ORA_DISK_1: restoring datafile 00001 to /ora/work/data/SANDPIT/datafile/o1_mf_system_b4c34452_.dbf
+channel ORA_DISK_1: restoring datafile 00004 to /ora/work/data/SANDPIT/datafile/o1_mf_users_b6j47jsz_.dbf
+channel ORA_DISK_1: reading from backup piece /FRA/SANDPIT/backupset/2014_11_23/o1_mf_nnnd0_TAG20141123T191208_b74dd9cl_.bkp
+channel ORA_DISK_1: piece handle=/FRA/SANDPIT/backupset/2014_11_23/o1_mf_nnnd0_TAG20141123T191208_b74dd9cl_.bkp tag=TAG20141123T191208
+channel ORA_DISK_1: restored backup piece 1
+channel ORA_DISK_1: restore complete, elapsed time: 00:01:25
+channel ORA_DISK_1: starting datafile backup set restore
+channel ORA_DISK_1: specifying datafile(s) to restore from backup set
+channel ORA_DISK_1: restoring datafile 00002 to /ora/work/data/SANDPIT/datafile/o1_mf_sysaux_b4c344co_.dbf
+channel ORA_DISK_1: restoring datafile 00003 to /ora/work/data/SANDPIT/datafile/o1_mf_undotbs1_b4c344dr_.dbf
+channel ORA_DISK_1: restoring datafile 00005 to /ora/work/data/SANDPIT/datafile/repo_01.dbf
+channel ORA_DISK_1: reading from backup piece /FRA/SANDPIT/backupset/2014_11_23/o1_mf_nnnd0_TAG20141123T191208_b74ddb9f_.bkp
+channel ORA_DISK_1: piece handle=/FRA/SANDPIT/backupset/2014_11_23/o1_mf_nnnd0_TAG20141123T191208_b74ddb9f_.bkp tag=TAG20141123T191208
+channel ORA_DISK_1: restored backup piece 1
+channel ORA_DISK_1: restore complete, elapsed time: 00:01:15
+Finished restore at 23-NOV-14
+
+Starting recover at 23-NOV-14
+using channel ORA_DISK_1
+
+starting media recovery
+
+archived log for thread 1 with sequence 7 is already on disk as file /arch/arch_1_7_863747688.arc
+archived log for thread 1 with sequence 8 is already on disk as file /arch/arch_1_8_863747688.arc
+archived log for thread 1 with sequence 9 is already on disk as file /arch/arch_1_9_863747688.arc
+archived log for thread 1 with sequence 10 is already on disk as file /arch/arch_1_10_863747688.arc
+archived log for thread 1 with sequence 11 is already on disk as file /arch/arch_1_11_863747688.arc
+archived log for thread 1 with sequence 12 is already on disk as file /arch/arch_1_12_863747688.arc
+archived log file name=/arch/arch_1_7_863747688.arc thread=1 sequence=7
+archived log file name=/arch/arch_1_8_863747688.arc thread=1 sequence=8
+archived log file name=/arch/arch_1_9_863747688.arc thread=1 sequence=9
+archived log file name=/arch/arch_1_10_863747688.arc thread=1 sequence=10
+archived log file name=/arch/arch_1_11_863747688.arc thread=1 sequence=11
+archived log file name=/arch/arch_1_12_863747688.arc thread=1 sequence=12
+media recovery complete, elapsed time: 00:00:24
+Finished recover at 23-NOV-14
+
+sql statement: alter database open resetlogs
+new incarnation of database registered in recovery catalog
+starting full resync of recovery catalog
+full resync complete
+
+RMAN>

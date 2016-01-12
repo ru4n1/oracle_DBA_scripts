@@ -1,0 +1,45 @@
+
+
+## Adding comment to Table 
+
+SQL> select * from user_tab_comments; 
+TABLE_NAME                     TABLE_TYPE  COMMENTS
+------------------------------ ----------- ------------------------------------------------------------------------------------------------------------------------------------------------------
+TAB1                           TABLE
+TEST1                          TABLE
+TEST2                          TABLE
+SHIPS                          TABLE
+PORTS                          TABLE
+POINT1                         TABLE
+TESTING123                     TABLE
+
+
+SQL> comment on TABLE SHIPS is 'This is my ships table!!'; 
+Comment created.
+
+SQL> select * from user_tab_comments; 
+
+TABLE_NAME                     TABLE_TYPE  COMMENTS
+------------------------------ ----------- ------------------------------------------------------------------------------------------------------------------------------------------------------
+TAB1                           TABLE
+TEST1                          TABLE
+TEST2                          TABLE
+SHIPS                          TABLE       This is my ships table!!
+PORTS                          TABLE
+POINT1                         TABLE
+TESTING123                     TABLE
+
+
+
+## And adding a comment to a column
+
+SQL> comment on column SHIPS.SIZING is 'How fecking big???';
+Comment created.
+
+SQL> select * from user_col_comments;
+TABLE_NAME                     COLUMN_NAME                    COMMENTS
+------------------------------ ------------------------------ --------------------------------------------
+SHIPS                          SIZING                         How fecking big???
+TESTING123                     EXTRA
+BIN$CSL6fTo9O6zgVAAcQtI2hw==$0 HOME_PORT_ID
+

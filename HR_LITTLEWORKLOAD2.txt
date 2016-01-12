@@ -1,0 +1,99 @@
+-------------------------------------------------
+---    ***Training purposes only***
+---    ***Not appropriate for production use***
+-------------------------------------------------
+
+----------------------------------------------
+--- HR based workload used for tuning sets ---
+--- start c:/cranhurst/COURSEINCLUDES/SQL_TUNING_SETS/hr_littleworkload2.txt
+----------------------------------------------
+connect hr/hr
+
+set linesize 150
+set timing on
+set echo on
+set term on 
+
+drop   table employees2;
+create table employees2 tablespace example nologging as select * from employees;
+alter  table employees2 modify (employee_id   number (10,0));
+
+
+insert into employees2 select * from employees2;
+insert into employees2 select * from employees2;
+insert into employees2 select * from employees2;
+insert into employees2 select * from employees2;
+insert into employees2 select * from employees2;
+insert into employees2 select * from employees2;
+insert into employees2 select * from employees2;
+insert into employees2 select * from employees2;
+
+--about 56,000#
+--insert into employees2 select * from employees2;
+
+--about 112,000#
+--insert into employees2 select * from employees2;
+
+
+--about 224,000#
+--insert into employees2 select * from employees2;
+
+
+--about 450,000#
+--insert into employees2 select * from employees2;
+
+commit;
+
+----------------------------------------------
+--- Build skewed data 
+----------------------------------------------
+
+--- one row 
+update hr.employees2 set department_id = 250 
+where  rownum <= 1; 
+commit;
+
+
+--- 50 rows 
+update hr.employees2 set salary = 950
+where  rownum <= 50; 
+commit;
+
+--- 100 rows
+update hr.employees2 set last_name = 'JJJJJJ' 
+where  rownum <= 100; 
+commit;
+
+----------------------------------------------------
+--- OPTIONAL 
+--- Strong need for index on salary and department_id 
+----------------------------------------------------
+--create index idx_empl2_salary     on hr.employees2 (salary);
+--create index idx_empl2_department on hr.employees2 (department_id);
+
+----------------------------------------------------
+--- Build Primary Key
+----------------------------------------------------
+update hr.employees2 set employee_id = rownum;
+
+alter table hr.employees2  add constraint employees2_pk primary key (employee_id);
+
+
+----------------------------------------------------
+--- Gather Stats 
+---------------------------------------------------- 
+exec dbms_stats.gather_table_stats ('HR', 'EMPLOYEES2', cascade=> true ); 
+
+select table_name, num_rows, blocks, empty_blocks, avg_row_len, tablespace_name
+from user_tables
+where table_name like 'EMPLOYEES2';
+
+select index_name , status, uniqueness
+from   user_indexes
+where  table_name like 'EMPLOYEES2';
+
+select count(*) from hr.employees2;
+
+-------------------------------
+---   C O M P L E T E D  
+-------------------------------

@@ -1,0 +1,12 @@
+-- Use the PL/SQL package dbms_metadata to generate DDL for you for database objects
+-- better to always use this in uppercase
+-- you must set the sqlplus parameter ' set long 90000 ' befoe running the 
+-- statement otherwise output will be truncated. 
+e.g
+SELECT DBMS_METADATA.GET_DDL('TABLESPACE', 'USERS') FROM DUAL;
+
+DBMS_METADATA.GET_DDL('TABLESPACE','USERS')
+--------------------------------------------------------------------------------
+
+  CREATE TABLESPACE "USERS" DATAFILE
+  '/Users/oracle/oradata/dbrdl/users01.db

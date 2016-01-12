@@ -1,0 +1,41 @@
+One last transaction control statement is the select for update statement.
+
+SELECT... FOR UPDATE
+
+
+consider the following:
+=======================
+session 1:			Session 2:
+select * from regions;		select * from regions;
+				delete * from regions where region_id=5;
+				commit;
+update regions set region_name
+='UK' where region_id=5;
+=======================
+
+
+The first session may see the following!
+HR @ sandpit > select * from regions;
+ REGION_ID REGION_NAME
+---------- -------------------------
+         5 GB
+         1 Europe
+         2 Americas
+         3 Asia
+         4 Middle East and Africa
+HR @ sandpit > update regions set region_name = 'UK' where region_id=5;
+0 rows updated.
+
+
+So this despite being correct, is a little disconcerting...
+One way around this problem, is to lock the rows for update.
+
+select * from regions for update; 
+
+SYS @ sandpit > select * from DBA_DML_LOCKS; 
+SESSION_ID OWNER                          NAME                           MODE_HELD     MODE_REQUESTE LAST_CONVERT BLOCKING_OTHERS
+---------- ------------------------------ ------------------------------ ------------- ------------- ------------ ----------------------------------------
+        19 HR                             REGIONS                        Row-X (SX)    None                   115 Not Blocking
+
+
+-- The for update statement will place a lock on the rows retrieved , no updates can be made to them by any session other than that which issued the command. 

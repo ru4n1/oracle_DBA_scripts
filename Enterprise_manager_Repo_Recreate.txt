@@ -1,0 +1,107 @@
+I encountered an error before with using database control for enterprise manager - the web browser page was sugggesting it could not connect to the agent / instance when I attempted to log on. I tried a number of times to recreate the respository but it was failing due to password difficulties with the dbsnmp user. Eventually I got it to work as per below...
+
+emca -config dbcontrol db -repos recreate
+
+if the above fails, you may need to look to reconfigure and deconfigure it:
+
+emca -deconfig dbcontrol db -repos drop
+emca -config dbcontrol db -repos create
+
+
+Sample log output below...
+------------------------------------------------------------------------------------------
+-bash-4.1$ emca -deconfig dbcontrol db -repos drop                                                  
+
+STARTED EMCA at Mar 16, 2014 4:38:15 PM
+EM Configuration Assistant, Version 11.2.0.0.2 Production
+Copyright (c) 2003, 2005, Oracle.  All rights reserved.
+
+Enter the following information:
+Database SID: sandpit
+Listener port number: 1521
+Password for SYS user:  
+Password for SYSMAN user:  
+
+Do you wish to continue? [yes(Y)/no(N)]: Y
+Mar 16, 2014 4:38:31 PM oracle.sysman.emcp.EMConfig perform
+INFO: This operation is being logged at /u01/app/oracle/product/11.2.0/cfgtoollogs/emca/sandpit/emca_2014_03_16_16_38_14.log.
+Mar 16, 2014 4:38:33 PM oracle.sysman.emcp.EMDBPreConfig performDeconfiguration
+WARNING: EM is not configured for this database. No EM-specific actions can be performed.
+Mar 16, 2014 4:38:33 PM oracle.sysman.emcp.EMReposConfig invoke
+INFO: Dropping the EM repository (this may take a while) ...
+Mar 16, 2014 4:39:31 PM oracle.sysman.emcp.util.PlatformInterface executeCommand
+WARNING: Error executing /u01/app/oracle/product/11.2.0/db_1/sysman/admin/emdrep/bin/RepManager -connect (DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=solaris11)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=sandpit.ardfield))) -repos_user SYSMAN -action drop -verbose -output_file /u01/app/oracle/product/11.2.0/cfgtoollogs/emca/sandpit/emca_repos_drop_2014_03_16_16_38_33.log 
+Mar 16, 2014 4:39:31 PM oracle.sysman.emcp.EMReposConfig invoke
+SEVERE: Error dropping the repository
+Mar 16, 2014 4:39:31 PM oracle.sysman.emcp.EMReposConfig invoke
+INFO: Refer to the log file at /u01/app/oracle/product/11.2.0/cfgtoollogs/emca/sandpit/emca_repos_drop_<date>.log for more details.
+Mar 16, 2014 4:39:31 PM oracle.sysman.emcp.EMConfig perform
+SEVERE: Error dropping the repository
+Refer to the log file at /u01/app/oracle/product/11.2.0/cfgtoollogs/emca/sandpit/emca_2014_03_16_16_38_14.log for more details.
+Could not complete the configuration. Refer to the log file at /u01/app/oracle/product/11.2.0/cfgtoollogs/emca/sandpit/emca_2014_03_16_16_38_14.log for more details.
+-bash-4.1$ emca -config dbcontrol db -repos create                                                  
+
+STARTED EMCA at Mar 16, 2014 4:41:47 PM
+EM Configuration Assistant, Version 11.2.0.0.2 Production
+Copyright (c) 2003, 2005, Oracle.  All rights reserved.
+
+Enter the following information:
+Database SID: sandpit
+Listener port number: 1521
+Listener ORACLE_HOME [ /u01/app/oracle/product/11.2.0/db_1 ]: 
+Password for SYS user:  
+Password for DBSNMP user:  
+Password for SYSMAN user:  
+Email address for notifications (optional): 
+Outgoing Mail (SMTP) server for notifications (optional): 
+-----------------------------------------------------------------
+
+You have specified the following settings
+
+Database ORACLE_HOME ................ /u01/app/oracle/product/11.2.0/db_1
+
+Local hostname ................ solaris11
+Listener ORACLE_HOME ................ /u01/app/oracle/product/11.2.0/db_1
+Listener port number ................ 1521
+Database SID ................ sandpit
+Email address for notifications ............... 
+Outgoing Mail (SMTP) server for notifications ............... 
+
+-----------------------------------------------------------------
+Do you wish to continue? [yes(Y)/no(N)]: Y
+Mar 16, 2014 4:42:05 PM oracle.sysman.emcp.EMConfig perform
+INFO: This operation is being logged at /u01/app/oracle/product/11.2.0/cfgtoollogs/emca/sandpit/emca_2014_03_16_16_41_47.log.
+Mar 16, 2014 4:42:07 PM oracle.sysman.emcp.EMReposConfig createRepository
+INFO: Creating the EM repository (this may take a while) ...
+Mar 16, 2014 5:03:15 PM oracle.sysman.emcp.EMReposConfig invoke
+INFO: Repository successfully created
+Mar 16, 2014 5:03:30 PM oracle.sysman.emcp.EMReposConfig uploadConfigDataToRepository
+INFO: Uploading configuration data to EM repository (this may take a while) ...
+Mar 16, 2014 5:04:54 PM oracle.sysman.emcp.EMReposConfig invoke
+INFO: Uploaded configuration data successfully
+Mar 16, 2014 5:05:04 PM oracle.sysman.emcp.util.DBControlUtil configureSoftwareLib
+INFO: Software library configured successfully.
+Mar 16, 2014 5:05:04 PM oracle.sysman.emcp.EMDBPostConfig configureSoftwareLibrary
+INFO: Deploying Provisioning archives ...
+Mar 16, 2014 5:06:42 PM oracle.sysman.emcp.EMDBPostConfig configureSoftwareLibrary
+INFO: Provisioning archives deployed successfully.
+Mar 16, 2014 5:06:42 PM oracle.sysman.emcp.util.DBControlUtil secureDBConsole
+INFO: Securing Database Control (this may take a while) ...
+Mar 16, 2014 5:06:50 PM oracle.sysman.emcp.util.DBControlUtil secureDBConsole
+INFO: Database Control secured successfully.
+Mar 16, 2014 5:06:50 PM oracle.sysman.emcp.util.DBControlUtil startOMS
+INFO: Starting Database Control (this may take a while) ...
+Mar 16, 2014 5:08:24 PM oracle.sysman.emcp.EMDBPostConfig performConfiguration
+INFO: Database Control started successfully
+Mar 16, 2014 5:08:26 PM oracle.sysman.emcp.EMDBPostConfig performConfiguration
+INFO: >>>>>>>>>>> The Database Control URL is https://solaris11:5500/em <<<<<<<<<<<
+Mar 16, 2014 5:08:29 PM oracle.sysman.emcp.EMDBPostConfig invoke
+WARNING: 
+************************  WARNING  ************************
+
+Management Repository has been placed in secure mode wherein Enterprise Manager data will be encrypted.  The encryption key has been placed in the file: /u01/app/oracle/product/11.2.0/db_1/solaris11_sandpit/sysman/config/emkey.ora.   Please ensure this file is backed up as the encrypted data will become unusable if this file is lost. 
+
+***********************************************************
+Enterprise Manager configuration completed successfully
+FINISHED EMCA at Mar 16, 2014 5:08:29 PM
+-bash-4.1$ 

@@ -1,0 +1,146 @@
+A user is someone who connects to a user account by establishing a session against an instance; a schema is a set of objects owned by a user account. 
+
+A user must be granted priviliges before a session can do anything worthwhile. There are many different privilges which can be granted for many different objects and actions and to manage these individually is not practical for any but the simplets systems. Priviliges therefore are usually grouped into roles which make privilege administration much easier. 
+
+User ---> Privilege
+
+User ---> Role [Privilege + Privilege + Privilege]
+
+
+To establish a session against an instance and a database, a user must connect to a user account giving credentials. The way in which the account was set up will determine the attributes for the session. A user account has a number of attributes defined at creation time (which can be changed later):
+- Username
+- Authentication method
+- Default Tabelspace
+- Temp Tablespace
+- Tabelspace quotas
+- User profile
+- Account status
+
+All of these should be specified when creating a user although only username and authentication method are mandatory.
+
+
+USERNAME : The username must be unique in the database and must begin with a letter, be no more than 30 characters and can consist of letters, numbers, $ or _ . A username may not be a reserved word. The letters are case sensitive but will be converted to upper case. A username cannot be changed after creation - if it is neccessary to change it, the account must be dropped including all the objects in the users schema so not a great option. 
+
+DEFAULT TABLESPACE : Every account created has a default tablespace. This is the tablespace where any objects created by the user will reside (assuming that the user does not specify an alternative tabslepace [which they have been granted access to] when creating something). 
+* There is a database default property that will be appleid to all users accounts if a default tablespace is not specified when creating a user. 
+ALTER DATABASE DEFAULT TABLESPACE USERS;
+A quota is the amount of space in a tablespace that a user is allowed to occupy. He can create objects and allocate extents until the quota is reached. If he/she has no quota on a tablespace - he can create nothing! Quota can be changed at any time. if the quota is downsized to less than the size of the objects the user already owns, they will survive but not be allowed to grow any bigger. 
+
+  1  select username,created,account_status, default_tablespace, temporary_tablespace from dba_users
+  2* where username='HR'
+SYS @ sandpit > /
+USERNAME  CREATED   ACCOUNT_STATUS                 DEFAULT_TABLESPACE             TEMPORARY_TABLESPACE
+--------- --------- ------------------------------ ------------------------------ ------------------------------
+HR        15-FEB-14 EXPIRED & LOCKED               USERS                          TEMP
+
+
+Example of setting a quota:
+
+SYS @ sandpit > host echo This is how we grant a 1MB quota to scott
+This is how we grant a 1MB quota to scott
+
+SYS @ sandpit > alter user scott quota 1m on users;
+User altered.
+
+  1  select tablespace_name, username, max_bytes, max_bytes/1024/1024 MBs from dba_ts_quotas
+  2* where username='SCOTT'
+SYS @ sandpit > /
+TABLESPACE_NAME                USERNAME   MAX_BYTES        MBS
+------------------------------ --------- ---------- ----------
+USERS                          SCOTT         1048576          1
+
+Note that a figure of may_bytes=-1 means unlimited. 
+
+
+TEMPORARY_TABLESPACE : Permanent objects such as tables are stored in permanent tablespaces. Temporary objects are stored in temporary tablespaces. A session needs space in a temporary tablespace if the operation exceeds the space available in the sessions PGA or progam global area [private memory allocated to the session]. Operations such as this include sorting rows, joining tables and building indexes. Every user account is defined a temporary tablespace. Users do not need a quota on temporary tablespaces. 
+
+
+PROFILE : a users profile controls his / her password settings and limited control over his / her resource usage. 
+
+
+ACCOUNT_STATUS : Every account has a certain status indictaing the state of the account. e.g.
+open - all good and avalable for use
+locked - indicates that the DBA delibertaly locked the account and it is not available
+expired - indicates that the lifetime of the password has expired
+expired & locked - not only has the account been locked but the pasword expired also
+expired (grace) - indicates that the grace period is in effect to allow users an opportunity to change the password. 
+locked (timed) - indicates that the acount is locked because of incorrect attempts to log in
+
+To manipulate an account:
+
+  1* select username, account_status from dba_users where username ='SCOTT'
+SYS @ sandpit > /
+USERNAME                                 ACCOUNT_STATUS
+---------------------------------------- ------------------------------
+SCOTT                                     OPEN
+
+SYS @ sandpit > alter user scott account lock;
+User altered.
+
+SYS @ sandpit > select username, account_status from dba_users where username ='SCOTT'
+USERNAME                                 ACCOUNT_STATUS
+---------------------------------------- ------------------------------
+SCOTT                                     LOCKED
+
+SYS @ sandpit > alter user scott password expire; 
+User altered.
+
+SYS @ sandpit > select username, account_status from dba_users where username ='SCOTT';
+USERNAME                                 ACCOUNT_STATUS
+---------------------------------------- ------------------------------
+SCOTT                                     EXPIRED & LOCKED
+
+
+AUTHENTICATION_METHODS : An account must have some means of determining whether it is allowed to create a session. The simplest tehnique is by providing a password matched against a password stored in the database. 
+Alternatively: 
+- operating system authentication - 
+- password file authentication -
+- external authentication - 
+- global authentication -
+
+
+Operating system authentication and password file authentication are used only by administrators ( the two go together). You must grant either SYSDBA or SYSOPER privilege. 
+
+  1* select * from dict where table_name like '%FILE%' or table_name like '%USER%'
+SYS @ sandpit > select * from V$PWFILE_USERS;
+USERNAME                                 SYSDB SYSOP SYSAS
+---------------------------------------- ----- ----- -----
+SYS                                      TRUE  TRUE  FALSE
+
+SYS @ sandpit > grant sysdba to scott; 
+Grant succeeded.
+
+SYS @ sandpit > select * from V$PWFILE_USERS;
+USERNAME                                 SYSDB SYSOP SYSAS
+---------------------------------------- ----- ----- -----
+SYS                                      TRUE  TRUE  FALSE
+SCOTT                                     TRUE  FALSE FALSE
+
+This copyies the users password from the data dictionary into the external password file where it can be checked and matched by the instance even if the the database is not yet open. 
+
+Password file Authentication ==== connect scott/scott as sysdba;
+Operating system Authentictaion === connect / as sysdba; 
+Password Authentication === connect scott/scott;
+
+Any user can change his/her password using the same syntac (whether changing your own or someone elses...)
+alter  user scott identified by scott; 
+
+External Authentication is via an external service, a kerboros server, radius server or windows authentication server. Without the advanced security options, the only form of external authentication is operating system authentication. Th technique is to create an oracle user account but prefixed with a string specific to the instance parameter OS_AUTHENT_PREFIX. 
+
+SYS @ sandpit > show parameter os_a
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+os_authent_prefix                    string      ops$
+
+Assuming you have an operating system used called johndoe...
+
+create user ops$johndoe identified externally;
+
+Now John Doe can simply issue a 'sqlplus /' in order to connect to the database account ops$johndoe. 
+
+Having created user account, it may be neccessary to drop it 
+e.g. drop user scott;
+This command will only succeed if scott has no objects created?
+
+e.g. drop user scott cascade;
+This will drop scott and all his stuff too!

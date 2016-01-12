@@ -1,0 +1,7 @@
+A schema consists of objects owned by the the user account. Initially, it will be empty; a schema is a container for tables, views, code and other database objects. 
+
+Some schemas will always be empty - they will never create any objects because he/she does not need to and will usually have been granted permissions either through direct privileges or roles to to use code and access objects within other schemas owned by other users. Other users may be the reverse of this and will own many objects but will never actually log onto the database. 
+
+Schema objects are objects with an owener. The uniqie identifier for an object is its name prefixed with the name of the schema so HR.REGIONS for example. There could be another completely different table called SCOTT.REGIONS. residing in a different schema. 
+
+A number of users and their schemas are created automatically at database creation time. Principal amongst these are SYA and SYSTEM. SYS owns the data dictionary and several hundred PL/SQL packages. The SYSTEM schema stores various additional objects for admin and monitoring. 

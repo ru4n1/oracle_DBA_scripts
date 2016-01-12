@@ -1,0 +1,15 @@
+Database buffer cache is an aspect of the SGA - it is oracles work area for executing SQL. Data blocks containing the data of interest are first copied into the database buffer cache and changes such as inserting new rows or modifying existing rows are applied to these copies of the data blocks in the database buffer cache.
+
+Example 
+select * from employees were employee_id=100;
+update employees set salary=salary*1.5 where employee_id=100;
+
+The first select retrieves the data blocks containing the relevant row from a datafile into the buffer cache. Secondly the update statement will be constructed and executed. In this simple example, the database buffer cache hit ration will be 50% -i.e. two accesses of a block in the cache but onyl one read from disk. 
+
+A well tuned database will have a buffer cache well over 90%. 
+
+A database buffer will be clean when a block is first copied into it. A buffer will become a dirty buffer when the block image in cache is not the same as the image on disk. Evenetually dirty buffers must be written back to datafiles but there is no correlation between commits and when the blocks get written to *datafiles*. 
+
+The cache should be sized apporpriately for caching all frequently accessed blocks so as to avoid excessive disk activity.
+
+

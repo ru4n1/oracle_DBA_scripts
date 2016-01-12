@@ -1,0 +1,16 @@
+Example create table statement
+------------------------------
+
+Default value included plus a not-null constraint
+
+Note the addition of the PK constraint at the end also. 
+
+                CREATE TABLE cruises
+                ( cruise_id			NUMBER,
+                  cruise_type_id	NUMBER,
+                  cruise_name		VARCHAR2(20),
+                  captain_id		NUMBER NOT NULL,
+                  start_date		DATE,
+                  end_date			DATE,
+                  status			VARCHAR2(5) DEFAULT 'DOCK',
+                  CONSTRAINT cruise_pk PRIMARY KEY (cruise_id) );

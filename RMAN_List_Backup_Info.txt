@@ -1,0 +1,73 @@
+# The below will allow you to interogate the RMAN Catalog information
+
+
+**** shows parameter and config settings 
+----------------------------------------
+RMAN> show all; 
+RMAN configuration parameters for database with db_unique_name SANDPIT are:
+CONFIGURE RETENTION POLICY TO RECOVERY WINDOW OF 7 DAYS;
+CONFIGURE BACKUP OPTIMIZATION OFF; # default
+CONFIGURE DEFAULT DEVICE TYPE TO DISK; # default
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+CONFIGURE CONTROLFILE AUTOBACKUP FORMAT FOR DEVICE TYPE DISK TO '%F'; # default
+CONFIGURE DEVICE TYPE DISK PARALLELISM 1 BACKUP TYPE TO BACKUPSET; # default
+CONFIGURE DATAFILE BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE ARCHIVELOG BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE MAXSETSIZE TO UNLIMITED; # default
+CONFIGURE ENCRYPTION FOR DATABASE OFF; # default
+CONFIGURE ENCRYPTION ALGORITHM 'AES128'; # default
+CONFIGURE COMPRESSION ALGORITHM 'BASIC' AS OF RELEASE 'DEFAULT' OPTIMIZE FOR LOAD TRUE ; # default
+CONFIGURE ARCHIVELOG DELETION POLICY TO NONE; # default
+CONFIGURE SNAPSHOT CONTROLFILE NAME TO '/ora/app/product/11.2.0/db1/dbs/snapcf_sandpit.f'; # default
+
+RMAN> configure archivelog deletion policy to backed up 1 times to disk;
+new RMAN configuration parameters:
+CONFIGURE ARCHIVELOG DELETION POLICY TO BACKED UP 1 TIMES TO DISK;
+new RMAN configuration parameters are successfully stored
+starting full resync of recovery catalog
+full resync complete
+
+RMAN> configure CONTROLFILE AUTOBACKUP ON;
+old RMAN configuration parameters:
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+new RMAN configuration parameters:
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+new RMAN configuration parameters are successfully stored
+starting full resync of recovery catalog
+full resync complete
+
+
+
+**** List backup information 
+----------------------------
+RMAN> list backup;
+RMAN> list archivelog all;
+RMAN> list backup summary;
+
+
+**** Crosscheck objects to see if they still exist 
+--------------------------------------------------
+RMAN> crosscheck backup;
+RMAN> crosscheck archivelog all;
+
+
+**** Report and Remove any expired backups
+-------------------------------------------
+RMAN> list expired ;
+RMAN> delete expired backup;
+RMAN> report obsolete;
+RMAN> DELETE BACKUP COMPLETED BEFORE 'SYSDATE - 3';
+RMAN> DELETE ARCHIVELOG ALL BACKED UP 2 TIMES TO disk;
+RMAN> LIST BACKUP tag='FULL DB BACKUP' ;
+RMAN> LIST ARCHIVELOG ALL;
+RMAN> LIST BACKUP OF ARCHIVELOG ALL;
+RMAN> LIST BACKUP;
+RMAN> LIST BACKUP OF DATABASE;
+RMAN> LIST BACKUP OF DATAFILE 1;
+RMAN> LIST BACKUP BY BACKUP ; 
+RMAN> LIST BACKUP BY FILE; 
+RMAN> LIST BACKUP OF DATABASE ; 
+RMAN> LIST BACKUP OF ARCHIVELOG ALL ; 
+RMAN> LIST RESTORE POINT ALL;
+RMAN> REPORT SCHEMA ;
+

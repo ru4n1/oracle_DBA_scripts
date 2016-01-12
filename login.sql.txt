@@ -1,0 +1,13 @@
+-- you can define a profile file for Sqlplus also 
+-- by creating a login.sql file in a directory which is 
+-- invoked each time you open sqlplus from that durectory
+
+-- you cam also have a global sqlplus glogin.sql file 
+-- which is invoked by every sqlplus session then
+-- $ORACLE_HOME/sqlplus/admin/glogin.sql
+
+set linesize 120
+set pagesize 120
+set feedback on
+define _editor=vi
+set sqlprompt "&_user '@' _connect_identifier > "

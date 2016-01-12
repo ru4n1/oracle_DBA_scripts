@@ -1,0 +1,28 @@
+--- LPAD and RPAD adds a padding string of characters to the left or right of a string until it reaches a specified length.
+
+## RPAD
+ 1* select rpad ('password',10,'#') from dual
+HR @ sandpit > /
+RPAD('PASS
+----------
+password##
+
+
+## LPAD
+1* select lpad ('password',10,'#') from dual
+HR @ sandpit > /
+LPAD('PASSWORD',20,'
+--------------------
+############password
+
+
+
+select rpad( lpad(table_name,25,'*'),50,'*') from user_tables
+SQL>/
+
+RPAD(LPAD(TABLE_NAME,25,'*'),50,'*')
+--------------------------------------------------
+*********************DEPT*************************
+**********************EMP*************************
+********************BONUS*************************
+*****************SALGRADE*************************

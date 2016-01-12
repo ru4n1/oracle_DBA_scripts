@@ -1,0 +1,26 @@
+Segment Space Management
+------------------------
+
+The segment space management is set per tablespace and applies to all segments within the tabelspace. There are two options, automatic and manual (auto should alwyas be used and the other is only a legacy still supported holdover from previous releases. 
+Automatic segment space management was introduced with 9i and has become the default within 11G. There are five bitmaps for each segment. And each block will appear on one and only one bitmap
+
+so there are bitmaps for blocks 
+- that are full
+- that are 75-100% full
+- that are 50-75% full
+- that are 25-50% full
+- that are 0-25% full. 
+
+Asrows are inserted, deleted or changed, the bitmaps are updated accordingly. 
+
+ 1* select tablespace_name, segment_space_management from dba_tablespaces
+SYS @ sandpit > /
+
+TABLESPACE_NAME                SEGMEN
+------------------------------ ------
+SYSTEM                         MANUAL
+SYSAUX                         AUTO
+UNDOTBS1                       MANUAL
+TEMP                           MANUAL
+USERS                          AUTO
+EXAMPLE                        AUTO

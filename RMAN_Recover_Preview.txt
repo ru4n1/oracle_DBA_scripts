@@ -1,0 +1,29 @@
+# You can also ask RMAN to give a preview indication of what would be required for a 
+# resotee / recovery 
+
+RMAN> restore database preview summary ;
+
+Starting restore at 16-NOV-14
+using channel ORA_DISK_1
+
+
+List of Backups
+===============
+Key     TY LV S Device Type Completion Time #Pieces #Copies Compressed Tag
+------- -- -- - ----------- --------------- ------- ------- ---------- ---
+1630    B  0  A DISK        16-NOV-14       1       1       NO         TAG20141116T020534
+1631    B  1  A DISK        16-NOV-14       1       1       NO         TAG20141116T020534
+
+List of Archived Log Copies for database with db_unique_name SANDPIT
+=====================================================================
+
+Key     Thrd Seq     S Low Time 
+------- ---- ------- - ---------
+1628    1    4       A 16-NOV-14
+        Name: /arch/arch_1_4_863747688.arc
+
+Media recovery start SCN is 1208597
+Recovery must be done beyond SCN 1208833 to clear datafile fuzziness
+Finished restore at 16-NOV-14
+
+

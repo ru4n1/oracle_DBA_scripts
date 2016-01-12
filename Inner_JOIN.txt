@@ -1,0 +1,19 @@
+INNER JOIN (SIMPLE JOIN)
+Chances are, you've already written a statement that uses an Oracle INNER JOIN. It is the most common type of join. Oracle INNER JOINS return all rows from multiple tables where the join condition is met.
+SYNTAX
+
+The syntax for the Oracle INNER JOIN is:
+
+SELECT columns FROM table1
+INNER JOIN table2
+ON table1.column = table2.column;
+
+select *
+from ref_user_name_map inner join ref_agent
+on (REF_USER_NAME_MAP.LOGICAL_USER_NAME=REF_AGENT.ID)
+where REF_USER_NAME_MAP.LOGICAL_USER_NAME ='1234';
+-- older implicit oracle syntax
+select *
+from ref_user_name_map, ref_agent
+where ref_user_name_map.logical_user_name=ref_agent.id
+and ref_user_name_map.logical_user_name='1234';

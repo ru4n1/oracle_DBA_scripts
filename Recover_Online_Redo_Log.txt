@@ -1,0 +1,86 @@
+
+# you can lose an online redo log file and the instance will not be impacted so long as the redo log 
+# is multiplexed as part of a logfile group
+
+
+SYS @ sandpit > select * from v$logfile;
+    GROUP# STATUS    TYPE    MEMBER                                   IS_
+---------- --------- ------- ---------------------------------------- ---
+         3           ONLINE  /u03/oradata/sandpit/redo03a.log         NO
+         2           ONLINE  /u02/oradata/sandpit/redo02a.log         NO
+         1           ONLINE  /u01/oradata/sandpit/redo01a.log         NO
+         3           ONLINE  /u03/oradata/sandpit/redo03b.log         NO
+         2           ONLINE  /u02/oradata/sandpit/redo02b.log         NO
+         1           ONLINE  /u01/oradata/sandpit/redo01b.log         NO
+
+# here i remove a single redo log file while the instance is up. 
+SYS @ sandpit > host rm /u01/oradata/sandpit/redo01a.log
+rm: /u01/oradata/sandpit/redo01a.log: No such file or directory
+
+SYS @ sandpit > alter system switch logfile;
+System altered.
+
+SYS @ sandpit > /
+System altered.
+
+SYS @ sandpit > /
+System altered.
+
+SYS @ sandpit > select * from v$logfile;
+    GROUP# STATUS    TYPE    MEMBER                                   IS_
+---------- --------- ------- ---------------------------------------- ---
+         3           ONLINE  /u03/oradata/sandpit/redo03a.log         NO
+         2           ONLINE  /u02/oradata/sandpit/redo02a.log         NO
+         1           ONLINE  /u01/oradata/sandpit/redo01a.log         NO
+         3           ONLINE  /u03/oradata/sandpit/redo03b.log         NO
+         2           ONLINE  /u02/oradata/sandpit/redo02b.log         NO
+         1           ONLINE  /u01/oradata/sandpit/redo01b.log         NO
+
+SYS @ sandpit > shutdown immediate;
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+SYS @ sandpit > startup;
+ORACLE instance started.
+Total System Global Area  471830528 bytes
+Fixed Size                  2212128 bytes
+Variable Size             385879776 bytes
+Database Buffers           75497472 bytes
+Redo Buffers                8241152 bytes
+Database mounted.
+Database opened.
+
+# After shutting down and restarting the instance, note the status of the log file which we removed
+SYS @ sandpit > select * from v$logfile;
+
+    GROUP# STATUS    TYPE    MEMBER                                   IS_
+---------- --------- ------- ---------------------------------------- ---
+         3           ONLINE  /u03/oradata/sandpit/redo03a.log         NO
+         2           ONLINE  /u02/oradata/sandpit/redo02a.log         NO
+         1 INVALID   ONLINE  /u01/oradata/sandpit/redo01a.log         NO
+         3           ONLINE  /u03/oradata/sandpit/redo03b.log         NO
+         2           ONLINE  /u02/oradata/sandpit/redo02b.log         NO
+         1           ONLINE  /u01/oradata/sandpit/redo01b.log         NO
+
+# to correct this, use the command beow which will delete and recreate all the members of the log file group 
+# it will only work if the log file group is not active or current or of course, not yet archived out. 
+SYS @ sandpit > alter database clear logfile group 1;
+Database altered.
+
+SYS @ sandpit > select * from v$logfile;
+    GROUP# STATUS    TYPE    MEMBER                                   IS_
+---------- --------- ------- ---------------------------------------- ---
+         3           ONLINE  /u03/oradata/sandpit/redo03a.log         NO
+         2           ONLINE  /u02/oradata/sandpit/redo02a.log         NO
+         1           ONLINE  /u01/oradata/sandpit/redo01a.log         NO
+         3           ONLINE  /u03/oradata/sandpit/redo03b.log         NO
+         2           ONLINE  /u02/oradata/sandpit/redo02b.log         NO
+         1           ONLINE  /u01/oradata/sandpit/redo01b.log         NO
+
+SYS @ sandpit > host ls -lrt /u0*/oradata/sandpit/redo*log
+-rw-r-----   1 oracle   oinstall 52429312 Mar 22 23:32 /u02/oradata/sandpit/redo02a.log
+-rw-r-----   1 oracle   oinstall 52429312 Mar 22 23:32 /u02/oradata/sandpit/redo02b.log
+-rw-r-----   1 oracle   oinstall 52429312 Mar 22 23:33 /u01/oradata/sandpit/redo01a.log
+-rw-r-----   1 oracle   oinstall 52429312 Mar 22 23:33 /u01/oradata/sandpit/redo01b.log
+-rw-r-----   1 oracle   oinstall 52429312 Mar 22 23:35 /u03/oradata/sandpit/redo03a.log
+-rw-r-----   1 oracle   oinstall 52429312 Mar 22 23:35 /u03/oradata/sandpit/redo03b.log

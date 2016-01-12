@@ -1,0 +1,9 @@
+create tablespace DATA1				-- define TS name
+datafile '/u02/oradata/sandpit/data01.dbf' 	-- specify the data file name
+size 100M autoextend off 			-- set the initial size and it will not auto extend
+logging						-- all operations on the tablespace will generate redo - this is default
+online						-- creates the TS online?
+permanent					-- specifies the type of tablespace as opposed to temp or undo
+extent management local autoallocate		-- local extent management - this is default, and the autoallocate simplifies management
+segment space management auto;			-- automatic segment space management, tells oracle you want to use bitmaps to manage the free space
+						-- this is simpler and more efficient 

@@ -1,0 +1,34 @@
+HR @ sandpit > select ' i am a literal character string ' from dual;
+
+'IAMALITERALCHARACTERSTRING'
+---------------------------------
+ i am a literal character string
+
+1 row selected.
+
+HR @ sandpit > select ' literal'||'processing from regions' from regions;
+
+'LITERAL'||'PROCESSINGFROMREGIO
+-------------------------------
+ literalprocessing from regions
+ literalprocessing from regions
+ literalprocessing from regions
+ literalprocessing from regions
+
+
+Be careful with quotation marks...
+
+ 1* select 'plural's have one quote too many' from dual
+HR @ sandpit > /
+ERROR:
+ORA-01756: quoted string not properly terminated
+
+-- Note the insertion of the singular extra quotation operator
+  1* select 'plural''s have one quote too many' from dual
+HR @ sandpit > /
+
+'PLURAL''SHAVEONEQUOTETOOMANY'
+--------------------------------
+plural's have one quote too many
+1 row selected.
+

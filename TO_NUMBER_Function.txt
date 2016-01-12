@@ -1,0 +1,15 @@
+Example: In the example that follows, our starting value is a string, ‘$17,000.23’. 
+This isn’t a numeric datatype but a character string containing a dollar sign and a comma.
+ The format model here explains that the dollar sign is a symbol, and the format model makes 
+ it clear where the significant numeric data can be found in the source column.
+  The “9” element below is not a literal number 9, but rather an element of the format model 
+  that indicates the presence of any digit. It is repeated to indicate the upper bound of
+   acceptable values. Finally the output is displayed—a raw numeric value extracted from
+    the character string ‘$17,000.23’.
+    
+    
+  SELECT TO_NUMBER('$17,000.23','$999,999.99')
+  FROM   DUAL;
+  TO_NUMBER('$17,000.23','$999,999.99')
+  ------------------------------------
+  17000.23

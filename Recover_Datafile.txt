@@ -1,0 +1,182 @@
+The data files that make up the SYSTEM and UNDO tablespaces are critical. If any of the datafiles are damaged whilst the system is up, then the database will abort. The other datafiles are non critical to the database running and the database (if any of these datafiles get damaged) will take them offline automatically. 
+
+if the database is shut down, and you try to open it...
+if a critical datafile is damaged, the database will not open until it has been recovered and restored 
+if a non-critical datafile is damaged, the datafile must be taken offline manually before the database will open
+
+ # I accidentally deleted a tablespace data file -- ooops!
+
+SYS @ sandpit > select * from dba_data_files;
+FILE_NAME                                       FILE_ID TABLESPACE_NAME                     BYTES     BLOCKS STATUS
+-------------------------------------------- ---------- ------------------------------ ---------- ---------- ---------
+RELATIVE_FNO AUT   MAXBYTES  MAXBLOCKS INCREMENT_BY USER_BYTES USER_BLOCKS ONLINE_
+------------ --- ---------- ---------- ------------ ---------- ----------- -------
+/u02/oradata/sandpit/users01.dbf                      4 USERS                             5242880        640 AVAILABLE
+           4 YES  104857600      12800          160    4194304         512 ONLINE
+
+/u02/oradata/sandpit/undotbs01.dbf                    3 UNDOTBS1                         62914560       7680 AVAILABLE
+           3 YES 3.4360E+10    4194302          640   61865984        7552 ONLINE
+
+/u02/oradata/sandpit/sysaux01.dbf                     2 SYSAUX                          744488960      90880 AVAILABLE
+           2 YES 3.4360E+10    4194302         1280  743440384       90752 ONLINE
+
+/u02/oradata/sandpit/system01.dbf                     1 SYSTEM                          786432000      96000 AVAILABLE
+           1 YES 3.4360E+10    4194302         1280  785383424       95872 SYSTEM
+
+/u02/oradata/sandpit/example01.dbf                    5 EXAMPLE                         104857600      12800 AVAILABLE
+           5 YES 3.4360E+10    4194302           80  103809024       12672 ONLINE
+
+/u02/oradata/sandpit/undo2tbs01.dbf                   6 UNDO2                           262144000      32000 AVAILABLE
+           6 NO           0          0            0  261095424       31872 ONLINE
+
+/u02/oradata/sandpit/testing01.dbf                    7 TESTING                          10485760       1280 AVAILABLE
+           7 NO           0          0            0    9437184        1152 ONLINE
+
+
+SYS @ sandpit > host rm /u02/oradata/sandpit/testing01.dbf 
+
+SYS @ sandpit > create taboile tab1 (name varchar2(10), dday date) tablespace testing;
+create table tab1 (name varchar2(10), dday date) tablespace testing
+*
+ERROR at line 1:
+ORA-01116: error in opening database file 7
+ORA-01110: data file 7: '/u02/oradata/sandpit/testing01.dbf'
+ORA-27041: unable to open file
+Solaris-AMD64 Error: 2: No such file or directory
+Additional information: 3
+
+# To Diagnose a damaged datafile, try the below process, the datafile missing will cause you heartache when you try
+# to open or shut the database.
+
+SYS @ sandpit > shutdown abort;
+ORACLE instance shut down.
+SYS @ sandpit > startup;
+ORACLE instance started.
+Total System Global Area  471830528 bytes
+Fixed Size                  2212128 bytes
+Variable Size             385879776 bytes
+Database Buffers           75497472 bytes
+Redo Buffers                8241152 bytes
+Database mounted.
+ORA-01157: cannot identify/lock data file 7 - see DBWR trace file
+ORA-01110: data file 7: '/u02/oradata/sandpit/testing01.dbf'
+
+# start the database into mount mode and the...
+# You will need to offline the offending tablespace whilst you recover it.
+SYS @ sandpit > alter database datafile '/u02/oradata/sandpit/testing01.dbf' offline;
+Database altered.
+
+SYS @ sandpit > list
+  1* select status, name, file# from v$datafile
+SYS @ sandpit > /
+
+STATUS  NAME                                              FILE#
+------- -------------------------------------------- ----------
+SYSTEM  /u02/oradata/sandpit/system01.dbf                     1
+ONLINE  /u02/oradata/sandpit/sysaux01.dbf                     2
+ONLINE  /u02/oradata/sandpit/undotbs01.dbf                    3
+ONLINE  /u02/oradata/sandpit/users01.dbf                      4
+ONLINE  /u02/oradata/sandpit/example01.dbf                    5
+ONLINE  /u02/oradata/sandpit/undo2tbs01.dbf                   6
+RECOVER /u02/oradata/sandpit/testing01.dbf                    7
+
+
+Now you should be in a position restore and recover the damaged file
+# as per below rman example...
+-bash-4.1$ rman target /
+Recovery Manager: Release 11.2.0.1.0 - Production on Sun Mar 23 00:34:23 2014
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+connected to target database: SANDPIT (DBID=4081594592, not open)
+
+RMAN> connect catalog rcat/rcat@catalog 
+connected to recovery catalog database
+
+RMAN> list failure
+
+List of Database Failures
+=========================
+
+Failure ID Priority Status    Time Detected Summary
+---------- -------- --------- ------------- -------
+1002       HIGH     OPEN      23-MAR-14     One or more non-system datafiles are missing
+
+RMAN> advise failure;
+
+List of Database Failures
+=========================
+Failure ID Priority Status    Time Detected Summary
+---------- -------- --------- ------------- -------
+1002       HIGH     OPEN      23-MAR-14     One or more non-system datafiles are missing
+
+analyzing automatic repair options; this may take some time
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=9 device type=DISK
+analyzing automatic repair options complete
+
+Mandatory Manual Actions
+========================
+no manual actions available
+
+Optional Manual Actions
+=======================
+1. If file /u02/oradata/sandpit/users01.dbf was unintentionally renamed or moved, restore it
+
+Automated Repair Options
+========================
+Option Repair Description
+------ ------------------
+1      Restore and recover datafile 4  
+  Strategy: The repair includes complete media recovery with no data loss
+  Repair script: /u01/app/oracle/product/11.2.0/diag/rdbms/sandpit/sandpit/hm/reco_1276290087.hm
+
+RMAN> @/u01/app/oracle/product/11.2.0/diag/rdbms/sandpit/sandpit/hm/reco_1276290087.hm
+
+RMAN>    # restore and recover datafile
+2>    restore datafile 4;
+Starting restore at 23-MAR-14
+using channel ORA_DISK_1
+channel ORA_DISK_1: starting datafile backup set restore
+channel ORA_DISK_1: specifying datafile(s) to restore from backup set
+channel ORA_DISK_1: restoring datafile 00004 to /u02/oradata/sandpit/users01.dbf
+channel ORA_DISK_1: reading from backup piece /export/home/oracle/BKP/SANDPIT_20
+channel ORA_DISK_1: piece handle=/export/home/oracle/BKP/SANDPIT_20 tag=TAG20140320T014601
+channel ORA_DISK_1: restored backup piece 1
+channel ORA_DISK_1: restore complete, elapsed time: 00:00:01
+Finished restore at 23-MAR-14
+
+RMAN>    recover datafile 4;
+Starting recover at 23-MAR-14
+using channel ORA_DISK_1
+starting media recovery
+archived log for thread 1 with sequence 111 is already on disk as file /u04/arch/1_111_839566437.dbf
+archived log for thread 1 with sequence 112 is already on disk as file /u04/arch/1_112_839566437.dbf
+archived log for thread 1 with sequence 113 is already on disk as file /u04/arch/1_113_839566437.dbf
+archived log for thread 1 with sequence 114 is already on disk as file /u04/arch/1_114_839566437.dbf
+archived log for thread 1 with sequence 115 is already on disk as file /u04/arch/1_115_839566437.dbf
+archived log for thread 1 with sequence 116 is already on disk as file /u04/arch/1_116_839566437.dbf
+archived log for thread 1 with sequence 117 is already on disk as file /u04/arch/1_117_839566437.dbf
+archived log for thread 1 with sequence 118 is already on disk as file /u04/arch/1_118_839566437.dbf
+archived log for thread 1 with sequence 119 is already on disk as file /u04/arch/1_119_839566437.dbf
+archived log file name=/u04/arch/1_111_839566437.dbf thread=1 sequence=111
+archived log file name=/u04/arch/1_112_839566437.dbf thread=1 sequence=112
+archived log file name=/u04/arch/1_113_839566437.dbf thread=1 sequence=113
+archived log file name=/u04/arch/1_114_839566437.dbf thread=1 sequence=114
+archived log file name=/u04/arch/1_115_839566437.dbf thread=1 sequence=115
+archived log file name=/u04/arch/1_116_839566437.dbf thread=1 sequence=116
+archived log file name=/u04/arch/1_117_839566437.dbf thread=1 sequence=117
+media recovery complete, elapsed time: 00:00:02
+Finished recover at 23-MAR-14
+RMAN> **end-of-file**
+RMAN> quit
+
+Recovery Manager complete.
+-bash-4.1$ sp
+SQL*Plus: Release 11.2.0.1.0 Production on Sun Mar 23 00:35:18 2014
+Copyright (c) 1982, 2009, Oracle.  All rights reserved.
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SYS @ sandpit > alter database open;
+Database altered.
+

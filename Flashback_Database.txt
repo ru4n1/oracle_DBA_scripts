@@ -1,0 +1,113 @@
+SQL> PROMPT First enable the flashback option, Database will have to be in archivelog mode
+First enable the flashback option, Database will have to be in archivelog mode
+
+SQL> select flashback_on from v$database ;
+
+FLASHBACK_ON
+------------------
+NO
+
+SQL> archive log list 
+Database log mode              Archive Mode
+Automatic archival             Enabled
+Archive destination            /FRA
+Oldest online log sequence     11
+Next log sequence to archive   13
+Current log sequence           13
+
+SQL> alter database flashback on ;
+
+Database altered.
+
+SQL> select flashback_on from v$database ;
+FLASHBACK_ON
+------------------
+YES
+
+SQL> PROMPT Then check for restore points 
+Then check for restore points
+
+SQL> select * from v$restore_point;
+
+no rows selected
+
+
+
+-------
+# Create a restore point 
+
+
+SQL> create restore point test_point guarantee flashback database ;
+
+Restore point created.
+
+SQL> desc v$restore_point;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ SCN                                                NUMBER
+ DATABASE_INCARNATION#                              NUMBER
+ GUARANTEE_FLASHBACK_DATABASE                       VARCHAR2(3)
+ STORAGE_SIZE                                       NUMBER
+ TIME                                               TIMESTAMP(9)
+ RESTORE_POINT_TIME                                 TIMESTAMP(9)
+ PRESERVED                                          VARCHAR2(3)
+ NAME                                               VARCHAR2(128)
+
+SQL> col name format a33
+SQL> select name, time, guarantee_flashback_database from v$restore_point ;
+
+NAME
+---------------------------------
+TIME                                                                        GUA
+--------------------------------------------------------------------------- ---
+TEST_POINT
+04-NOV-14 11.50.07.000000000 PM  
+
+
+
+
+
+--------flashback database 
+
+
+SQL> startup mount;
+ORACLE instance started.
+
+Total System Global Area  563691520 bytes
+Fixed Size                  2213016 bytes
+Variable Size             406850408 bytes
+Database Buffers          146800640 bytes
+Redo Buffers                7827456 bytes
+select * from Database mounted.
+vSQL> $restore_point;
+
+       SCN DATABASE_INCARNATION# GUA STORAGE_SIZE
+---------- --------------------- --- ------------
+TIME
+---------------------------------------------------------------------------
+RESTORE_POINT_TIME                                                          PRE
+--------------------------------------------------------------------------- ---
+NAME
+--------------------------------------------------------------------------------
+   1005835                     2 YES     40804352
+04-NOV-14 11.50.07.000000000 PM
+                                                                            YES
+TEST_POINT
+
+
+SQL> flashback database to restore point test_point;
+
+Flashback complete.
+
+SQL> alter database open;
+alter database open
+*
+ERROR at line 1:
+ORA-01589: must use RESETLOGS or NORESETLOGS option for database open
+
+
+SQL> alter database open resetlogs;
+
+Database altered.
+
+SQL> 

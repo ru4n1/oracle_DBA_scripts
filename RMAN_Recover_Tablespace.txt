@@ -1,0 +1,96 @@
+# TABLESPACE
+# You can also specify a specific tablespace to recover individually. 
+# You must take the tablespace offline firstly in order to prepare it for recovery. 
+
+SYS @ sandpit > select tablespace_name, status from dba_tablespaces;
+TABLESPACE_NAME                STATUS
+------------------------------ ---------
+SYSTEM                         ONLINE
+SYSAUX                         ONLINE
+UNDOTBS1                       ONLINE
+TEMP                           ONLINE
+USERS                          ONLINE
+EXAMPLE                        ONLINE
+UNDO2                          ONLINE
+
+SYS @ sandpit > alter tablespace example offline;
+Tablespace altered.
+
+SYS @ sandpit > select tablespace_name, status from dba_tablespaces;
+TABLESPACE_NAME                STATUS
+------------------------------ ---------
+SYSTEM                         ONLINE
+SYSAUX                         ONLINE
+UNDOTBS1                       ONLINE
+TEMP                           ONLINE
+USERS                          ONLINE
+EXAMPLE                        OFFLINE
+UNDO2                          ONLINE
+
+-bash-4.1$ rmanconn
+Recovery Manager: Release 11.2.0.1.0 - Production on Sun Sep 7 18:07:41 2014
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+connected to target database: SANDPIT (DBID=4081594592)
+connected to recovery catalog database
+
+RMAN> restore tablespace example; 
+
+Starting restore at 07-SEP-14
+starting full resync of recovery catalog
+full resync complete
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=11 device type=DISK
+
+channel ORA_DISK_1: starting datafile backup set restore
+channel ORA_DISK_1: specifying datafile(s) to restore from backup set
+channel ORA_DISK_1: restoring datafile 00005 to /u02/oradata/sandpit/example01.dbf
+channel ORA_DISK_1: reading from backup piece /export/home/oracle/BKP/20140907_1_75_SANDPIT_07
+channel ORA_DISK_1: piece handle=/export/home/oracle/BKP/20140907_1_75_SANDPIT_07 tag=FULL1 BACKUP HERE
+channel ORA_DISK_1: restored backup piece 1
+channel ORA_DISK_1: restore complete, elapsed time: 00:00:56
+Finished restore at 07-SEP-14
+
+RMAN> recover tablespace example;
+Starting recover at 07-SEP-14
+using channel ORA_DISK_1
+
+starting media recovery
+
+archived log for thread 1 with sequence 27 is already on disk as file /u04/arch/1_27_852212336.dbf
+archived log for thread 1 with sequence 28 is already on disk as file /u04/arch/1_28_852212336.dbf
+archived log for thread 1 with sequence 29 is already on disk as file /u04/arch/1_29_852212336.dbf
+archived log for thread 1 with sequence 1 is already on disk as file /u04/arch/1_1_857668607.dbf
+archived log file name=/u04/arch/1_27_852212336.dbf thread=1 sequence=27
+archived log file name=/u04/arch/1_28_852212336.dbf thread=1 sequence=28
+archived log file name=/u04/arch/1_29_852212336.dbf thread=1 sequence=29
+archived log file name=/u04/arch/1_1_857668607.dbf thread=1 sequence=1
+media recovery complete, elapsed time: 00:00:02
+Finished recover at 07-SEP-14
+
+RMAN> sql 'alter tablespace example online';
+
+sql statement: alter tablespace example online
+starting full resync of recovery catalog
+full resync complete
+RMAN> quit
+
+Recovery Manager complete.
+-bash-4.1$ sp
+SQL*Plus: Release 11.2.0.1.0 Production on Sun Sep 7 18:10:53 2014
+Copyright (c) 1982, 2009, Oracle.  All rights reserved.
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SYS @ sandpit > select tablespace_name, status from dba_tablespaces;
+
+TABLESPACE_NAME                STATUS
+------------------------------ ---------
+SYSTEM                         ONLINE
+SYSAUX                         ONLINE
+UNDOTBS1                       ONLINE
+TEMP                           ONLINE
+USERS                          ONLINE
+EXAMPLE                        ONLINE
+UNDO2                          ONLINE

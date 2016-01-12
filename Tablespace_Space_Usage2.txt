@@ -1,0 +1,17 @@
+-- Script to ascertain tablespace usage information
+
+spool table_space_usage
+
+set linesize 200
+set pagesize 60
+set feedback on 
+set heading on
+
+select t.tablespace_name NAME, d.allocated, u.used, f.free, t.status, d.cnt, contents, t.extent_management EXTMAN, t.segment_space_management SEGMAN
+from dba_tablespaces t,
+(select sum(bytes) allocated, count(file_id) CNT 	from dba_data_files  where tablespace_name = 'EXAMPLE') d,
+(select sum(bytes) FREE   				from dba_free_space  where tablespace_name = 'EXAMPLE') f,
+(select sum(bytes) USED 				from dba_segments    where tablespace_name = 'EXAMPLE') u,
+where t.tablespace_name='EXAMPLE'; 
+
+spool off

@@ -1,0 +1,13 @@
+The redo log buffer is a staging area for change vectors before they are written out to redo log on disk. A change vector is a modifictaion applied to something, i.e. DML statements to data.
+
+Sessions write redo log to the log buffer in memory as they proceed (i.e. think of a number of 100 of insert stateemnts). The log buffer may contain change vectors from many different sessions interleaved with one another, is then written out to the redo log file on disk. One write of the redo log buffer to disk may therefore be a bunch of many change vectors for many transactions.The writes are done in very nearly real time and performed by the log writer background process. LGWR.
+
+Log writer writes the contents of the redo log buffer to the redo log on disk...
+- every 3 seconds
+- at the commiting of a transaction
+- when the redo log buffer is 1/3 full
+- upon being signalled by the DBWR
+
+When a commit statement is issued - part of the commit processing involves writing the contents of the log buffer to redo log file on disk (to make permanent the change - the info does not have to yet be reflected in the database files but needs to be in the redo log file!) A large log buffer means that there may be more to write when a commit is issued. 
+
+Redo is a replayable history...

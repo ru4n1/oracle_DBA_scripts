@@ -1,0 +1,6 @@
+When you commit - all that physically happens is that LGWR flushes the log buffer to disk. (DBWR does nothing!)
+
+To make a transaction durable, all that is required is that the changes that make up the transaction are on disk, there is no need for the actual changed table data to be on disk in the datafiles!! If the change vectors are on disk, in the form of mutiplexed redo log files, then in the event of damage to the database, the transaction can be easily reinstated by restoring the datafiles from backup and applying the changes for the redo/archive logs. 
+
+Where there is sometimes confusion is that the stream of redo written out to the log files by LGWR will contain changes for both uncommitted and committed transactions; furthermore, DBWR may have written out dirty buffer blocks for both committed and uncommitted transactions to the datafiles. Uh oh! But in the event of a crash, the stream of redo on disk always has enough information to reinstate any committed transactions that are not in the datafiles (by use of the change vectors applied to data blocks) and reinstate the undo segments (using the change vectors applied to undo blocks) needed to roll back any uncommitted transactions that are in the datafiles too. 
+

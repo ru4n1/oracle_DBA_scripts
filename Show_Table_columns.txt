@@ -1,0 +1,42 @@
+## SQL TO Generate detailed column listing as from the Data Dictionary based on table name entered 
+
+SQL> LIST 
+  1   SELECT '*TABLE: ' || TABLE_NAME, COMMENTS
+  2                  FROM   ALL_TAB_COMMENTS
+  3                  WHERE  OWNER = 'SYS'
+  4                    AND  TABLE_NAME = '&&Enter_Table'
+  5                  UNION ALL
+  6                  SELECT 'COL: ' || COLUMN_NAME, COMMENTS
+  7                  FROM   ALL_COL_COMMENTS
+  8                  WHERE  OWNER = 'SYS'
+  9*                   AND  TABLE_NAME = '&&Enter_Table'
+SQL> /
+old   4:                   AND  TABLE_NAME = '&&Enter_Table'
+new   4:                   AND  TABLE_NAME = 'DBA_TABLES'
+old   9:                   AND  TABLE_NAME = '&&Enter_Table'
+new   9:                   AND  TABLE_NAME = 'DBA_TABLES'
+
+'*TABLE:'||TABLE_NAME                  COMMENTS
+-------------------------------------- ------------------------------------------------------------------------------------------------------------------------------------------------------
+*TABLE: DBA_TABLES                     Description of all relational tables in the database
+COL: MAX_TRANS                         Maximum number of transactions
+COL: INITIAL_EXTENT                    Size of the initial extent in bytes
+COL: NEXT_EXTENT                       Size of secondary extents in bytes
+COL: MIN_EXTENTS                       Minimum number of extents allowed in the segment
+COL: MAX_EXTENTS                       Maximum number of extents allowed in the segment
+COL: PCT_INCREASE                      Percentage increase in extent size
+COL: FREELISTS                         Number of process freelists allocated in this segment
+COL: FREELIST_GROUPS                   Number of freelist groups allocated in this segment
+COL: LOGGING                           Logging attribute
+COL: BACKED_UP                         Has table been backed up since last modification?
+COL: NUM_ROWS                          The number of rows in the table
+COL: BLOCKS                            The number of used blocks in the table
+COL: EMPTY_BLOCKS                      The number of empty (never used) blocks in the table
+COL: AVG_SPACE                         The average available free space in the table
+COL: CHAIN_CNT                         The number of chained rows in the table
+COL: AVG_ROW_LEN                       The average row length, including row overhead
+COL: AVG_SPACE_FREELIST_BLOCKS         The average freespace of all blocks on a freelist
+COL: NUM_FREELIST_BLOCKS               The number of blocks on the freelist
+COL: DEGREE                            The number of threads per instance for scanning the table
+COL: INSTANCES                         The number of instances across which the table is to be scanned
+.... ETC

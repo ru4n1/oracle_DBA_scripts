@@ -1,0 +1,58 @@
+-- Rman config settings - reccomended below
+
+RMAN> CONFIGURE RETENTION POLICY TO RECOVERY WINDOW OF 3 days; 
+
+old RMAN configuration parameters:
+CONFIGURE RETENTION POLICY TO RECOVERY WINDOW OF 1 DAYS;
+new RMAN configuration parameters:
+CONFIGURE RETENTION POLICY TO RECOVERY WINDOW OF 3 DAYS;
+new RMAN configuration parameters are successfully stored
+starting full resync of recovery catalog
+full resync complete
+
+RMAN> CONFIGURE BACKUP OPTIMIZATION ON;
+
+old RMAN configuration parameters:
+CONFIGURE BACKUP OPTIMIZATION ON;
+new RMAN configuration parameters:
+CONFIGURE BACKUP OPTIMIZATION ON;
+new RMAN configuration parameters are successfully stored
+starting full resync of recovery catalog
+full resync complete
+
+RMAN> CONFIGURE CONTROLFILE AUTOBACKUP ON;
+
+old RMAN configuration parameters:
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+new RMAN configuration parameters:
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+new RMAN configuration parameters are successfully stored
+starting full resync of recovery catalog
+full resync complete
+
+RMAN> CONFIGURE ARCHIVELOG DELETION POLICY TO BACKED UP 1 TIMES TO DISK;
+
+new RMAN configuration parameters:
+CONFIGURE ARCHIVELOG DELETION POLICY TO BACKED UP 1 TIMES TO DISK;
+new RMAN configuration parameters are successfully stored
+starting full resync of recovery catalog
+full resync complete
+
+RMAN> SHOW ALL;
+
+RMAN configuration parameters for database with db_unique_name SANDPRD are:
+CONFIGURE RETENTION POLICY TO RECOVERY WINDOW OF 3 DAYS;
+CONFIGURE BACKUP OPTIMIZATION ON;
+CONFIGURE DEFAULT DEVICE TYPE TO DISK; # default
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+CONFIGURE CONTROLFILE AUTOBACKUP FORMAT FOR DEVICE TYPE DISK TO '%F'; # default
+CONFIGURE DEVICE TYPE DISK PARALLELISM 1 BACKUP TYPE TO BACKUPSET; # default
+CONFIGURE DATAFILE BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE ARCHIVELOG BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE MAXSETSIZE TO UNLIMITED; # default
+CONFIGURE ENCRYPTION FOR DATABASE OFF; # default
+CONFIGURE ENCRYPTION ALGORITHM 'AES128'; # default
+CONFIGURE COMPRESSION ALGORITHM 'BASIC' AS OF RELEASE 'DEFAULT' OPTIMIZE FOR LOAD TRUE ; # default
+CONFIGURE ARCHIVELOG DELETION POLICY TO BACKED UP 1 TIMES TO DISK;
+CONFIGURE SNAPSHOT CONTROLFILE NAME TO '/ora/app/product/11.2.0.4/sandpit/dbs/snapcf_sandprd.f'; # default
+

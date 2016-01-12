@@ -1,0 +1,10 @@
+
+  1* select upper(region_name) from regions
+UPPER(REGION_NAME)
+-------------------------
+EUROPE
+AMERICAS
+ASIA
+MIDDLE EAST AND AFRICA
+
+

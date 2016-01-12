@@ -1,0 +1,21 @@
+
+-- check what each users default temporary and permanent tablespace is...
+SQL> select username, default_tablespace, temporary_tablespace, from dba_users ;
+
+-- alter scotts quota to 1)) MB
+SQL> alter user scott quota 100M on users;
+
+-- alter scotts qupta to be unlimited 
+SQL> alter user scott quota unlimited on users; 
+
+SQL> select tablespace_name, bytes, max(bytes) from dba_ts_quotas where lower(username)= 'scott'; 
+
+-- check default temp and permanent tablespace settings 
+SQL> select property_name, property_value from database_properties where property_name like '%TABLESPACE%';
+
+
+
+## to alter a users specific defaults..
+
+SQL> alter user John TEMPORARY tablespace TEMP1; 
+SQL> alter user John PERMANENT tablespace USERS;

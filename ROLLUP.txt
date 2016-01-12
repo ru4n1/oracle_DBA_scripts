@@ -1,0 +1,96 @@
+## ROLLUP adds up subtotals and totals within the SQL statements output for each grouped category
+
+
+SQL> list
+  1  select max(ship_id), ship_name , home_port_id
+  2  from ships
+  3  group by ship_name, rollup (home_port_id)
+  4* order by 1
+SQL> /
+
+MAX(SHIP_ID) SHIP_NAME                 HOME_PORT_ID
+------------ ------------------------- ------------
+           1 Codd Crytal                          1
+           1 Codd Crytal
+           2 Codd Elegance
+           2 Codd Elegance                        3
+           3 Codd Champion
+           3 Codd Champion
+           4 Codd Victorious                      3
+           4 Codd Victorious
+           5 Codd Grandeur                        2
+           5 Codd Grandeur
+           6 Codd Prince
+           6 Codd Prince                          2
+           
+           
+           
+### Easier example to check out below:
+-- This is our data
+SQL> select * from ships;
+   SHIP_ID SHIP_NAME                 HOME_PORT_ID     SIZING
+---------- ------------------------- ------------ ----------
+         1 Codd Crytal                          1       1000
+         2 Codd Elegance                        3       1400
+         3 Codd Champion                                1700
+         4 Codd Victorious                      3       1200
+         5 Codd Grandeur                        2        900
+         6 Codd Prince                          2        750
+
+
+
+#############################################     
+-- Straightforward Group by clause example:
+#############################################
+
+SQL> list
+  1  select sum(sizing), home_port_id "Port"
+  2  FROM ships
+  3  GROUP BY home_port_id
+  4* ORDER BY 1
+SQL> /
+SUM(SIZING)       Port
+----------- ----------
+       1000          1
+       1650          2
+       1700
+       2600          3
+
+SQL> list
+  1  select sum(sizing), home_port_id "Port"
+  2  FROM ships
+  3  GROUP BY ROLLUP (home_port_id)
+  4* ORDER BY 1
+SQL> /
+SUM(SIZING)       Port
+----------- ----------
+       1000          1
+       1650          2
+       1700
+       2600          3
+       6950
+
+-- Note that now you get a TOTAL value of 6950 as shown above, subtotals can also be displayed if
+-- the group by clause uses more than one column...
+
+
+SQL> list 
+  1   SELECT  home_port_id "Port", SHIP_ID, sum(sizing)
+  2    FROM ships
+  3    GROUP BY ROLLUP (home_port_id,ship_id)
+  4*  ORDER BY 1
+SQL> /
+
+      Port    SHIP_ID SUM(SIZING)
+---------- ---------- -----------
+         1          1        1000
+         1                   1000					---> this is subtotal for the first two rows, port 1
+         2          5         900
+         2          6         750
+         2                   1650					---> this is subtotal for the rows totalling 990 + 750 
+         3          2        1400
+         3          4        1200
+         3                   2600					--> this is the subtotal for the port id of 3(1200+1400)
+                    3        1700
+                             1700
+                             6950					--> this is the over total of all above mentioned subtotals

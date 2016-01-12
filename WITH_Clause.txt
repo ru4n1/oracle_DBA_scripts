@@ -1,0 +1,18 @@
+-- Interesting use of the WITH clause which is a subquery utility
+
+Allows you to define a subquery or more as you go and post reference these...
+Note how I give tow DA_ aliases below and then subsequently select from these...
+
+SQL> WITH
+DA_PORTS AS (select port_id from ports),
+DA_SHIPS AS (select ship_name, home_port_id from ships)
+SELECT  ship_name from DA_SHIPS where DA_SHIPS.home_port_id IN (SELECT * FROM DA_PORTS)
+
+SHIP_NAME
+-------------------------
+Codd Crytal
+Codd Elegance
+Codd Victorious
+Codd Grandeur
+Codd Prince
+

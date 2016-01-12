@@ -1,0 +1,23 @@
+Three common numeric functions are ROUND, TRUNC and MOD.
+
+## TRUNC
+TRUNC function drops off the number given a decimal precision point
+HR @ sandpit > select trunc(100.91,0) from dual;
+TRUNC(100.91,0)
+---------------
+            100
+
+HR @ sandpit > select trunc(100.91,1) from dual;
+TRUNC(100.91,1)
+---------------
+          100.9
+
+
+## MOD
+Mod returns the remainder of a division  operation
+HR @ sandpit > select mod (14,6) from dual;
+ MOD(14,6)
+----------
+         2
+
+

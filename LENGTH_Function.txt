@@ -1,0 +1,10 @@
+## LENGTH
+HR @ sandpit > select region_name, length(region_name) from regions;
+REGION_NAME               LENGTH(REGION_NAME)
+------------------------- -------------------
+Europe                                      6
+Americas                                    8
+Asia                                        4
+Middle East and Africa                     22
+
+

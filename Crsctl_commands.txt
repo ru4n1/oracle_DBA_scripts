@@ -1,0 +1,105 @@
+root@RAC1:~# ps -ef | grep -v root | grep ora
+  oracle  6186     1   0 04:06:14 ?           0:00 /u01/app/12.1.0/grid/bin/tnslsnr LISTENER -no_crs_notify -inherit
+  oracle  5680     1   0 04:04:51 ?           0:02 /u01/app/12.1.0/grid/bin/oraagent.bin
+  oracle  5701     1   0 04:04:52 ?           0:08 /u01/app/12.1.0/grid/bin/evmd.bin
+  oracle  5806     1   0 04:04:54 ?           0:42 /u01/app/12.1.0/grid/bin/gipcd.bin
+  oracle  6178     1   0 04:06:12 ?           0:00 /u01/app/12.1.0/grid/bin/tnslsnr LISTENER_SCAN1 -no_crs_notify -inherit
+  oracle  5732     1   0 04:04:53 ?           0:01 /u01/app/12.1.0/grid/bin/gpnpd.bin
+  oracle 10644 10643   0 04:21:26 pts/1       0:00 -bash
+  oracle  6172  6171   0 04:06:10 ?           0:00 /u01/app/12.1.0/grid/opmn/bin/ons -d
+  oracle  5696     1   0 04:04:52 ?           0:00 /u01/app/12.1.0/grid/bin/mdnsd.bin
+  oracle  6107     1   0 04:06:08 ?           0:04 /u01/app/12.1.0/grid/bin/oraagent.bin
+  oracle  5870     1   0 04:05:26 ?           0:08 /u01/app/12.1.0/grid/bin/ocssd.bin 
+  oracle  6171     1   0 04:06:10 ?           0:00 /u01/app/12.1.0/grid/opmn/bin/ons -d
+  oracle  5834  5701   0 04:04:55 ?           0:00 /u01/app/12.1.0/grid/bin/evmlogger.bin -o /u01/app/12.1.0/grid/log/[HOSTNAME]/e
+root@RAC1:~# crsctl status resource -t 
+--------------------------------------------------------------------------------
+Name           Target  State        Server                   State details       
+--------------------------------------------------------------------------------
+Local Resources
+--------------------------------------------------------------------------------
+ora.LISTENER.lsnr
+               ONLINE  ONLINE       rac1                     STABLE
+               ONLINE  ONLINE       rac2                     STABLE
+ora.asm
+               OFFLINE OFFLINE      rac1                     STABLE
+               OFFLINE OFFLINE      rac2                     STABLE
+ora.net1.network
+               ONLINE  ONLINE       rac1                     STABLE
+               ONLINE  ONLINE       rac2                     STABLE
+ora.ons
+               ONLINE  ONLINE       rac1                     STABLE
+               ONLINE  ONLINE       rac2                     STABLE
+--------------------------------------------------------------------------------
+Cluster Resources
+--------------------------------------------------------------------------------
+ora.LISTENER_SCAN1.lsnr
+      1        ONLINE  ONLINE       rac1                     STABLE
+ora.cvu
+      1        ONLINE  ONLINE       rac1                     STABLE
+ora.oc4j
+      1        OFFLINE OFFLINE                               STABLE
+ora.rac1.vip
+      1        ONLINE  ONLINE       rac1                     STABLE
+ora.rac2.vip
+      1        ONLINE  ONLINE       rac2                     STABLE
+ora.scan1.vip
+      1        ONLINE  ONLINE       rac1                     STABLE
+--------------------------------------------------------------------------------
+root@RAC1:~# crsctl stat res -t 
+--------------------------------------------------------------------------------
+Name           Target  State        Server                   State details       
+--------------------------------------------------------------------------------
+Local Resources
+--------------------------------------------------------------------------------
+ora.LISTENER.lsnr
+               ONLINE  ONLINE       rac1                     STABLE
+               ONLINE  ONLINE       rac2                     STABLE
+ora.asm
+               OFFLINE OFFLINE      rac1                     STABLE
+               OFFLINE OFFLINE      rac2                     STABLE
+ora.net1.network
+               ONLINE  ONLINE       rac1                     STABLE
+               ONLINE  ONLINE       rac2                     STABLE
+ora.ons
+               ONLINE  ONLINE       rac1                     STABLE
+               ONLINE  ONLINE       rac2                     STABLE
+--------------------------------------------------------------------------------
+Cluster Resources
+--------------------------------------------------------------------------------
+ora.LISTENER_SCAN1.lsnr
+      1        ONLINE  ONLINE       rac1                     STABLE
+ora.cvu
+      1        ONLINE  ONLINE       rac1                     STABLE
+ora.oc4j
+      1        OFFLINE OFFLINE                               STABLE
+ora.rac1.vip
+      1        ONLINE  ONLINE       rac1                     STABLE
+ora.rac2.vip
+      1        ONLINE  ONLINE       rac2                     STABLE
+ora.scan1.vip
+      1        ONLINE  ONLINE       rac1                     STABLE
+--------------------------------------------------------------------------------
+root@RAC1:~# crsctl check crs
+CRS-4638: Oracle High Availability Services is online
+CRS-4537: Cluster Ready Services is online
+CRS-4529: Cluster Synchronization Services is online
+CRS-4533: Event Manager is online
+root@RAC1:~# crsctl status server 
+NAME=rac1
+STATE=ONLINE
+
+NAME=rac2
+STATE=ONLINE
+
+root@RAC1:~# crsctl status srvpool 
+NAME=Free
+ACTIVE_SERVERS=rac1 rac2
+
+NAME=Generic
+ACTIVE_SERVERS=
+
+root@RAC1:~# crsctl config crs
+CRS-4622: Oracle High Availability Services autostart is enabled.
+root@RAC1:~# 
+

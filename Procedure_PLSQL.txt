@@ -1,0 +1,27 @@
+-- The below is a simple example of anonymous PLSQL procedure ...
+
+SQL>
+SQL> declare increase number := 10;
+begin
+update emp set sal=sal*(100+increase)/100;
+commit;
+end;
+/
+
+
+-- The below is an example of a stored procedure, 
+-- compilation is done at creation and avoids occurring at the time of execution 
+SQL> create procedure inc_sal(increase number) as 
+begin
+update emp set sal=sal*(100+increase)/100;
+commit;
+end;
+/
+
+Procedure Created 
+
+SQL> execute inc_sal(10);
+
+PL/SQL procedure completed successfully 
+
+SQL>

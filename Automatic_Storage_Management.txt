@@ -1,0 +1,44 @@
+Datafiles can exist on four types of devices:
+local filesystems,
+clustered file systems,			* usually to do with implementing RAC
+raw devices,				* only a historical anomaly really
+files on ASM devices.			* alternative to file system based storage.
+
+In summary ASM is a logical volume manager provided by Oracle and bundled with the database. The idea is that you take a raw disk, give them to oracle and let oracle get on with it. System administrators need not worry about creating file systems at all. ASM is a logical volume manager designed for oracle database files however it cannot be used for all files (It cannot be used for the ORACLE_HOME or for the alert log or trace files. 
+
+## To check out ASM rebalance operation progress...
+select group_number, operation, state, power, actual, sofar, est_work, est_rate, est_minutes
+from v$asm_operations; 
+
+
+## To query the existing disk groups and disks 
+select group_number, disk_number, mount_status, name, path
+from v$asm_disk
+order by group_number, disk_number; 
+
+
+## To check out the members of a disk group
+select dg.name diskgroup, dg.type, d.disk_number, d.name asmdisk, d.failgroup, d.path
+from v$asm_diskgroup dg join v$asm_disk d using (group_number) 
+where dg.name = '+DATA1'; 
+
+
+## To create a new tablespace 
+SQL> create tablespace DATA_STUFF datafile '+DATA1'; 
+
+
+## To check out rebalancing operation
+SQL> select group_number, operation, state, power, actual, sofar, est_work, est_rate, est_minutes from v$asm_operation; 
+
+
+## To change the rebalance power 
+SQL> Alter diskgroup DAT4_01 rebalance power 10; 
+
+
+-- Dont forget the ASMCMD utility 
+asmcmd> ls -l
+asmcmd> pwd
+asmcmd> lsdg    # list disk groups 
+asmcmd> lsdsk   # list disks
+asmcmd> cp spfiledw.ora /tmp/BACKUPspfiledw.ora
+

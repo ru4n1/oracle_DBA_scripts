@@ -1,0 +1,17 @@
+-- This will show blocking sessions
+-- with locks on tables
+
+spool show_blocking_sessions
+
+set linesize 100
+set pagesize 60
+set feedback on 
+set heading on
+
+select blocking_session, sid, serial#, wait_class, seconds_in_wait 
+from v$session
+where blocking_session is not NULL
+order by
+blocking_session;
+
+spool off

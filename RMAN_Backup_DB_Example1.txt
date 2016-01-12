@@ -1,0 +1,24 @@
+# The below commands connect to the target and catalog for metadata
+# Will log the output to a file of the session details
+# Allocates one channel of type disk in the designated location with the format specified
+
+# Backs up the database  with a tag lable for quick identification 
+# Backs up the controlfile, then backs up the spfile 
+# Then switches the redo logfile group 
+# Then backs up all archivelogs  
+
+rman target / catalog rcat/rcat@cartman log '/tmp/RMAN_sess.txt'
+
+
+run
+{
+allocate channel d1 device type disk format '/export/home/oracle/BKP/%T_%c_%s_%d_%D';
+
+backup database tag='FULL DB Backup';
+backup current controlfile tag='Controlfile Backup';
+backup spfile tag='SPFILE Backup';
+
+ sql 'ALTER SYSTEM ARCHIVE LOG CURRENT';
+
+ backup archivelog all tag='Archive Logs Backup';
+}

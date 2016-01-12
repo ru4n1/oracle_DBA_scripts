@@ -1,0 +1,55 @@
+The database recovery advisor is a utility associated with rman that makes use of the health monitoring of an instance and will actually generate scripts to correct scenarios.
+
+-bash-4.1$ rman target /
+
+Recovery Manager: Release 11.2.0.1.0 - Production on Sun Mar 23 00:34:23 2014
+
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+
+connected to target database: SANDPIT (DBID=4081594592, not open)
+
+RMAN> connect catalog rcat/rcat@catalog 
+
+connected to recovery catalog database
+
+RMAN> list failure
+2> ;
+
+List of Database Failures
+=========================
+
+Failure ID Priority Status    Time Detected Summary
+---------- -------- --------- ------------- -------
+1002       HIGH     OPEN      23-MAR-14     One or more non-system datafiles are missing
+
+RMAN> advise failure;
+
+List of Database Failures
+=========================
+
+Failure ID Priority Status    Time Detected Summary
+---------- -------- --------- ------------- -------
+1002       HIGH     OPEN      23-MAR-14     One or more non-system datafiles are missing
+
+analyzing automatic repair options; this may take some time
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=9 device type=DISK
+analyzing automatic repair options complete
+
+Mandatory Manual Actions
+========================
+no manual actions available
+
+Optional Manual Actions
+=======================
+1. If file /u02/oradata/sandpit/users01.dbf was unintentionally renamed or moved, restore it
+
+Automated Repair Options
+========================
+Option Repair Description
+------ ------------------
+1      Restore and recover datafile 4  
+  Strategy: The repair includes complete media recovery with no data loss
+  Repair script: /u01/app/oracle/product/11.2.0/diag/rdbms/sandpit/sandpit/hm/reco_1276290087.hm
+
+RMAN> @/u01/app/oracle/product/11.2.0/diag/rdbms/sandpit/sandpit/hm/reco_1276290087.hm

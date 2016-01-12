@@ -1,0 +1,62 @@
+SYS @ sandpit > column name format a20
+SYS @ sandpit > column value format a60 
+SYS @ sandpit > select num, name, value from  v$parameter where name ='spfile';
+
+       NUM NAME                 VALUE
+---------- -------------------- ------------------------------------------------------------
+       164 spfile               /u01/app/oracle/product/11.2.0/db_1/dbs/spfilesandpit.ora
+
+
+When an Oracle instance is started , the characteristics of the instance are established by parameters and configuration in the initialisation file either a Pfile or spfile.
+
+A pfile is a static client side text file that must be updated via an editor. The file normally resides on the server however you do need a local copy if you want to start the oracle instance remotely. Its commonly referred to as the init.ora file. You can check what type of file the instance was started with by:
+ 
+SYS @ DB > show parameter spfile
+ 
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+spfile                               string      /u01/app/oracle/product/11.2.0
+                                                 .3.0/dbhome_1/dbs/spfileDB.ora
+ 
+Spfile provide advantages:
+- spfile can be backed up by RMAN
+- Spfile is minatained by the server side so parameters are actually checked before being accepted
+ 
+You can check the SPFILE parameter value settings by checking the below dynamic performance view.
+ 
+SYS @ PTSB > column name format a50
+SYS @ PTSB > column value format a50
+SYS @ PTSB > set linesize 300
+SYS @ PTSB > select name, value from v$spparameter;
+ 
+NAME                                               VALUE
+-------------------------------------------------- --------------------------------------------------
+lock_name_space
+processes                                          150
+sessions                                           600
+timed_statistics
+< output truncated here >
+ 
+When starting an instance Oracle will search for the necessary file in the following order of priority / preference… within $ORACLE_HOME/dbs
+spfile${ORACLE_SID}.ora
+spfile.ora
+init${ORACLE_SID}.ora
+init.ora
+ 
+Or one can alternatively override this by specifying the startup process to point at a particular Pfile parameter file. This can only be done with PFILEs.
+SQL> startup PFILE=’/tmp/pfile_test.txt’
+ 
+ 
+The SPfile parameters can be changed using commands such as ‘ALTER SYSTEM SET…’ e.g. ‘alter system set open_cursors=300 scope=spfile’
+The scope parameter can be set to SPFILE (update the spfile, the current instance is unaffected and the change will take affect upon next database startup).
+The scope parameter can be set to MEMORY (update the current instance and the change will not be persistent across database restarts)
+The scope parameter can be set to BOTH (update both the current instance and and persist to the spfile also i.e. make the change current and permanent) –
+* This is default if an spfile has been used to start the instance.
+ 
+You can remove a particular parameter from an spfile by setting it to NULL.
+e.g.
+SQL> alter system set timed_statistics=’’ scope=spfile;
+ 
+You can convert between both types of files easily enough.
+SQL> create spfile from pfile;
+SQL> create pfile=’/tmp/backup_pfile.txt’ from spfile;

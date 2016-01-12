@@ -1,0 +1,133 @@
+*******************************************************************************
+Script is displayed directly below with output included further on 
+*******************************************************************************
+oracle@solaris11:~$ cat /ora/app/product/11.2.0/db1/dbs/initdupe.ora
+DB_NAME=dupe
+
+-------------------------------------------------------------------------------
+oracle@solaris11:~$ cat R1.sh
+rm $ORACLE_HOME/dbs/spfiledupe.ora $ORACLE_HOME/dbs/hc_dupe.dat
+
+# set toaux SID tempoarily
+export ORACLE_SID=dupe && echo "shutdown abort;" | sqlplus / as sysdba
+
+echo "startup nomount;" | sqlplus / as sysdba
+
+# set back to normal
+export ORACLE_SID=sandpit
+
+rman target sys/oracle123@sandpit catalog rcat/rcat@cartman auxiliary sys/oracle123@duper  @run1.rman
+
+-------------------------------------------------------------------------------
+# Below is the rman script initiated from above...
+
+oracle@solaris11:~$ cat run1.rman 
+run
+{
+DUPLICATE TARGET DATABASE TO DUPE
+ FROM ACTIVE DATABASE
+ LOGFILE
+ GROUP 1 ('/ora/work/data/DUPE/redo1a.log','/ora/work/data/DUPE/redo1b.log') size 10M,
+ GROUP 2 ('/ora/work/data/DUPE/redo2a.log','/ora/work/data/DUPE/redo2b.log') size 10M;
+}
+*******************************************************************************
+
+##### You cannot use something like this with a target and auxilairy on the SAME HOST !!!!!  ######
+
+connected to target database: SANDPIT (DBID=4103520783)
+connected to recovery catalog database
+connected to auxiliary database: DUPE (not mounted)
+
+RMAN> RUN
+2> {
+3> DUPLICATE TARGET DATABASE TO DUPE
+4>  FROM ACTIVE DATABASE
+5>  LOGFILE
+6>  GROUP 1 ('/ora/work/data/DUPE/redo1a.log','/ora/work/data/DUPE/redo1b.log') size 10M,
+7>  GROUP 2 ('/ora/work/data/DUPE/redo2a.log','/ora/work/data/DUPE/redo2b.log') size 10M;
+8> }
+9> 
+Starting Duplicate Db at 24-NOV-14
+allocated channel: ORA_AUX_DISK_1
+channel ORA_AUX_DISK_1: SID=95 device type=DISK
+
+contents of Memory Script:
+{
+   sql clone "create spfile from memory";
+}
+executing Memory Script
+
+sql statement: create spfile from memory
+
+contents of Memory Script:
+{
+   shutdown clone immediate;
+   startup clone nomount;
+}
+executing Memory Script
+
+Oracle instance shut down
+
+connected to auxiliary database (not started)
+Oracle instance started
+
+Total System Global Area     217157632 bytes
+
+Fixed Size                     2209600 bytes
+Variable Size                159385792 bytes
+Database Buffers              50331648 bytes
+Redo Buffers                   5230592 bytes
+
+contents of Memory Script:
+{
+   sql clone "alter system set  db_name = 
+ ''SANDPIT'' comment=
+ ''Modified by RMAN duplicate'' scope=spfile";
+   sql clone "alter system set  db_unique_name = 
+ ''DUPE'' comment=
+ ''Modified by RMAN duplicate'' scope=spfile";
+   shutdown clone immediate;
+   startup clone force nomount
+   backup as copy current controlfile auxiliary format  '/ora/app/product/11.2.0/db1/dbs/cntrldupe.dbf';
+   alter clone database mount;
+}
+executing Memory Script
+
+sql statement: alter system set  db_name =  ''SANDPIT'' comment= ''Modified by RMAN duplicate'' scope=spfile
+
+sql statement: alter system set  db_unique_name =  ''DUPE'' comment= ''Modified by RMAN duplicate'' scope=spfile
+
+Oracle instance shut down
+
+Oracle instance started
+
+Total System Global Area     217157632 bytes
+
+Fixed Size                     2209600 bytes
+Variable Size                159385792 bytes
+Database Buffers              50331648 bytes
+Redo Buffers                   5230592 bytes
+
+Starting backup at 24-NOV-14
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=139 device type=DISK
+channel ORA_DISK_1: starting datafile copy
+copying current control file
+output file name=/ora/app/product/11.2.0/db1/dbs/snapcf_sandpit.f tag=TAG20141124T062615 RECID=17 STAMP=864455177
+channel ORA_DISK_1: datafile copy complete, elapsed time: 00:00:03
+Finished backup at 24-NOV-14
+
+database mounted
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-03002: failure of Duplicate Db command at 11/24/2014 06:26:24
+RMAN-05501: aborting duplication of target database
+RMAN-05001: auxiliary file name /ora/work/data/SANDPIT/datafile/repo_01.dbf conflicts with a file used by the target database
+RMAN-05001: auxiliary file name /ora/work/data/SANDPIT/datafile/o1_mf_users_b6j47jsz_.dbf conflicts with a file used by the target database
+RMAN-05001: auxiliary file name /ora/work/data/SANDPIT/datafile/o1_mf_undotbs1_b4c344dr_.dbf conflicts with a file used by the target database
+RMAN-05001: auxiliary file name /ora/work/data/SANDPIT/datafile/o1_mf_sysaux_b4c344co_.dbf conflicts with a file used by the target database
+RMAN-05001: auxiliary file name /ora/work/data/SANDPIT/datafile/o1_mf_system_b4c34452_.dbf conflicts with a file used by the target database
+
+Recovery Manager complete.
+oracle@solaris11:~$

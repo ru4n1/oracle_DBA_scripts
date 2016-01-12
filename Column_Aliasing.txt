@@ -1,0 +1,15 @@
+An alias is an alternative term for a column or expression.
+Double quotation marks specify a literal value (and are neccessary if you want your alias to consist of more than one word) otherwsie 
+
+SQL offers a much more formalised way of handling and inserting aliases also. 
+
+  1* select region_id as ID, region_name as " the place we are in " from regions
+HR @ sandpit > /
+
+        ID  the place we are in
+---------- -------------------------
+         1 Europe
+         2 Americas
+         3 Asia
+         4 Middle East and Africa
+

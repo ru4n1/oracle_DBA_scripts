@@ -1,0 +1,43 @@
+Oracle - How to check if Physical Standby is in sync with Primary
+-----------------------------------------------------------------
+
+************** Run the queries below on Primary database: **************
+
+# check the max log sequence on Primary DB
+SELECT Max(sequence#) 
+FROM   v$log_history; 
+
+# identify the last sequence generated on Primary DB
+SELECT thread#, 
+       Max(sequence#) "Last Primary Seq Generated" 
+FROM   v$archived_log 
+WHERE  first_time BETWEEN ( SYSDATE - 1 ) AND ( SYSDATE + 1 ) 
+GROUP  BY thread# 
+ORDER  BY 1; 
+
+
+************** Now run the following queries below on Standby database: **************
+
+# double-check that you are on Standby database - the query below should return "mounted"
+SELECT status FROM   v$instance; 
+
+# check the max log sequence
+SELECT Max(sequence#) 
+FROM   v$log_history;
+
+# check the last log received from Primary DB
+SELECT thread#, 
+       Max(sequence#) "Last Standby Seq Received" 
+FROM   v$archived_log 
+GROUP  BY thread# 
+ORDER  BY 1; 
+
+# check the last log applied
+SELECT thread#, 
+       Max(sequence#) "Last Standby Seq Applied" 
+FROM   v$archived_log 
+WHERE  applied = 'YES' 
+GROUP  BY thread# 
+ORDER  BY 1; 
+
+Now compare the max log sequence on Primary DB with "Last Standby Seq Received" and "Last Standby Seq Applied" to see if there is a gap.

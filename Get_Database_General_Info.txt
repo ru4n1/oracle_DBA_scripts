@@ -1,0 +1,24 @@
+set termout off
+set linesize 140
+set pagesize 90
+set feedback on
+set heading on
+
+-- RL 02102012
+-- Script to provide basic level details of DB setup config
+-- Just a general summary or whatsup on a database
+
+spool tellmeaboutDB.txt
+ select tablespace_name, status, contents, extent_management extents, segment_space_management free_space from dba_tablespaces;
+ select name as datafiles from v$datafile;
+ select name as controlfiles from v$controlfile;
+ select member as logs from v$logfile;
+ archive log list;
+ show sga;
+spool off
+
+spool tellmeaboutusers.txt
+ column serial# format a20
+ select username,osuser,sid || ',' || serial# "Sid,ID",status,to_char(logon_time, 'hh24:mi dd/mm/yy') login_time,last_call_et from v$session where username is not null order by login_time;
+ select username,sid || ',' || serial# "Sid,ID",status,last_call_et "Last Activity" from v$session where username is not null order by status desc, last_call_et desc;
+spool off

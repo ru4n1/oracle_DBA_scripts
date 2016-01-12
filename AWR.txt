@@ -1,0 +1,73 @@
+AWR: 
+
+STATISTICS_LEVEL Parameter:
+The gatehring and visibility of statistics can be controlled by the parameter above -statistics_level. It can be BASIC, TYPICAL or ALL. The parameter default setting is typical which will gather all the statistics needed for the self management and tuning capabilities of the database and will also enable the automatic object analysis task that runs daily in the maintenance window. BASIC setting disables comutation of the AWR statistics and disables the daily maintenance job. ALL gathers very intensive stats including OS stats and very detailed statistics on SQL statement execution. (It is possible that this setting may impact performance). 
+
+Oracle collects a vast amount of statistical information regarding performance and activity. This information is accumulated in memory and peridocally written out to disk. This is the info that makes up the the AWR - automatic worklaod repository. These are a set of tables like any other and is related to the data dictonary but unlike the data dictionary, the AWR is not essential for the database to function. 
+
+Statistics are accumulated in memory in data structures within the SGA - by deafult (once an hour) - thye are flsuhed out to disk, to the AWR in what is known as an AWR snapshot; this flushing to disk is done by the MMON, manageability monitor. The AWR tables are located within the SYSAUX tablespace and the SYSMAN schema. 
+
+An AWR snapshot can be though of a contents of the V$VIEWS at the time the snapshot was taken., but this info is taken directly from the memory structures that make up the instance. The process that makes the copy is MMON. Snapshots are kept by default for 8 days. But this is configurable. 
+
+As the MMON processes saves an AWR snapshot , it generates a large number of statistics (these are raw measurement figures) along with which it will correlate into metrics (which is a grouping of statistics) - but to make these metrics usefaul for comparison purposes - a baseline can be created by the DBA. Snapshots are purged after a certain period but a baseline is a set of snapshots that wil be kep indefinately until it is deliberatley dropped. The metrics derived from the baseline can then be compared with metrics from current activity levels to assit in identifying changes in activity. 
+
+
+To manually take a snapshot - 
+SYS @ sandpit > execute dbms_workload_repository.create_snapshot;
+PL/SQL procedure successfully completed.
+
+To list all snapshots available -
+  1  select snap_id, startup_time,BEGIN_INTERVAL_TIME from dba_hist_snapshot
+  2* order by BEGIN_INTERVAL_TIME
+SYS @ sandpit > /
+   SNAP_ID STARTUP_TIME                   BEGIN_INTERVAL_TIME
+---------- ------------------------------ ---------------------------------------------------------------------------
+        98 10-MAR-14 10.55.07.000 PM      11-MAR-14 01.00.21.581 AM
+        99 10-MAR-14 10.55.07.000 PM      11-MAR-14 05.15.39.078 AM
+       100 10-MAR-14 10.55.07.000 PM      11-MAR-14 06.00.40.917 AM
+       101 11-MAR-14 11.24.24.000 PM      11-MAR-14 11.24.24.000 PM
+       102 11-MAR-14 11.24.24.000 PM      11-MAR-14 11.35.32.491 PM
+
+To modify the snapshot configuration to kepp snapshots for 30 days and have them taken every half hour - 
+There are two ways to invoke the package & procedure...
+* Note the synyax differences.
+
+SYS @ sandpit > execute dbms_workload_repository.modify_snapshot_settings(-
+> retention=>43200, interval=>30);
+PL/SQL procedure successfully completed.
+
+SYS @ sandpit > begin 
+  2   dbms_workload_repository.modify_snapshot_settings (
+  3  retention=>43200,
+  4  interval=>30);
+  5  end;
+  6  /
+PL/SQL procedure successfully completed.
+
+
+To check the snapshot settings afterwards - you can query the below view:
+DBA_HIST_WR_CONTROL
+
+ 1* select snap_interval, retention from dba_hist_wr_control
+  2  /
+SNAP_INTERVAL                                                               RETENTION
+--------------------------------------------------------------------------- ---------------------------------------------------------------------------
++00000 00:30:00.0                                                           +00030 00:00:00.0
+
+# Values are in minutes above #
+
+
+
+
+The below will fetch the above info for you...
+select
+       extract( day from snap_interval) *24*60+
+       extract( hour from snap_interval) *60+
+       extract( minute from snap_interval ) "Snapshot Interval",
+       extract( day from retention) *24*60+
+       extract( hour from retention) *60+
+       extract( minute from retention ) "Retention Interval"
+from dba_hist_wr_control;
+
+
+SELECT * FROM dba_hist_wr_control;

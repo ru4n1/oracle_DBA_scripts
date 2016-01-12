@@ -1,0 +1,3 @@
+OFA – Optimal flexible architecture; Oracle has designed OFA, optimal flexible architecture as a file system directory structure that should make maintenance more straight forward. There are tow variables at the heart of OFA… $ORACLE_HOME and $ORACLE_BASE.  The UNIX / linux standard for such addressing of $ORACLE_BASE is for /u01/app/oracle and for $ORACLE_HOME is $ORACLE_BASE/product/11.1.0/db_1 for example.
+ 
+The OFA for the database itself is $ORACLE_BASE/oradata/orcl with the controlfile copies,redo log files and datafiles named appropriately: control01.ctl, redo01a.log and tablespacename01.dbf.

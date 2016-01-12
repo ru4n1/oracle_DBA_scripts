@@ -1,0 +1,21 @@
+set pagesize 90
+set linesize 220
+set feedback on 
+set heading on
+
+spool user_sessions_high_cpu
+
+select ss.username, ss.status, ss.machine, ss.sid, ss.serial#, ss.program, ss.paddr, ss.logon_time, se.SID,
+VALUE/100 cpu_usage_seconds
+from
+v$session ss,
+v$sesstat se,
+v$statname sn
+where se.STATISTIC# = sn.STATISTIC#
+and NAME like '%CPU used by this session%'
+and se.SID = ss.SID
+and ss.status='ACTIVE'
+and ss.username is not null
+order by VALUE desc;
+
+spool off

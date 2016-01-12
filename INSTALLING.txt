@@ -1,0 +1,73 @@
+# Fresh installation 
+/usr/sbin/groupadd oinstall
+/usr/sbin/groupadd dba
+/usr/sbin/useradd -d /export/home/oracle -m -s /bin/bash -g oinstall -G dba oracle
+passwd -r files oracle
+projadd group.dba
+vi /etc/user_attr # add line below
+root@solaris11:~# tail -1 /etc/user_attr
+oracle::::project=group.dba
+
+su - oracle 
+id -p 
+prctl -n project.max-shm-memory -i project group.dba
+prctl -n project.max-sem-ids -i project group.dba
+prctl -n project.max-shm-memory -v 1gb -r -i project group.dba
+prctl -n project.max-sem-ids -v 256 -r -i project group.dba
+projmod -sK "project.max-shm-memory=(privileged,1G,deny)" group.dba
+cat /etc/project
+prctl -n project.max-shm-memory -i process $$
+
+ulimit -n
+ulimit -s
+
+mkdir /ora/app
+mkdir /ora/work
+chown -R oracle:oinstall /ora/app
+chown -R oracle:oinstall /ora/work 
+chmod -R 775 /ora/app
+chmod -R 775 /ora/work 
+
+vi .profile
+umask 022
+#export DISPLAY=local_host:0.0 
+export ORACLE_BASE=/ora/app
+#export ORACLE_HOME =/ora/app/1
+export ORACLE_SID=sandpit
+export ORACLE_BASE ORACLE_SID ORACLE_HOME
+export LD_LIBRARY_PATH=/usr/X11R6/lib
+
+
+sftp the 2xzip files for the installation, unzip them and then ./runInstaller 
+# note had to pkg install motif on solaris in order to properly run the installer 
+
+--- need to set the below in order to correctly create the first DB
+# ORACLE Variables
+export ORACLE_BASE=/ora/app
+export ORACLE_HOME=/ora/app/product/11.2.0/db1
+export ORACLE_SID=sandpit
+export ORACLE_BASE ORACLE_SID ORACLE_HOME
+export LD_LIBRARY_PATH=/usr/X11R6/lib
+export TNS_ADMIN=$ORACLE_HOME/network/admin
+export ORACLE_HOME_LISTNER=LISTENER
+export PATH=$ORACLE_HOME/bin:$ORACLE_HOME/OPatch:$PATH
+
+# ORACLE Aliases
+alias app='cd /ora/app; echo ; pwd ; echo ; ls -lrt '
+alias work='cd /ora/work; echo ; pwd ; echo ; ls -lrt '
+alias data='cd /ora/work/data; echo ; pwd ; echo ; ls -lrt '
+
+
+
+--- If you are trouble using DBCA and encountering TNS errors,
+--- it may be because of below. 
+Edit $ORACLE_HOME/bin/dbstart, and found below lines:
+ORACLE_HOME_LISTNER=$1
+if [ ! $ORACLE_HOME_LISTNER ] ; then
+  echo "ORACLE_HOME_LISTNER is not SET, unable to auto-start Oracle Net Listener"
+else
+  LOG=$ORACLE_HOME_LISTNER/listener.log
+Changed ORACLE_HOME_LISTNER=$1 to ORACLE_HOME_LISTNER=$ORACLE_HOME
+
+
+-- if you continue to have problems, you may have to perform a 'relink a' to relink all the oracle software binaries (i continued to have the TNS error mentioned above and could not use sqlplus or dbca and had to do this)

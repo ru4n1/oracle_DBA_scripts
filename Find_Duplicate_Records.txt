@@ -1,0 +1,5 @@
+SELECT registrationnumber, 
+ COUNT(registrationnumber) AS NumOccurrences
+FROM temp_app_ivr_customer_details
+GROUP BY registrationnumber
+HAVING ( COUNT(registrationnumber) > 1 );

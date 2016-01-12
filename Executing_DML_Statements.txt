@@ -1,0 +1,18 @@
+
+[ SELECT ]
+The select command retrieves data. The execution of a select is a staged process; first the server process executing the statement will check whether the blocks containing the data required are already in memory, in the database buffer cache. If they are, execution can proceed, otherwise - the server must locate them on disk and copy them into the database buffer cache. Once the data blocks are in the database buffer cache, any further processing such as sorting or aggregation is carried out in the PGA of the session; when this is complete - the result set is returned back to the user. 
+
+
+[ UPDATE ] 
+The first step in executing an update DML is the same as executing a select, the required blocks must be copied into the database buffer cache. First, locks are placed on the rows associated and associated index keys that are going to be affected by the operation. Then redo is generated as the server process writes out the change vectors that are going to be applied to the data blocks. This generation of redo is applied for both table block changes and for undo block changes. 
+
+E.g, if a column value in a row is to be updated 
+- then the rowid and and new column value are written to the log buffer (change applied to data block)
+- the old value of the column row is written out to the log buffer (which is the change applied to the undo block)
+
+Having generated the redo, the update is carried out in the database buffer cache - the block of table date is updated with the new version of the changed column, and the old version of the change column is written to the undo segment. * From this point onwards (until the change is committed) - all queries from other sessions addressing the changed row will be directed to the undo segnment copy. 
+
+
+[ INSERT & DELETE ]
+conceptually, insert and delete are handled in the same fashion as update - first step is to copy the relevant blocks from into the database buffer cache if they are not there already. 
+Then redo generation is exactly the same - all change vectors applied to data and undo blocks are first written out to the log buffer (REDO). 

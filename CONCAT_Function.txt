@@ -1,0 +1,8 @@
+## CONCAT
+HR @ sandpit > select concat (first_name, last_name) from employees where first_name like 'A%';
+CONCAT(FIRST_NAME,LAST_NAME)
+---------------------------------------------
+AmitBanda
+AlexisBull
+
+

@@ -1,0 +1,11 @@
+load data
+infile 'dept.txt'
+badfile'dept.rejects'
+discardfile 'dept.dsc'
+append
+into table dept
+fields terminated by ','
+trailing nullcols
+(deptno integer external(2),
+dname,
+loc)

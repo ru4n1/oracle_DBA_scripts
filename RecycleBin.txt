@@ -1,0 +1,41 @@
+In Oracle 10g, a DROP command places the object in the recycle bin. The extents allocated to the segment are not reallocated until you purge the object. You can restore the object from the recycle bin at any time.
+
+SYS @ sandpit > show parameter recycle
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+buffer_pool_recycle                  string
+db_recycle_cache_size                big integer 0
+recyclebin                           string      on
+
+
+Recycle Bin
+
+A recycle bin contains all the dropped database objects until,
+
+- You permanently drop them with the PURGE command.
+- Recover the dropped objects with the UNDROP command.
+- There is no room in the tablespace for new rows or updates to existing rows.
+- The tablespace needs to be extended.
+
+The recycle bin is a logical container for all dropped tables and their dependent objects. When a table is dropped, the database will store the table, along with its dependent objects in the recycle bin so that they can be recovered later. Dependent objects which are stored in the recycle bin include indexes, constraints, triggers, nested tables, LOB segments and LOB index segments
+
+
+SCOTT @ sandpit > drop table t1; 
+Table dropped.
+
+SCOTT @ sandpit > commit;
+SCOTT @ sandpit > flashback table t1 to before drop;
+Flashback complete.
+
+SCOTT @ sandpit > select table_name from user_tables;
+TABLE_NAME
+------------------------------
+DEPARTMENT
+EMPLOYEE
+T1
+TABLE1_SAFE
+TABLE2
+TABLE1
+TEST
+TAB1

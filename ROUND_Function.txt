@@ -1,0 +1,29 @@
+## ROUND
+ROUND function drounds off a number to a lowest of highest value give ven a decimal precision point
+
+HR @ sandpit > select ROUND(100.91,0) from dual;
+TRUNC(100.91,0)
+---------------
+            101
+
+HR @ sandpit > select ROUND(100.91,1) from dual;
+TRUNC(100.91,1)
+---------------
+          100.9
+          
+          
+          
+# Difference between trunc (which just drops off digits) versus ROUND which rounds a decimal...
+          
+SQL> select round(0.123456789,5) from dual;
+ROUND(0.123456789,5)
+--------------------
+              .12346
+SQL> select trunc(0.123456789,5) from dual;
+TRUNC(0.123456789,5)
+--------------------
+              .12345
+
+
+
+

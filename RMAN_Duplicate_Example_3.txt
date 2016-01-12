@@ -1,0 +1,343 @@
+*******************************************************************************
+Script is displayed directly below with output included further on 
+*******************************************************************************
+oracle@solaris11:~$ cat /ora/app/product/11.2.0/db1/dbs/initdupe.ora
+DB_NAME=dupe
+DB_FILE_NAME_CONVERT='/ora/work/data/SANDPIT','/ora/work/data/DUPE'
+
+
+-------------------------------------------------------------------------------
+oracle@solaris11:~$ cat R1.sh
+rm $ORACLE_HOME/dbs/spfiledupe.ora $ORACLE_HOME/dbs/hc_dupe.dat
+
+# set toaux SID tempoarily
+export ORACLE_SID=dupe && echo "shutdown abort;" | sqlplus / as sysdba
+
+echo "startup nomount;" | sqlplus / as sysdba
+
+# set back to normal
+export ORACLE_SID=sandpit
+
+rman target / catalog rcat/rcat@cartman auxiliary sys/oracle123@duper  @run1.rman
+
+-------------------------------------------------------------------------------
+# Below is the rman script initiated from above...
+
+oracle@solaris11:~$ cat run1.rman 
+RMAN> RUN
+{
+SET NEWNAME FOR DATAFILE 1 TO '/ora/work/data/CLONEE/datafile/o1_mf_system_b4c34452_.dbf';
+SET NEWNAME FOR DATAFILE 2 TO '/ora/work/data/CLONEE/datafile/o1_mf_sysaux_b4c344co_.dbf';
+SET NEWNAME FOR DATAFILE 3 TO '/ora/work/data/CLONEE/datafile/o1_mf_undotbs1_b4c344dr_.dbf';
+SET NEWNAME FOR DATAFILE 4 TO '/ora/work/data/CLONEE/datafile/o1_mf_users_b4c344g0_.dbf';
+SET NEWNAME FOR DATAFILE 5 TO '/ora/work/data/CLONEE/datafile/repo_01.dbf';
+SET NEWNAME FOR TEMPFILE 1 TO '/ora/work/data/CLONEE/temp01.dbf';
+DUPLICATE TARGET DATABASE TO dupe
+     LOGFILE
+       GROUP 1 ('/ora/work/data/DUPE/redo01a.log',
+                '/ora/work/data/DUPE/redo01b.log') SIZE 4M REUSE,
+       GROUP 2 ('/ora/work/data/DUPE/redo02a.log',
+                '/ora/work/data/DUPE/redo02b.log') SIZE 4M REUSE;
+ }
+
+
+*******************************************************************************
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+
+connected to target database: SANDPIT (DBID=4103520783)
+connected to recovery catalog database
+connected to auxiliary database: DUPE (not mounted)
+
+RMAN> RUN
+2> {
+3> SET NEWNAME FOR DATAFILE 1 TO '/ora/work/data/CLONEE/datafile/o1_mf_system_b4c34452_.dbf';
+4> SET NEWNAME FOR DATAFILE 2 TO '/ora/work/data/CLONEE/datafile/o1_mf_sysaux_b4c344co_.dbf';
+5> SET NEWNAME FOR DATAFILE 3 TO '/ora/work/data/CLONEE/datafile/o1_mf_undotbs1_b4c344dr_.dbf';
+6> SET NEWNAME FOR DATAFILE 4 TO '/ora/work/data/CLONEE/datafile/o1_mf_users_b4c344g0_.dbf';
+7> SET NEWNAME FOR DATAFILE 5 TO '/ora/work/data/CLONEE/datafile/repo_01.dbf';
+8> SET NEWNAME FOR TEMPFILE 1 TO '/ora/work/data/CLONEE/temp01.dbf';
+9> DUPLICATE TARGET DATABASE TO dupe
+10>     LOGFILE
+11>       GROUP 1 ('/ora/work/data/DUPE/redo01a.log',
+12>                '/ora/work/data/DUPE/redo01b.log') SIZE 4M REUSE,
+13>       GROUP 2 ('/ora/work/data/DUPE/redo02a.log',
+14>                '/ora/work/data/DUPE/redo02b.log') SIZE 4M REUSE;
+15> }
+16> 
+executing command: SET NEWNAME
+
+executing command: SET NEWNAME
+
+executing command: SET NEWNAME
+
+executing command: SET NEWNAME
+
+executing command: SET NEWNAME
+
+executing command: SET NEWNAME
+
+Starting Duplicate Db at 24-NOV-14
+allocated channel: ORA_AUX_DISK_1
+channel ORA_AUX_DISK_1: SID=9 device type=DISK
+
+contents of Memory Script:
+{
+   sql clone "create spfile from memory";
+}
+executing Memory Script
+
+sql statement: create spfile from memory
+
+contents of Memory Script:
+{
+   shutdown clone immediate;
+   startup clone nomount;
+}
+executing Memory Script
+
+Oracle instance shut down
+
+connected to auxiliary database (not started)
+Oracle instance started
+
+Total System Global Area     217157632 bytes
+
+Fixed Size                     2209600 bytes
+Variable Size                159385792 bytes
+Database Buffers              50331648 bytes
+Redo Buffers                   5230592 bytes
+
+contents of Memory Script:
+{
+   sql clone "alter system set  db_name = 
+ ''SANDPIT'' comment=
+ ''Modified by RMAN duplicate'' scope=spfile";
+   sql clone "alter system set  db_unique_name = 
+ ''DUPE'' comment=
+ ''Modified by RMAN duplicate'' scope=spfile";
+   shutdown clone immediate;
+   startup clone force nomount
+   restore clone primary controlfile;
+   alter clone database mount;
+}
+executing Memory Script
+
+sql statement: alter system set  db_name =  ''SANDPIT'' comment= ''Modified by RMAN duplicate'' scope=spfile
+
+sql statement: alter system set  db_unique_name =  ''DUPE'' comment= ''Modified by RMAN duplicate'' scope=spfile
+
+Oracle instance shut down
+
+Oracle instance started
+
+Total System Global Area     217157632 bytes
+
+Fixed Size                     2209600 bytes
+Variable Size                159385792 bytes
+Database Buffers              50331648 bytes
+Redo Buffers                   5230592 bytes
+
+Starting restore at 24-NOV-14
+allocated channel: ORA_AUX_DISK_1
+channel ORA_AUX_DISK_1: SID=95 device type=DISK
+
+channel ORA_AUX_DISK_1: starting datafile backup set restore
+channel ORA_AUX_DISK_1: restoring control file
+channel ORA_AUX_DISK_1: reading from backup piece /FRA/SANDPIT/autobackup/2014_11_24/o1_mf_s_864449144_b75fzt6k_.bkp
+channel ORA_AUX_DISK_1: piece handle=/FRA/SANDPIT/autobackup/2014_11_24/o1_mf_s_864449144_b75fzt6k_.bkp tag=TAG20141124T044544
+channel ORA_AUX_DISK_1: restored backup piece 1
+channel ORA_AUX_DISK_1: restore complete, elapsed time: 00:00:03
+output file name=/ora/app/product/11.2.0/db1/dbs/cntrldupe.dbf
+Finished restore at 24-NOV-14
+
+database mounted
+
+contents of Memory Script:
+{
+   set until scn  1284366;
+   set newname for datafile  1 to 
+ "/ora/work/data/CLONEE/datafile/o1_mf_system_b4c34452_.dbf";
+   set newname for datafile  2 to 
+ "/ora/work/data/CLONEE/datafile/o1_mf_sysaux_b4c344co_.dbf";
+   set newname for datafile  3 to 
+ "/ora/work/data/CLONEE/datafile/o1_mf_undotbs1_b4c344dr_.dbf";
+   set newname for datafile  4 to 
+ "/ora/work/data/CLONEE/datafile/o1_mf_users_b4c344g0_.dbf";
+   set newname for datafile  5 to 
+ "/ora/work/data/CLONEE/datafile/repo_01.dbf";
+   restore
+   clone database
+   ;
+}
+executing Memory Script
+
+executing command: SET until clause
+
+executing command: SET NEWNAME
+
+executing command: SET NEWNAME
+
+executing command: SET NEWNAME
+
+executing command: SET NEWNAME
+
+executing command: SET NEWNAME
+
+Starting restore at 24-NOV-14
+using channel ORA_AUX_DISK_1
+
+channel ORA_AUX_DISK_1: starting datafile backup set restore
+channel ORA_AUX_DISK_1: specifying datafile(s) to restore from backup set
+channel ORA_AUX_DISK_1: restoring datafile 00001 to /ora/work/data/CLONEE/datafile/o1_mf_system_b4c34452_.dbf
+channel ORA_AUX_DISK_1: restoring datafile 00002 to /ora/work/data/CLONEE/datafile/o1_mf_sysaux_b4c344co_.dbf
+channel ORA_AUX_DISK_1: restoring datafile 00003 to /ora/work/data/CLONEE/datafile/o1_mf_undotbs1_b4c344dr_.dbf
+channel ORA_AUX_DISK_1: restoring datafile 00004 to /ora/work/data/CLONEE/datafile/o1_mf_users_b4c344g0_.dbf
+channel ORA_AUX_DISK_1: restoring datafile 00005 to /ora/work/data/CLONEE/datafile/repo_01.dbf
+channel ORA_AUX_DISK_1: reading from backup piece /FRA/SANDPIT/backupset/2014_11_24/o1_mf_nnndf_TAG20141124T044202_b75frv1r_.bkp
+channel ORA_AUX_DISK_1: piece handle=/FRA/SANDPIT/backupset/2014_11_24/o1_mf_nnndf_TAG20141124T044202_b75frv1r_.bkp tag=TAG20141124T044202
+channel ORA_AUX_DISK_1: restored backup piece 1
+channel ORA_AUX_DISK_1: restore complete, elapsed time: 00:06:56
+Finished restore at 24-NOV-14
+
+contents of Memory Script:
+{
+   switch clone datafile all;
+}
+executing Memory Script
+
+datafile 1 switched to datafile copy
+input datafile copy RECID=17 STAMP=864453596 file name=/ora/work/data/CLONEE/datafile/o1_mf_system_b4c34452_.dbf
+datafile 2 switched to datafile copy
+input datafile copy RECID=18 STAMP=864453596 file name=/ora/work/data/CLONEE/datafile/o1_mf_sysaux_b4c344co_.dbf
+datafile 3 switched to datafile copy
+input datafile copy RECID=19 STAMP=864453596 file name=/ora/work/data/CLONEE/datafile/o1_mf_undotbs1_b4c344dr_.dbf
+datafile 4 switched to datafile copy
+input datafile copy RECID=20 STAMP=864453596 file name=/ora/work/data/CLONEE/datafile/o1_mf_users_b4c344g0_.dbf
+datafile 5 switched to datafile copy
+input datafile copy RECID=21 STAMP=864453596 file name=/ora/work/data/CLONEE/datafile/repo_01.dbf
+
+contents of Memory Script:
+{
+   set until scn  1284366;
+   recover
+   clone database
+    delete archivelog
+   ;
+}
+executing Memory Script
+
+executing command: SET until clause
+
+Starting recover at 24-NOV-14
+using channel ORA_AUX_DISK_1
+
+starting media recovery
+
+archived log for thread 1 with sequence 5 is already on disk as file /arch/arch_1_5_864430353.arc
+archived log for thread 1 with sequence 6 is already on disk as file /arch/arch_1_6_864430353.arc
+archived log file name=/arch/arch_1_5_864430353.arc thread=1 sequence=5
+archived log file name=/arch/arch_1_6_864430353.arc thread=1 sequence=6
+media recovery complete, elapsed time: 00:00:01
+Finished recover at 24-NOV-14
+
+contents of Memory Script:
+{
+   shutdown clone immediate;
+   startup clone nomount;
+   sql clone "alter system set  db_name = 
+ ''DUPE'' comment=
+ ''Reset to original value by RMAN'' scope=spfile";
+   sql clone "alter system reset  db_unique_name scope=spfile";
+   shutdown clone immediate;
+   startup clone nomount;
+}
+executing Memory Script
+
+database dismounted
+Oracle instance shut down
+
+connected to auxiliary database (not started)
+Oracle instance started
+
+Total System Global Area     217157632 bytes
+
+Fixed Size                     2209600 bytes
+Variable Size                159385792 bytes
+Database Buffers              50331648 bytes
+Redo Buffers                   5230592 bytes
+
+sql statement: alter system set  db_name =  ''DUPE'' comment= ''Reset to original value by RMAN'' scope=spfile
+
+sql statement: alter system reset  db_unique_name scope=spfile
+
+Oracle instance shut down
+
+connected to auxiliary database (not started)
+Oracle instance started
+
+Total System Global Area     217157632 bytes
+
+Fixed Size                     2209600 bytes
+Variable Size                159385792 bytes
+Database Buffers              50331648 bytes
+Redo Buffers                   5230592 bytes
+sql statement: CREATE CONTROLFILE REUSE SET DATABASE "DUPE" RESETLOGS ARCHIVELOG 
+  MAXLOGFILES     16
+  MAXLOGMEMBERS      3
+  MAXDATAFILES      100
+  MAXINSTANCES     8
+  MAXLOGHISTORY      292
+ LOGFILE
+  GROUP  1 ( '/ora/work/data/DUPE/redo01a.log', '/ora/work/data/DUPE/redo01b.log' ) SIZE 4 M  REUSE,
+  GROUP  2 ( '/ora/work/data/DUPE/redo02a.log', '/ora/work/data/DUPE/redo02b.log' ) SIZE 4 M  REUSE
+ DATAFILE
+  '/ora/work/data/CLONEE/datafile/o1_mf_system_b4c34452_.dbf'
+ CHARACTER SET WE8MSWIN1252
+
+
+contents of Memory Script:
+{
+   set newname for tempfile  1 to 
+ "/ora/work/data/CLONEE/temp01.dbf";
+   switch clone tempfile all;
+   catalog clone datafilecopy  "/ora/work/data/CLONEE/datafile/o1_mf_sysaux_b4c344co_.dbf", 
+ "/ora/work/data/CLONEE/datafile/o1_mf_undotbs1_b4c344dr_.dbf", 
+ "/ora/work/data/CLONEE/datafile/o1_mf_users_b4c344g0_.dbf", 
+ "/ora/work/data/CLONEE/datafile/repo_01.dbf";
+   switch clone datafile all;
+}
+executing Memory Script
+
+executing command: SET NEWNAME
+
+renamed tempfile 1 to /ora/work/data/CLONEE/temp01.dbf in control file
+
+cataloged datafile copy
+datafile copy file name=/ora/work/data/CLONEE/datafile/o1_mf_sysaux_b4c344co_.dbf RECID=1 STAMP=864453625
+cataloged datafile copy
+datafile copy file name=/ora/work/data/CLONEE/datafile/o1_mf_undotbs1_b4c344dr_.dbf RECID=2 STAMP=864453625
+cataloged datafile copy
+datafile copy file name=/ora/work/data/CLONEE/datafile/o1_mf_users_b4c344g0_.dbf RECID=3 STAMP=864453626
+cataloged datafile copy
+datafile copy file name=/ora/work/data/CLONEE/datafile/repo_01.dbf RECID=4 STAMP=864453627
+
+datafile 2 switched to datafile copy
+input datafile copy RECID=1 STAMP=864453625 file name=/ora/work/data/CLONEE/datafile/o1_mf_sysaux_b4c344co_.dbf
+datafile 3 switched to datafile copy
+input datafile copy RECID=2 STAMP=864453625 file name=/ora/work/data/CLONEE/datafile/o1_mf_undotbs1_b4c344dr_.dbf
+datafile 4 switched to datafile copy
+input datafile copy RECID=3 STAMP=864453626 file name=/ora/work/data/CLONEE/datafile/o1_mf_users_b4c344g0_.dbf
+datafile 5 switched to datafile copy
+input datafile copy RECID=4 STAMP=864453627 file name=/ora/work/data/CLONEE/datafile/repo_01.dbf
+
+contents of Memory Script:
+{
+   Alter clone database open resetlogs;
+}
+executing Memory Script
+
+database opened
+Finished Duplicate Db at 24-NOV-14
+
+Recovery Manager complete.
+oracle@solaris11:~$

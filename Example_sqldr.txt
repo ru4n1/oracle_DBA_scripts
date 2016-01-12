@@ -1,0 +1,1 @@
+$ sqlldr userid=rdl/rdl control=dept.ctl direct=true

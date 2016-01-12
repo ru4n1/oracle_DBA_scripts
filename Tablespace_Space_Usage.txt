@@ -1,0 +1,26 @@
+-- Script to ascertain tablespace usage information
+
+spool table_space_usage
+
+set linesize 200
+set pagesize 60
+set feedback on 
+set heading on
+
+SELECT df.tablespace_name TABLESPACE, df.total_space TOTAL_SPACE,
+fs.free_space FREE_SPACE, df.total_space_mb TOTAL_SPACE_MB,
+(df.total_space_mb - fs.free_space_mb) USED_SPACE_MB,
+fs.free_space_mb FREE_SPACE_MB,
+ROUND(100 * (fs.free_space / df.total_space),2) PCT_FREE
+FROM (SELECT tablespace_name, SUM(bytes) TOTAL_SPACE,
+ROUND(SUM(bytes) / 1048576) TOTAL_SPACE_MB
+FROM dba_data_files
+GROUP BY tablespace_name) df,
+(SELECT tablespace_name, SUM(bytes) FREE_SPACE,
+ROUND(SUM(bytes) / 1048576) FREE_SPACE_MB
+FROM dba_free_space
+GROUP BY tablespace_name) fs
+WHERE df.tablespace_name = fs.tablespace_name(+)
+ORDER BY PCT_FREE;
+
+spool off

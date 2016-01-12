@@ -1,0 +1,12 @@
+# The below commands connect to the target and catalog for metadata
+# Backs up a number of specified tablespaces 
+
+run 
+{
+allocate channel ch1 device type disk;
+allocate channel ch2 device type disk;
+allocate channel ch3 device type disk;
+allocate channel ch4 device type disk;
+backup as compressed backupset 
+tablespace example, sysaux, users tag 'another partial bkup'; 
+}

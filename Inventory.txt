@@ -1,0 +1,38 @@
+The inventory details all oracle products installed on the machine. And in some cases, details of patches applied. 
+Every run of the OUI will check the inventory for incompatibilities before proceeding and will then update it with details of the 
+products installed or upgraded. 
+
+
+-bash-4.1$ cd /var/opt/oracle/
+-bash-4.1$ ls -lrt 
+total 5
+-rw-rw----   1 oracle   oinstall      71 May 17  2013 oraInst.loc
+-rw-rw-r--   1 oracle   oinstall     770 Feb 28  2014 oratab
+-bash-4.1$ cat oraInst.loc 
+inventory_loc=/u01/app/oracle/product/oraInventory
+inst_group=oinstall
+-bash-4.1$ cat oratab 
+#
+
+
+
+# This file is used by ORACLE utilities.  It is created by root.sh
+# and updated by the Database Configuration Assistant when creating
+# a database.
+
+# A colon, ':', is used as the field terminator.  A new line terminates
+# the entry.  Lines beginning with a pound sign, '#', are comments.
+#
+# Entries are of the form:
+#   $ORACLE_SID:$ORACLE_HOME:<N|Y>:
+#
+# The first and second fields are the system identifier and home
+# directory of the database respectively.  The third filed indicates
+# to the dbstart utility that the database should , "Y", or should not,
+# "N", be brought up at system boot time.
+#
+# Multiple entries with the same $ORACLE_SID are not allowed.
+#
+#
+sandpit:/u01/app/oracle/product/11.2.0/db_1:Y
+catalog:/u01/app/oracle/product/11.2.0/db_1:Y

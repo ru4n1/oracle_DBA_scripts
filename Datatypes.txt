@@ -1,0 +1,15 @@
+When creating tables, each column must be assigned a datatype which determines the nature of the values which can be inserted into that column. 
+
+DATATYPES FOR ALPHANUMERIC DATA
+VARCHAR2 ( vraiable length character data stored in the database character set)
+CHAR (fixed length character data stored in the database character set)
+
+NUMBERS
+NUMBER ( numeric data for which you can specify a precision and scale)
+INTEGER ( equivalent to NUMBER but with zero scale)
+
+DATES
+DATE ( all dates include century, year, month, day, hour, minute and second)
+
+LARGE OBJECTS
+CLOB ( character datastored in the database character set size effectively unlimited)

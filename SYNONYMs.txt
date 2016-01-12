@@ -1,0 +1,43 @@
+# The below is an existing view to which we will create a synonym
+
+SQL> select * from employee_view;
+ENAME      JOB
+---------- ---------
+SMITH      CLERK
+ALLEN      SALESMAN
+WARD       SALESMAN
+JONES      MANAGER
+MARTIN     SALESMAN
+BLAKE      MANAGER
+CLARK      MANAGER
+SCOTT      ANALYST
+KING       PRESIDENT
+TURNER     SALESMAN
+ADAMS      CLERK
+JAMES      CLERK
+FORD       ANALYST
+MILLER     CLERK
+
+
+SQL> create synonym emper for employee_view;
+Synonym created.
+
+SQL> select * from emper;
+
+ENAME      JOB
+---------- ---------
+SMITH      CLERK
+ALLEN      SALESMAN
+WARD       SALESMAN
+JONES      MANAGER
+MARTIN     SALESMAN
+BLAKE      MANAGER
+CLARK      MANAGER
+SCOTT      ANALYST
+KING       PRESIDENT
+TURNER     SALESMAN
+ADAMS      CLERK
+JAMES      CLERK
+FORD       ANALYST
+MILLER     CLERK
+

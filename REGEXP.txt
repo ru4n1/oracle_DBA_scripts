@@ -1,0 +1,91 @@
+## Regular expressions 
+
+-- Replace example 
+SQL> select * from ships;
+   SHIP_ID SHIP_NAME                 HOME_PORT_ID     SIZING
+---------- ------------------------- ------------ ----------
+         1 Codd Crytal                          1       1000
+         2 Codd Elegance                        3       1400
+         3 Codd Champion                                1700
+         4 Codd Victorious                      3       1200
+         5 Codd Grandeur                        2        900
+         6 Codd Prince                          2        750
+
+
+SQL> select regexp_replace(ship_name,'Codd','New') from ships;
+REGEXP_REPLACE(SHIP_NAME,'CODD','NEW')
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+New Crytal
+New Elegance
+New Champion
+New Victorious
+New Grandeur
+New Prince
+
+********** More complex example below:
+
+-- Here we see that the regular expression looks to search for this criteria --> '(^[[:alpha:] ]+)'
+-- and replace it with 'CITY'
+-- The reg expression looks to match the start of a string using the ^ anchor.
+-- It matches any alpha character [:alpha:]. It expands on this to match a string that commences 
+-- with any alpha character string ^[[:alpha:] ] and also uses the space between the square brackets to 
+-- identify that this is an acceptable character to include as part of the searched for substring...
+-- The + character indicates we are looking for a continuous string of these characters in any order.
+
+SELECT ADDRESS2, REGEXP_REPLACE(ADDRESS2, '(^[[:alpha:] ]+)', 'CITY') THE_STRING
+FROM   ORDER_ADDRESSES
+WHERE  ROWNUM <= 5;
+
+ADDRESS2                                 THE_STRING
+---------------------------------------- ---------------------
+Tulsa, OK 74103								CITY, OK 74103
+Bugscuffle, TN 37183						CITY, TN 37183
+Issaquah, WA 98027							CITY, WA 98027
+Santa Barbara, CA 93109						CITY, CA 93109
+Havre De Grace, MD 21078					CITY, MD 21078
+
+
+
+
+
+-- sub string example
+SQL>   SELECT REGEXP_SUBSTR('123 Maple Avenue', '[a-z]') ADDRESS
+  FROM   DUAL; 
+A
+-
+a
+
+SQL> SELECT REGEXP_SUBSTR('123 Maple Avenue', '[[:alpha:]]+') ADDRESS
+  FROM   DUAL;  2  
+ADDRE
+-----
+Maple
+
+SQL> SELECT REGEXP_SUBSTR('123 Maple Avenue', '[[:alpha:]]+', 1, 2) ADDRESS
+FROM   DUAL;  
+ADDRES
+------
+Avenue
+
+SQL> SELECT REGEXP_SUBSTR('123 Maple Avenue', '[[:alnum:]]+') ADDRESS
+  FROM   DUAL;
+ADD
+---
+123
+
+SQL> SELECT REGEXP_SUBSTR('she sells sea shells down by the seashore',
+'[[:alpha:]]+(shore)' ) THE_RESULT FROM DUAL;
+THE_RESU
+--------
+seashore
+
+-------------------------- Check constraint 
+You can use a regular expression elsewhere in the database such as a check constraint 
+-- to ensure email addresses are valid
+
+CREATE TABLE EMAIL_LIST
+(  EMAIL_LIST_ID    NUMBER(7)  PRIMARY KEY,
+   EMAIL1           VARCHAR2(120),
+   CONSTRAINT CK_EL_EMAIL1
+     CHECK (REGEXP_LIKE (EMAIL1, '^([[:alnum:]]+)@[[:alnum:]]+.(com|net|org|edu|gov|mil)$') )
+);

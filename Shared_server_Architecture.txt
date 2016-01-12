@@ -1,0 +1,124 @@
+Shared_Server_Architecture.txt
+======================
+
+
+******************EDIT*******************
+The below is a good summary of shared server architecture but needs a few corrections since 11G. Shared server architecture need not be thought of as an alternative to dedicated architecture but instead as an additional add-on to it. You don’t get to choose explicitly one or the other. i.e. if someone has server=dedicated as part of their connect string, thats how they will connect regardless of the server config. Also note that in 10G shared server is anabled by setting the SHARED_SERVERS parameter to a value greater than zero. No other param needs to be set. Because shared server requires at least one dispatcher to work, a dispatcher is brought up even if none is set by the DISPATCHERS param!
+http://docs.oracle.com/cd/B28359_01/server.111/b28310/manproc003.htm#
+******************EDIT*******************
+
+
+Shared server architecture is the additon to Dedicated server – it is offered as an option by oracle to overcome the problems encountered by the above. It allows a large number of user processes to be serviced by a relatively small number/pool of server processes, thus reducing dramatically the number of server processes that the operating system has to manage. Memory usage may also reduce.
+ 
+The shared server architecture is implemented purely on the server side. The user process and application software have no way of knowing that anything has changed. Shared server is implemented by additional parameter processes that form part of the instance. They are background processes launched at instance start-up time: “Dispatchers” and “shared server” processes. There are also some extra memory structures within SGA and the database listener modifies its behaviour for shared server.
+ 
+DISPATCHERS and SHARED SERVERS
+ 
+When an instance that is configured for shared server starts up – it initiates the usual background processes along with one or more dispatcher processes. These dispatchers like any other TCP process, run on a unique port allocated on the system, they contact the listener via registration (remember dynamic registration?) and they register with it.
+ 
+One of more shared server processes also start; these are in concept very similar to a dedicated server process but just not tied to one session. They will receive SQL statements (PBEF = parse, bind, execute and fetch) to handle but they will not be received “directly” from a user process; they will be read from an -input-  queue that is populated with statements from any number of user processes(via dispatcher(s)! Similarly, the shared server processes don’t fetch the result sets back directly to the user processes; instead they put the results set onto a response -queue-.
+ 
+So how do the user generated statements get landed in the input queue to be handled by the shared server processes and how do the result sets get back from the response queue back to the user processes? This is where dispatchers come in – when a user process contacts a listener (instead of launching a server process as per dedicated architecture mode) – the listener passes back the address of a dispatcher (‘One of your waiters for this evening sir?’). If there are multiple dispatchers the listener will load-balance incoming connection requests across them. Each user process will foolishly think it is talking to a dedicated server process! It is not!
+ 
+When a user process issues a SQL statement – it is sent to the dispatcher; the dispatcher puts all the statements it receives into the input queue. This is also called the common queue because all dispatchers share it. All the shared server processes monitor the common/input queue; when a statement arrives in the input queue, the first available shared server picks it up. From then execution proceeds through the normal usual parse-bind-execute (Not fetch!) cycle. * You see its impossible for the shared server process to fetch the results sets back to the user process because they have no direct connection. So instead the shared server puts the results set into a response queue (specific to each dispatcher). So the dispatcher that received the job in the first place monitors its own response queue and whenever any results are put on it – the dispatcher will pick them up and fetch them back to the original user process!!
+ 
+UGA
+ 
+HOWEVER – this poses a potential issue – user statements could be picked off the common queue by a different shared server processes which might have no idea what state a transaction is in.
+e.g. user issuing a select for update – then a delete – then a commit?
+To get around this problem, whenever a shared server process picks up an incoming request off the common queue, it will go to the SGA and connect to the appropriate block of memory to find out the state of the session. Memory used in the SGA for each shared server session is known as UGA (user global area); it is comparable to PGA. UGA’s are stored in the shared pool in the SGA.
+ 
+-----------------------------------------------------
+Configuring Shared Server Architecture
+-----------------------------------------------------
+On the server side – shared server is nothing to do with the database only the instance. The listener will be automatically configured for shared server through the dynamic instance registration. Shared server is configured through instance initialisation parameters of which the following two are the most important.
+-       DISPATCHERS
+-       SHARED_SERVERS
+
+ 
+shared_servers: this controls the number of shared_server processes to be launched at instance start up. shared servers use a queuing (input/common queue) system but ideally there should be no queuing and there should always be a server process ready and waiting for every job dropped onto the common queue by dispatchers. Therefore this should be set to a high water mark in terms of concurrent requests. Even if there is a sudden burst of activity, oracle will address this by launching additional shared server processes up to a value specified by max_shared_servers.
+ 
+dispatchers: this controls how many dispatcher processes to launch at instance startup and how they will behave. This is the only required parameter; options are how many to start and the protocol.
+* The max_distpatchers parameter sets an upper limit to the number of dispatchers you can start.
+ 
+ 
+To enable shared server architecture:
+ 
+SQL > alter system set dispatchers=’(dispatchers=5) (protocol=tcp)’
+SQL > alter system set shared_servers=10;
+SQL> show parameter shared_servers
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ---------------------------
+shared_servers                       integer     10
+ 
+SQL> show parameter dispatchers
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ---------------------------
+dispatchers                          string      (dispatchers=5) (protocol=t
+max_dispatchers                      integer
+ 
+C:\Users\scott>lsnrctl services
+LSNRCTL for 32-bit Windows: Version 11.2.0.4.0 - Production on 27-FEB-2014 1:47
+Copyright (c) 1991, 2013, Oracle.  All rights reserved.
+ 
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=IPC)(KEY=EXTPROC1521)))
+Services Summary...
+Service "CLRExtProc" has 1 instance(s).
+  Instance "CLRExtProc", status UNKNOWN, has 1 handler(s) for this service..
+    Handler(s):
+      "DEDICATED" established:0 refused:0
+         LOCAL SERVER
+Service "sandpit.scott" has 1 instance(s).
+  Instance "sandpit", status READY, has 6 handler(s) for this service...
+    Handler(s):
+      "DEDICATED" established:94 refused:0 state:ready
+         LOCAL SERVER
+      "D000" established:0 refused:0 current:0 max:1022 state:ready
+         DISPATCHER <machine: DHX31882, pid: 13428>
+         (ADDRESS=(PROTOCOL=tcp)(HOST=DHX31882.omega.internal)(PORT=46543))
+      "D001" established:1 refused:0 current:1 max:1022 state:ready
+         DISPATCHER <machine: DHX31882, pid: 37808>
+         (ADDRESS=(PROTOCOL=tcp)(HOST=DHX31882.omega.internal)(PORT=47153))
+      "D002" established:1 refused:0 current:1 max:1022 state:ready
+         DISPATCHER <machine: DHX31882, pid: 43564>
+         (ADDRESS=(PROTOCOL=tcp)(HOST=DHX31882.omega.internal)(PORT=47154))
+      "D003" established:1 refused:0 current:1 max:1022 state:ready
+         DISPATCHER <machine: DHX31882, pid: 37776>
+         (ADDRESS=(PROTOCOL=tcp)(HOST=DHX31882.omega.internal)(PORT=47155))
+      "D004" established:1 refused:0 current:1 max:1022 state:ready
+         DISPATCHER <machine: DHX31882, pid: 29924>
+         (ADDRESS=(PROTOCOL=tcp)(HOST=DHX31882.omega.internal)(PORT=47156))
+Service "sandpitXDB.scott" has 1 instance(s).
+  Instance "sandpit", status READY, has 0 handler(s) for this service...
+The command completed successfully
+ 
+To check the successful generation of the associated processes once the shared server architecture has been put in place:
+SQL>
+  1  select username, program, terminal from v$process
+  2  where program like '%S0%' or program like '%D0%'
+  3* order by program
+SQL> /
+ 
+USERNAME        PROGRAM                        TERMINAL
+--------------- ------------------------------ ----------------
+SYSTEM          ORACLE.EXE (D000)              DHX31882
+SYSTEM          ORACLE.EXE (D001)              DHX31882
+SYSTEM          ORACLE.EXE (D002)              DHX31882
+SYSTEM          ORACLE.EXE (D003)              DHX31882
+SYSTEM          ORACLE.EXE (D004)              DHX31882
+SYSTEM          ORACLE.EXE (S000)              DHX31882
+SYSTEM          ORACLE.EXE (S001)              DHX31882
+SYSTEM          ORACLE.EXE (S002)              DHX31882
+SYSTEM          ORACLE.EXE (S003)              DHX31882
+SYSTEM          ORACLE.EXE (S004)              DHX31882
+SYSTEM          ORACLE.EXE (S005)              DHX31882
+SYSTEM          ORACLE.EXE (S006)              DHX31882
+SYSTEM          ORACLE.EXE (S007)              DHX31882
+SYSTEM          ORACLE.EXE (S008)              DHX31882
+SYSTEM          ORACLE.EXE (S009)              DHX31882
+ 
+15 rows selected.
+ 
+...Or
+select * from v$dispatcher;
+select * from v$shared_server;

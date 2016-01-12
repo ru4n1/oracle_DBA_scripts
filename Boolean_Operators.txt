@@ -1,0 +1,39 @@
+Data can be restricted using a where clause but for further refinement, booleanor logical operators 
+should be used in order to further refine the data extraction.
+
+These are the 'AND' and 'OR' operators.   
+
+AND
+1  select last_name,first_name from employees
+  2  where commission_pct is null
+  3  and
+  4* last_name like 'A%'
+HR @ sandpit > /
+
+LAST_NAME                 FIRST_NAME
+------------------------- --------------------
+Atkinson                  Mozhe
+Austin                    David
+
+
+OR
+Conforming to just one OR condition is enought for a record to be returned.
+
+  1  select * from jobs where
+  2  Job_title = 'Langer'
+  3  or
+  4* job_title = 'Programmer'
+HR @ sandpit > /
+
+JOB_ID     JOB_TITLE                           MIN_SALARY MAX_SALARY
+---------- ----------------------------------- ---------- ----------
+IT_PROG    Programmer                                4000      10000
+
+1 row selected.
+
+
+NOT 
+The not operator can be used to reverse the boolean matching so..
+where last_name like 'King'... can be changed to... where last_name not like 'King'
+where last name like 'King'... can be changed to... where not (last_name ' King')
+where dept_id in (10,20,30)... can be changed to... where dept_id not in (10,20,30)

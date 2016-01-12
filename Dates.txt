@@ -1,0 +1,18 @@
+HR @ sandpit > select * from job_history 
+  2  where start_date='01-JAN-07'; 
+
+EMPLOYEE_ID START_DAT END_DATE  JOB_ID     DEPARTMENT_ID
+----------- --------- --------- ---------- -------------
+        122 01-JAN-07 31-DEC-07 ST_CLERK              50
+        176 01-JAN-07 31-DEC-07 SA_MAN                80
+
+
+HR @ sandpit > select employee_id, start_date from job_history
+  2  where start_date+30 = '18-MAR-04';
+
+EMPLOYEE_ID START_DAT
+----------- ---------
+        201 17-FEB-04
+
+
+

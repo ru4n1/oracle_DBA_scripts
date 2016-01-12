@@ -1,0 +1,9 @@
+# The below commands connect to the target and catalog for metadata
+# Allocates one channel of type disk in the designated location with the format specified
+
+# Backs up the database plus archivelogs 
+
+run
+{
+ backup database plus archivelog tag = 'Full Backup';
+}

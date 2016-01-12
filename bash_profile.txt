@@ -1,0 +1,13 @@
+#-bash-4.1$ cat ~/.bash_profile | grep -v '^alias'
+umask 022
+ulimit -Sn 16384
+ORACLE_BASE=/u01/app/oracle/product/11.2.0
+ORACLE_HOME=/u01/app/oracle/product/11.2.0/db_1
+ORACLE_SID=sandpit
+PATH=$PATH:$ORACLE_HOME/bin:$PATH:/usr/bin:/usr/ucb:/etc:/usr/local/bin:/usr/sbin:.
+export ORACLE_BASE ORACLE_HOME ORACLE_SID NLS_DATE_FORMAT NLS_LANG PATH
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/usr/dt/lib:/usr/X11R6/lib
+TMP=/tmp
+TMPDIR=/tmp
+export TMP TMPDIR
+ORACLE_HOME_LISTNER=LISTENER; export ORACLE_HOME_LISTNER

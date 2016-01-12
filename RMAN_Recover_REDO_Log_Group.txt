@@ -1,0 +1,58 @@
+- This is the current REDO setup below. 
+
+- Remember, A REDO log "group" yes group can have a staus of CURRENT whereby oracle is writing concurrently to the members 
+- in this group. Or it can be ACTIVE where oracle is not writing but the group has not yet been archived and is needed for instance recovery.
+- Or INACTIVE where it is not needed for instance and may or may not be archived yet.
+
+* You can tell if a log group has been archived by the below !
+SQL> select group#, sequence#, ARCHIVED "Has it been archived?" from v$log;
+    GROUP#  SEQUENCE# Has
+---------- ---------- ---
+         1         22 YES
+         2         23 YES
+         3         24 NO
+
+SQL> select * from v$logfile order by group#; 
+    GROUP# STATUS  TYPE    MEMBER                                                  IS_
+---------- ------- ------- ------------------------------------------------------- ---
+         1         ONLINE  /ora/work/data/SANDPRD/onlinelog/o1_mf_1_bpn6zp5t_.log  NO
+         1         ONLINE  /FRA/SANDPRD/onlinelog/o1_mf_1_bpn6zrqd_.log            YES
+         2         ONLINE  /ora/work/data/SANDPRD/onlinelog/o1_mf_2_bpn6zxp6_.log  NO
+         2         ONLINE  /FRA/SANDPRD/onlinelog/o1_mf_2_bpn70090_.log            YES
+         3         ONLINE  /ora/work/data/SANDPRD/onlinelog/o1_mf_3_bpn703db_.log  NO
+         3         ONLINE  /FRA/SANDPRD/onlinelog/o1_mf_3_bpn705p1_.log            YES
+
+SQL> select * from v$log; 
+    GROUP#    THREAD#  SEQUENCE#      BYTES  BLOCKSIZE    MEMBERS ARC STATUS           FIRST_CHANGE# FIRST_TIM NEXT_CHANGE# NEXT_TIME
+---------- ---------- ---------- ---------- ---------- ---------- --- ---------------- ------------- --------- ------------ ---------
+         1          1         22   52428800        512          2 YES INACTIVE                909453 31-MAY-15       912367 31-MAY-15
+         2          1         23   52428800        512          2 YES INACTIVE                912367 31-MAY-15       943220 02-JUN-15
+         3          1         24   52428800        512          2 NO  CURRENT                 943220 02-JUN-15   2.8147E+14
+
+
+**************************************************************************************************
+ if a member of a redo log group is damaged or lost - oracle should continue on as normal writing 
+to the remaing members - but you need to correct the problem ASAP
+**************************************************************************************************
+If a member of a log group becomes damaged - it should reflect an INVALID status below.
+
+SQL> select * from v$logfile order by group#; 
+    GROUP# STATUS  TYPE    MEMBER                                                  IS_
+---------- ------- ------- ------------------------------------------------------- ---
+         1 INVALID ONLINE  /ora/work/data/SANDPRD/onlinelog/o1_mf_1_bpn6zp5t_.log  NO
+         1         ONLINE  /FRA/SANDPRD/onlinelog/o1_mf_1_bpn6zrqd_.log            YES
+         2         ONLINE  /ora/work/data/SANDPRD/onlinelog/o1_mf_2_bpn6zxp6_.log  NO
+         2         ONLINE  /FRA/SANDPRD/onlinelog/o1_mf_2_bpn70090_.log            YES
+         3         ONLINE  /ora/work/data/SANDPRD/onlinelog/o1_mf_3_bpn703db_.log  NO
+         3         ONLINE  /FRA/SANDPRD/onlinelog/o1_mf_3_bpn705p1_.log            YES
+
+SQL> alter database drop logfile member '/ora/work/data/SANDPRD/onlinelog/o1_mf_1_bpn6zp5t_.log';
+SQL> alter database add logfile member '/u01/oradata/redo1a.log' to group 1;
+* OMF is a little tricky - you cannot add a logfile member to a group - so dropping the group completely and then adding it again for OMF
+may be preferrable.
+
+SQL> alter database drop logfile group 1;
+Database altered.
+
+SQL> alter database add logfile group 1;
+Database altered.

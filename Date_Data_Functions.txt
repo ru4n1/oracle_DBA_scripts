@@ -1,0 +1,64 @@
+Working with dates can be challening so oracle provides a few built in functions to assist:
+The format in which a date is displayed is know as its format mask.
+
+
+## MONTHS_BETWEEN
+  1* select start_date, end_date, months_between(end_date,start_date) from job_history
+HR @ sandpit > /
+START_DAT END_DATE  MONTHS_BETWEEN(END_DATE,START_DATE)
+--------- --------- -----------------------------------
+13-JAN-01 24-JUL-06                          66.3548387
+21-SEP-97 27-OCT-01                          49.1935484
+28-OCT-01 15-MAR-05                          40.5806452
+17-FEB-04 19-DEC-07                          46.0645161
+
+
+## ADD_MONTHS
+HR @ sandpit > select sysdate "Today", add_months(sysdate,6) "Six months later..." from dual;
+Today                Six months later...
+-------------------- --------------------
+06-APR-2014 14:34:20 06-OCT-2014 14:34:20
+
+
+## LAST_DAY
+-- returns the last day of the month that the specified date falls into.
+HR @ sandpit > select last_day(sysdate) from dual;
+LAST_DAY(
+---------
+30-APR-14
+
+
+
+## NEXT_DAY
+-- returns the next date on which the next specified day of the week falls after the given date
+HR @ sandpit > select next_day(sysdate,'Thursday') from dual;
+NEXT_DAY(
+---------
+10-APR-14
+
+
+## SYSDATE
+sysdate function takes no parameters and returns the current system date
+
+HR @ sandpit > select 'Today is: ' || sysdate from dual;
+'TODAYIS:'||SYSDATE
+-------------------
+Today is: 06-APR-14
+
+HR @ sandpit > alter session set nls_date_format='DD-MON-YYYY HH24:MI:SS'
+  2  /
+HR @ sandpit > select sysdate from dual;
+SYSDATE
+--------------------
+06-APR-2014 14:26:23
+
+  1  select
+  2  to_date ('02-JUN-2008 12:10:30','DD-MON-YYYY HH24:MI:SS') -1 "Subtract 1 day",
+  3  to_date ('02-JUN-2008 12:10:30','DD-MON-YYYY HH24:MI:SS') +1 "Add 1 day",
+  4  to_date ('02-JUN-2008 12:10:30','DD-MON-YYYY HH24:MI:SS') +3/24 "Add three hours",
+  5  to_date ('02-JUN-2008 12:10:30','DD-MON-YYYY HH24:MI:SS') +12/24 "Add twelve hours"
+  6* from dual
+HR @ sandpit > /
+Subtract 1 day       Add 1 day            Add three hours      Add twelve hours
+-------------------- -------------------- -------------------- --------------------
+01-JUN-2008 12:10:30 03-JUN-2008 12:10:30 02-JUN-2008 15:10:30 03-JUN-2008 00:10:30

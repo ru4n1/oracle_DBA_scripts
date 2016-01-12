@@ -1,0 +1,6 @@
+There are more than a few hundred dynamic performance views or vee dollar views because their names are prefixed by V$.
+They give real time infomration on the instance and the database.
+
+Some of the dynaimic performance views can be queried even when the database is not opened as some are generated from the controlfile and (unlike the data dictionary) do not require the database to be open.
+
+They are created at startup, modifed during the lifetime of ther instance and dropped at shutdown.

@@ -1,0 +1,18 @@
+LEFT OUTER JOIN
+
+Another type of join is called an Oracle LEFT OUTER JOIN. This type of join returns all rows from the LEFT-hand table specified in the ON condition and only those rows from the other table where the joined fields are equal (join condition is met).
+
+SYNTAX
+
+The syntax for the Oracle LEFT OUTER JOIN is:
+
+SELECT columns
+FROM table1
+LEFT [OUTER] JOIN table2
+ON table1.column = table2.column;
+In some databases, the LEFT OUTER JOIN keywords are replaced with LEFT JOIN.
+
+VISUAL ILLUSTRATION
+The Oracle LEFT OUTER JOIN would return the all records from table1 and only those records from table2 that intersect with table1.
+
+

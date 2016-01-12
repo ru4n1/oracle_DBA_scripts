@@ -1,0 +1,31 @@
+Statspack is a set of performance and reporting utilities provided by oracle. it has been superceded by AWR reporting and automatic database diagnostic monitoring but can still be useful.
+
+You also need to be licensed to use the diagnostic pack in order to use AWR and ADDM.
+
+To install statspack - run the scripts below to drop the user firstly and then recreate the perfstat user schema.
+
+cd $ORACLE_HOME/rdbms/admin
+sqlplus "/ as sysdba" @spdrop.sql       -- Drop and install statspack
+sqlplus "/ as sysdba" @spcreate.sql     -- Enter tablespace names when prompted
+
+
+To take a performance snapshot manually:
+PERFSTAT @ sandpit > exec statspack.snap;
+PL/SQL procedure successfully completed.
+
+To automate the execution of statspack snaps, you can use the spauto.sql script located in the directory above.
+$ORACLE_HOME/rdbms/admin/spauto.sql
+
+ -- To get a list of current snapshots available:
+PERFSTAT @ sandpit > select SNAP_ID, SNAP_TIME from STATS$SNAPSHOT; 
+   SNAP_ID SNAP_TIME
+---------- ---------
+         1 08-MAR-14
+         2 08-MAR-14
+         3 08-MAR-14
+
+
+In order to execute the statspack report...
+bash-4.1$ sqlplus / as sysdba @$ORACLE_HOME/rdbms/admin/spreport.sql 
+
+And fill in the relevant snapshot ids to define how long you want the window of examination to be. The report will be output in a text format.

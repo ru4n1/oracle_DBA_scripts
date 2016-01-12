@@ -1,0 +1,16 @@
+An exclusive lock means that if a session is updating one row, the one row is locked and nothing else. Furthermore, the row is only locked to prevent other sessions from updating it - these other sessions can read it at any time. The lock is held until a transaction completes with a rollback or commit. Read access is permitted although these reads may involve the use of undo data to make sure the reading sessions do not see any uncommitted transactions. 
+
+Only one session can take an exclusive lock on a row or table at any one time. Shared locks can be taken on the same object by many sessions. Shared locks are taken on whole tables; the purpose of a shared lock is to prevent another session acquiring an exclusive lock. [ An exclusive lock is required in order to execute a DDL statement such as 'drop table' ]. You cannot issue a command statement that will modify an object, (e.g. drop a column of a table) if another session has a shared lock on the table. 
+
+To execute DML on rows, a session must acquire exclusive locks on the rows to be changed and shared locks on the tables containing the rows. If another session has exclusive locks on the rows, the session will hang until the locks are released by a commit/rollback. 
+
+When a session requests a lock on a row or object and cannot get it because another session has an exclusive on the row, or object, it will hang. This is lock contention. :w
+
+
+The below statement will find any blocking locks for you:
+
+select vlock1.sid, ' IS BLOCKING ', vlock2.sid 
+from v$lock vlock1, v$lock vlock2
+where vlock1.block =1 and vlock2.request > 0
+and vlock1.id1=vlock2.id1
+and vlock1.id2=vlock2.id2

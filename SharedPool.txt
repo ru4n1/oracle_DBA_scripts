@@ -1,0 +1,25 @@
+The shared pool is one of the more complex SGA structures. It contains
+
+- the library cache [memory area for storing recently executed code]
+	parsing of code such as idenitfying the objects needed for 'select * from employees'
+	means oracle has to work out what each piece means and how to execute it. This could
+	mean a number of different queries against the data dictionary...
+	The purpose of the library cache is to store statements in their parsed form ready for 
+	execution... saving a huge amount of time.
+- the data dictionary cache [stores recently used object definitions and other metadata]
+	Keeping such definitions in memory where they are accessible to all sessions speeds 
+	up the parsing process so if statements do have to be parsed - its quick.
+	e.g.
+	 select sum(salary) from employees;
+	 select * from employees where last_name ='Smyth';
+	Both statements must be parsed but the first slect will have loaded the definition of the
+	employyes tablei in to the data dictionary cache
+- the PL/SQL area [stored PL/SQL objects such as procedures,functions,triggers]
+	when a stored pl/sql object is invoked, it must be read from the data dictionary, to 
+	prevent repeated reading the objects are cached here in the shared pool for rsubsequent 
+	invocations
+- the SQL / PL/SQL result areas [result cache is a new 11G feature] 
+	in many apps, the same queyr is executed many times - - the result cache lets oracle
+	store the the results of such queries in memory (as opposed to rerunning the same query)
+	It is intelligent enough to be able to track the tables of the query have since been 
+	updated or not...

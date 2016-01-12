@@ -1,0 +1,77 @@
+# As you can see, the database is not in archivelog mode now
+SYS @ sandpit > archive log list 
+Database log mode              No Archive Mode
+Automatic archival             Disabled
+Archive destination            /u04/arch/
+Oldest online log sequence     34
+Current log sequence           36
+
+# Recovery file dest is used for the flash recovery area and its no harm to check this 
+# as archive logs can default to here if you do not set the archive_log_dest_n param
+SYS @ sandpit > show parameter_recovery_file_dest
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+db_recovery_file_dest                string
+db_recovery_file_dest_size           big integer 0
+
+# In this case - the archive log_dest param is already set
+SYS @ sandpit > show parameter log_archive_dest_1
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+log_archive_dest_1                   string      LOCATION=/u04/arch/
+log_archive_dest_10                  string
+log_archive_dest_11                  string
+log_archive_dest_12                  string
+log_archive_dest_13                  string
+log_archive_dest_14                  string
+log_archive_dest_15                  string
+log_archive_dest_16                  string
+log_archive_dest_17                  string
+log_archive_dest_18                  string
+log_archive_dest_19                  string
+
+# we shut her down firstly
+SYS @ sandpit > shutdown immediate;
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+
+SYS @ sandpit > host echo after shutting down the database, bring it back in mount mode
+after shutting down the database, bring it back in mount mode
+
+# Now bring back the instance in mount mode
+SYS @ sandpit > startup mount;
+ORACLE instance started.
+Total System Global Area 1052233728 bytes
+Fixed Size                  2217704 bytes
+Variable Size             750782744 bytes
+Database Buffers          293601280 bytes
+Redo Buffers                5632000 bytes
+Database mounted.
+
+
+# Now just enable or disable archivelog mode as needed!!
+SYS @ sandpit > alter database archivelog;
+Database altered.
+
+SYS @ sandpit > alter database open;
+Database altered.
+
+# and thats it...
+SYS @ sandpit > archive log list ;
+Database log mode              Archive Mode
+Automatic archival             Enabled
+Archive destination            /u04/arch/
+Oldest online log sequence     34
+Next log sequence to archive   36
+Current log sequence           36
+
+SYS @ sandpit > alter system switch logfile;
+
+System altered.
+
+SYS @ sandpit > host ls -lrt /u04/arch/ | tail -2
+-rw-r-----   1 oracle   oinstall 41067008 Feb 27 22:00 1_35_839566437.dbf
+-rw-r-----   1 oracle   oinstall 31452672 Feb 28 02:09 1_36_839566437.dbf
+
+SYS @ sandpit >

@@ -1,0 +1,6 @@
+- Nothing to do with RMAN but its always nice to back up your controlfile to trace 
+- so that you can recreate it if neccessary. 
+
+SQL> alter database backup controlfile to trace; o
+
+Defaults to the trace file directory. 

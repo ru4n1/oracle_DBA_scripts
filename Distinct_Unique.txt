@@ -1,0 +1,63 @@
+HR @ sandpit > select distinct(location_id) from departments;
+
+LOCATION_ID
+-----------
+       1800
+       2400
+       1400
+       2500
+       1700
+       2700
+       1500
+
+
+
+
+--  in the below example, you must note that the distinct keyword plays a part in the 
+-- elimination of rows from combinations of columns.
+-- in the below the distinct is working on finding distinct examples of (location_id + manager_id)
+-- so it is working against both projected columns and not just location_id
+
+HR @ sandpit > select distinct location_id, manager_id from departments;
+
+LOCATION_ID MANAGER_ID
+----------- ----------
+       1700        200
+       1700        114
+       1800        201
+       2500        145
+       1700        108
+       2700        204
+       1400        103
+       1700
+       1700        205
+       2400        203
+       1500        121
+       1700        100
+
+
+-- the below will work also but it is working against the combination of columns.
+
+ 1* select distinct(location_id), manager_id from departments
+HR @ sandpit > /
+
+LOCATION_ID MANAGER_ID
+----------- ----------
+       1700        200
+       1700        114
+       1800        201
+       2500        145
+       1700        108
+       2700        204
+       1400        103
+       1700
+       1700        205
+       2400        203
+       1500        121
+       1700        100
+
+12 rows selected.
+
+
+-- Note 
+UNIQUE and DISTINCT are synonyms. Please note that neither UNIQUE nor DISTINCT are functions, so the parens, although allowed, are meaningless. DISTINCT applies to all columns in the result set.

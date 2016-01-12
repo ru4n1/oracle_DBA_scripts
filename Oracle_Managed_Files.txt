@@ -1,0 +1,99 @@
+OMF or Oracle Managed files is intended to remove the neccessity for the DBA to have any knowledge of the file systems. Therefore the creation of database files becomes automated and defaulted based on a number of initialisation parameters:
+
+DB_CREATE_FILE_DEST
+DB_CREATE_ONLINE_LOG_DEST_1
+DB_CREATE_ONLINE_LOG_DEST_2
+DB_RECOVERY_FILE_DEST
+
+The DB_CREATE_FILE_DEST parameter specifies a default location for all datafiles. The DB_CREATE_ONLINE_LOG_DEST_n parameters specify a default location for online redo log files. DB_RECOVERY_FILE_DEST specifies a default location for archive redo log files and backup files. 
+
+
+Example of what happens when you set OMF on below...
+
+
+SYS @ sandpit > select file_name from dba_data_files;
+FILE_NAME
+------------------------------------------------------------------------------------------------------------------------
+/u02/oradata/sandpit/users01.dbf
+/u02/oradata/sandpit/undotbs01.dbf
+/u02/oradata/sandpit/sysaux01.dbf
+/u02/oradata/sandpit/system01.dbf
+/u02/oradata/sandpit/example01.dbf
+
+5 rows selected.
+
+SYS @ sandpit > alter system set db_create_file_dest='/tmp/';
+System altered.
+
+SYS @ sandpit > show parameter db_create_file_dest
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+db_create_file_dest                  string      /tmp/
+
+SYS @ sandpit > create tablespace newTS;
+Tablespace created.
+
+SYS @ sandpit > select file_name from dba_data_files;                                                                                 
+FILE_NAME
+------------------------------------------------------------------------------------------------------------------------
+/u02/oradata/sandpit/users01.dbf
+/u02/oradata/sandpit/undotbs01.dbf
+/u02/oradata/sandpit/sysaux01.dbf
+/u02/oradata/sandpit/system01.dbf
+/u02/oradata/sandpit/example01.dbf
+/tmp/SANDPIT/datafile/o1_mf_newts_9jymrb0f_.dbf
+
+SYS @ sandpit > select * from v$tablespace;
+       TS# NAME                           INC BIG FLA ENC
+---------- ------------------------------ --- --- --- ---
+         0 SYSTEM                         YES NO  YES
+         1 SYSAUX                         YES NO  YES
+         2 UNDOTBS1                       YES NO  YES
+         4 USERS                          YES NO  YES
+         3 TEMP                           NO  NO  YES
+         6 EXAMPLE                        YES NO  YES
+         8 NEWTS                          YES NO  YES
+
+7 rows selected.
+
+SYS @ sandpit > drop tablespace newts including contents and datafiles; 
+Tablespace dropped.
+
+  1* select * from v$tablespace
+SYS @ sandpit > /
+       TS# NAME                           INC BIG FLA ENC
+---------- ------------------------------ --- --- --- ---
+         0 SYSTEM                         YES NO  YES
+         1 SYSAUX                         YES NO  YES
+         2 UNDOTBS1                       YES NO  YES
+         4 USERS                          YES NO  YES
+         3 TEMP                           NO  NO  YES
+         6 EXAMPLE                        YES NO  YES
+
+6 rows selected.
+
+  1* select file_name from dba_data_files
+SYS @ sandpit > /
+
+FILE_NAME
+------------------------------------------------------------------------------------------------------------------------
+/u02/oradata/sandpit/users01.dbf
+/u02/oradata/sandpit/undotbs01.dbf
+/u02/oradata/sandpit/sysaux01.dbf
+/u02/oradata/sandpit/system01.dbf
+/u02/oradata/sandpit/example01.dbf
+
+5 rows selected.
+
+SYS @ sandpit > show parameter db_create 
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+db_create_file_dest                  string      /tmp/
+
+SYS @ sandpit > alter system set db_create_file_dest ='';
+System altered.
+
+SYS @ sandpit > show parameter db_create
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+db_create_file_dest   

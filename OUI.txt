@@ -1,0 +1,9 @@
+-- OUI options for initiating the installer software process
+
+./runInstaller 
+
+./runInstaller -ignoreSysPrereqs
+
+./runInstaller -silent -responsefile <responsefilename>
+
+./runInstaller -record -destinationFile <responsefilename>

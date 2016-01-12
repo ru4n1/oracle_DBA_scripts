@@ -1,0 +1,300 @@
+
+-----------------------------------------------------
+-- To create a physcial standby DataGuard Database --
+-----------------------------------------------------
+
+===== REDO LOGGING CONFIG =====
+For a physical standby database this is a big problem, so you must make sure that redo is logged regardless of what a user tells the database to do. To do this you can turn on Forced Logging. Here is how:
+
+SQL> alter database force logging;
+SQL> select name, force_logging from v$database;
+
+Next we’ll make sure that when we add or drop datafiles on our primary database, that those files are also added or dropped on the standby. This is done with:
+5
+SQL> alter system set standby_file_management = 'AUTO';
+
+
+===== STANDBY LOG GROUPS =======
+Once this is done, we need to make sure the primary database has Standby Log Files. Standby Log Files are
+used by a standby database to store the redo it receives from the primary database. I create these on the primary
+for two reasons, 1) it may become a standby later and would then need them, 2) when we create the standby
+they will be created as part of that process. Standby log files should be created the same size as the online
+logfiles. Preferably you should have as many, or more, standby logfile groups as online logfile groups. To easily
+differentiate them in the V$ views, I like to number my standby logfile groups so they are in a different range
+from online logfiles (e.g. online logfile groups would be 1-6, standby logfile groups would be 11-16). To create
+a standby logfile group:
+
+To add standby log groups 
+-------------------------------
+ALTER DATABASE ADD STANDBY LOGFILE ('/FRA/standby_redo01.log') SIZE 50M;
+ALTER DATABASE ADD STANDBY LOGFILE ('/FRA/standby_redo02.log') SIZE 50M;
+ALTER DATABASE ADD STANDBY LOGFILE ('/FRA/standby_redo03.log') SIZE 50M;
+ALTER DATABASE ADD STANDBY LOGFILE ('/FRA/standby_redo04.log') SIZE 50M;
+
+To check  standby log groups 
+-------------------------------
+select * from v$logfile; 
+
+
+===== AUTHENTICATION =====
+For this you must create a password file and have REMOTE_LOGIN_PASSWORDFILE set.
+
+SQL> alter system set remote_login_passwordfile=exclusive scope=spfile; (and bounce)
+OS> orapwd password=<the sys password>
+
+You should also make sure your primary database has the db_unique_name parameter set for consistency.
+SQL> show parameter db_unique_name
+SQL> select name, value from v$parameter where lower(name) like 'db%name'; 
+
+
+===== LOG ARCHIVE CONFIG =====
+ALTER SYSTEM SET LOG_ARCHIVE_CONFIG='DG_CONFIG=(sandpit,sandpitsby)';
+
+SQL> sho parameter log_archive_config
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+log_archive_config                   string      DG_CONFIG=(sandpit,sandpitsby)
+
+SQL> alter system set log_archive_dest_2='SERVICE=sandpitsby LGWR ASYNC VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME=sandpitsby';
+
+SQL> alter system set fal_server=sandpit;
+System altered.
+SQL> alter system set fal_client=sandpitsby;
+System altered.
+
+SQL> sho parameter fal_
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+fal_client                           string      SANDPITSBY
+fal_server                           string      SANDPIT
+
+SQL> alter system set standby_file_management=auto;
+
+
+===== LISTENER CONFIG ======
+The primary database and standby should be statically registered with its listener.
+As we are running both on the same host!
+
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC = 
+      (SID_NAME = sandpit)
+      (ORACLE_HOME = /u01/app/oracle/product/11.2.0/dbhome_1)
+    )
+  (SID_LIST =
+    (SID_DESC = 
+      (SID_NAME = sandpitsby)
+      (ORACLE_HOME = /u01/app/oracle/product/11.2.0/dbhome_1)
+    )
+  )
+
+
+Th below entries were configured for both the primary and standby in the TNS names file. 
+
+SANDPIT =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = solaris11)(PORT = 1522))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = sandpit.ardfield)
+    )
+  )
+SANDPITSBY =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = solaris11)(PORT = 1522))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SID = SANDPITSBY)
+    )
+  )
+
+
+===== PASSWORD FILE =====
+copy the password file for the primary as the standby also 
+cp $ORACLE_HOME/dbs/orapwsandpit $ORACLE_HOME/dbs/orapwsandpitsby 
+
+
+
+====== PFILE INITIAL =====
+Create a basic PFILE in ORACLE_HOME/dbs with the following parameters.
+
+[oracle@ocm2 dbs]$ cat initpritst.ora 
+DB_NAME=sandpit
+DB_UNIQUE_NAME=sandpitsby
+
+
+
+===== RMAN TIME =====
+- Start the standby instance in no mount mode now ...
+
+export ORACLE_SID=sandpitsby 
+echo "startup nomount ; " | sqlplus / as sysdba
+
+SQL> ALTER DATABASE CREATE STANDBY CONTROLFILE AS '/tmp/db11g_standby_sandpitsby'; 
+Database altered.
+
+---- The below will be my RMAN block attempt 
+
+run {
+allocate channel prmy1 type disk;
+allocate auxiliary channel stby type disk;
+duplicate target database for standby from active database
+spfile
+ parameter_value_convert 'sandpit','sandpitsby'
+ set db_unique_name='sandpitsby'
+ set db_file_name_convert='/ora/work/data/SANDPIT/datafile/','/ora/work/data/SANDPITSBY/datafile/'
+ set log_file_name_convert='/ora/work/data/SANDPIT/onlinelog/','/ora/work/data/SANDPITSBY/onlinelog/'
+ set control_files='/ora/work/data/SANDPITSBY/controlfile/control01.ctl'
+ set log_archive_max_processes='10'
+ set fal_client='sandpitsby'
+ set fal_server='sandpit'
+ set standby_file_management='AUTO'
+ set log_archive_config='dg_config=(sandpit,sandpitsby)'
+ set log_archive_dest_2='service=sandpit ASYNC valid_for=(ONLINE_LOGFILE,PRIMARY_ROLE) db_unique_name=sandpit'
+;
+}
+* Note to ensure the directory structure exists for the standby database otherwise RMAN will complain
+
+
+===== START MANAGED RECVERY ======
+SQL> alter database recover managed standby database disconnect from session;
+o
+
+
+===== VALIDATE ======
+At this point the duplicate is complete along with the dataguard environment. You can validate that that logs are shipping and applying. On the standby issue the following query.
+
+SQL> select sequence#, first_time, next_time, applied from v$archived_log order by sequence#; 
+
+Then on the primary side...
+SQL> alter system switch logfile;
+System altered.
+SQL> archive log list ; 
+Database log mode              Archive Mode
+Automatic archival             Enabled
+Archive destination            USE_DB_RECOVERY_FILE_DEST
+Oldest online log sequence     78
+Next log sequence to archive   80
+Current log sequence           80
+SQL> alter system switch logfile ;
+System altered.
+SQL> archive log list ;
+Database log mode              Archive Mode
+Automatic archival             Enabled
+Archive destination            USE_DB_RECOVERY_FILE_DEST
+Oldest online log sequence     79
+Next log sequence to archive   81
+Current log sequence           81
+
+
+SQL> select sequence#, first_time, next_time, applied from v$archived_log order by sequence#;
+ SEQUENCE# FIRST_TIM NEXT_TIME APPLIED
+---------- --------- --------- ---------
+        76 30-MAY-15 30-MAY-15 YES
+        77 30-MAY-15 30-MAY-15 YES
+        78 30-MAY-15 30-MAY-15 YES
+        79 30-MAY-15 30-MAY-15 YES
+        80 30-MAY-15 30-MAY-15 YES
+
+
+
+--- Further validation can be checked via ...
+
+--> standby 
+SQL> list
+  1  SELECT 'Last Applied : ' Logs, TO_CHAR(next_time,'DD-MON-YY:HH24:MI:SS') TIME,thread#,sequence#
+  2   FROM v$archived_log
+  3    WHERE sequence# =
+  4     (SELECT MAX(sequence#) FROM v$archived_log WHERE applied='YES')
+  5  UNION
+  6  SELECT 'Last Received : ' Logs, TO_CHAR(next_time,'DD-MON-YY:HH24:MI:SS') TIME,thread#,sequence#
+  7   FROM v$archived_log
+  8    WHERE sequence# =
+  9*   (SELECT MAX(sequence#) FROM v$archived_log)
+SQL> /
+
+LOGS             TIME                  THREAD#  SEQUENCE#
+---------------- ------------------ ---------- ----------
+Last Applied :   30-MAY-15:05:01:01          1         80
+Last Received :  30-MAY-15:05:01:01          1         80
+
+--> primary 
+SELECT
+ (SELECT name FROM V$DATABASE
+ ) name,
+ (SELECT MAX (sequence#) FROM v$archived_log WHERE dest_id = 1
+ ) Current_primary_seq,
+ (SELECT MAX (sequence#)
+ FROM v$archived_log
+ WHERE TRUNC(next_time) > SYSDATE - 1
+ AND dest_id = 2
+ ) max_stby,
+ (SELECT NVL (
+ (SELECT MAX (sequence#) - MIN (sequence#)
+ FROM v$archived_log
+ WHERE TRUNC(next_time) > SYSDATE - 1
+ AND dest_id = 2
+ AND applied = 'NO'
+ ), 0)
+ FROM DUAL
+ ) "To be applied",
+ (
+ (SELECT MAX (sequence#) FROM v$archived_log WHERE dest_id = 1
+ ) -
+ (SELECT MAX (sequence#) FROM v$archived_log WHERE dest_id = 2
+ )) "To be Shipped"
+FROM DUAL;
+ 
+
+
+
+
+***********************************************************************************
+And now to set up the DataGuard Broker 
+***********************************************************************************
+# standby 
+SQL> alter system set dg_broker_start=TRUE;
+
+# primary 
+SQL> alter system set dg_broker_start=TRUE;
+
+Add in a new static listener entry on the standby and primary server sides to correspond to the broker 
+# for primary 
+(SID_DESC=
+          (GLOBAL_DBNAME=sandpit_DGMGRL)
+          (SID_NAME=sandpit)
+          (ORACLE_HOME=/u01/app/oracle/product/11.2.0/db_1)
+    )
+
+# for standby
+(SID_DESC=
+          (GLOBAL_DBNAME=sandpitsby_DGMGRL)
+          (SID_NAME=sandpitsby)
+          (ORACLE_HOME=/u01/app/oracle/product/11.2.0/db_1)
+    )
+
+
+Dont forget to reload your listener. 
+
+Now Enter dgmgrl 
+
+dgmgrl sys/pass1234@sandpit 
+DGMGRL> create configuration 'DGConfig4sandpit' as primary database is 'sandpit' connect identifier is sandpit;
+Configuration "DGConfig4sandpit" created with primary database "sandpit"
+DGMGRL> show configuration ;
+Configuration - DGConfig4sandpit
+  Protection Mode: MaxPerformance
+  Databases:
+    sandpit - Primary database
+Fast-Start Failover: DISABLED
+Configuration Status:
+DISABLED
+
+# Now add in the standby database into the DG configuration. 
+DGMGRL> add database 'sandpitsby' as connect identifier is sandpitsby;
+
+# Enable the configuration and you are good to go...
+DGMGRL> enable configuration;
+DGMGRL> show configuration;
+
+ **********************************************************

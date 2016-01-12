@@ -1,0 +1,15 @@
+## TRIM
+HR @ sandpit > SELECT TRIM('Z' FROM 'Zebra') FROM dual;
+TRIM
+----
+ebra
+
+sandpit > select trim (leading 'l' from 'liverpool') from dual;
+TRIM(LEA
+--------
+iverpool
+
+HR @ sandpit > select trim (trailing 'X' from 'The BoX') from dual;
+TRIM(T
+------
+The Bo

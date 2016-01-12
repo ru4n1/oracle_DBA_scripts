@@ -1,0 +1,8 @@
+## LOWER
+HR @ sandpit > select lower(region_name) from regions;
+LOWER(REGION_NAME)
+-------------------------
+europe
+americas
+
+

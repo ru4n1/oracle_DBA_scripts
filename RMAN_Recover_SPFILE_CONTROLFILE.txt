@@ -1,0 +1,36 @@
+Example 5–7 Backing Up the Server Parameter File to Tape with a follow on restore 
+
+RUN
+{
+ALLOCATE CHANNEL c1 DEVICE TYPE sbt
+BACKUP SPFILE;
+}
+
+# Recovery 
+RUN
+{
+ALLOCATE CHANNEL c1 DEVICE TYPE sbt
+RESTORE SPFILE TO PFILE '/tmp/test_restore.f';
+}
+
+or 
+
+# Use the autobackup mechanism to restore the spfile or controlfile if you lose all CONTROLFILE instances.
+----------------------------------------------------------------------------------------------------------
+- First set the DBID if neccessary 
+RMAN> set dbid 123456789; 
+
+- Then get the instance up and running using a defaults pfile 
+RMAN> startup force nomount; 
+
+run { 
+restore spfile from autobackup;
+restore controlfile from autobackup;
+}
+
+RMAN> startup force; 
+or if you need to perform recovery 
+RMAN> alter database mount;
+RMAN> recover database;
+RMAN> alter database open resetlogs; 
+

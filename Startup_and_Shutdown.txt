@@ -1,0 +1,117 @@
+An oracle instance may be started or stopped but a database is only mounted and opened or dismounted and closed. 
+The alert log will give details of such an operation however they were initiated as they are critical operations. As such they are always recorded and can only be carried out by highly priviliged users. 
+
+Ordinary user cannot start up or shut down a database. This is because an ordinary user is authentictaed against the data dictionary which is not logically available if the instance has not been started yet! You mus therefore connect via some external form of authentication either by the Operating system, being part of the Oracle software owner group or by giving a username/password combination that exists in an external password file.
+
+If you are using SQLPLUS, the syntax of the connect command tells Oracle what type of authentication you wish to use - the default of [1]data dictionary authentication, [2] password file authentication or [3]operating system authentictaion.
+
+[1]
+connect user/pass@connectalias
+connect user/pass
+# Normal data dictionary authentication
+
+[2]
+connect user/pass@connectalias as sysdba
+connect user/pass as sysdba
+connect user/pass@connectalias as sysoper
+connect user/pass as sysoper
+# The inclusion of user/pass here instructs oracle to go to the external password file to validate the combination
+
+[3]
+connect / as sysdba
+connect / as sysoper
+# This is operating system authentication - oracle will go to the host operating system and and check whether the user running the SQLPLUS session is a member of the operating system group that owns the Oracle software and if so - he / she will be logged on as SYSDBA/SYSOPER
+
+
+***********
+STARTUP
+***********
+*The database and the instance are independant of each other therefore the startup process is staged. First you build the instance in memory, then you connect to the database and mount it, then you open the database for use.
+
+The four states of the database will be:
+SHUTDOWN
+NOMOUNT
+MOUNT
+OPEN
+
+When the database is shutdown, all files are closed - and the instance does not exist. When you issue a startup command, oracle will attempt to locate a prameter via the default filenames...
+
+$ORACLE_HOME/dbs/spfileSID.ora
+$ORACLE_HOME/dbs/spfile.ora
+$ORACLE_HOME/dbs/initSID.ora
+
+In NOMOUNT mode, the instance has been build in memory(the SGA has been allocated and the background processes started according to the specification in the parameter file). The parameters in the parameter file are used to build the SGA in memory and to start the background processes. Once the instance is successfully started in NOMOUNT mode - the instance can be transitioned to MOUNT mode by reading the controlfile. which it knows from having read the parameter file in NOMOUNT mode! 
+
+In MOUNT mode the instance locates and reads the database control file. As part of the MOUNT - the names and locations of the datafiles and redo logs are read from the controlfile, but Oracle does not yet attempt to find them. If any files are missing or damaged, the database will remain in MOUNT mode and cannot be opened. SMON is the background process that mounts and opens the database and performs instance recovery if neccessary (if the shutdown was not clean or consistent). 
+
+In OPEN mode, all database files are located and opened and the database is made available for use. 
+
+Connected to an idle instance.
+
+SYS @ sandpit > startup;
+ORACLE instance started.
+
+Total System Global Area 1052233728 bytes
+Fixed Size                  2217704 bytes
+Variable Size             746588440 bytes
+Database Buffers          297795584 bytes
+Redo Buffers                5632000 bytes
+Database mounted.
+Database opened.
+SYS @ sandpit >
+
+
+Below is an exmaple of staging the startup process:
+Connected to an idle instance.
+
+SYS @ sandpit > startup nomount; 
+ORACLE instance started.
+
+Total System Global Area 1052233728 bytes
+Fixed Size                  2217704 bytes
+Variable Size             746588440 bytes
+Database Buffers          297795584 bytes
+Redo Buffers                5632000 bytes
+SYS @ sandpit > alter database mount;
+
+Database altered.
+
+SYS @ sandpit > alter database open;
+
+Database altered.
+
+SYS @ sandpit >
+
+
+***********
+Shutdown
+***********
+Shutdown is the opposite of the startup process. During an orderly shutdown, the database is first closed, then dismounted, and finally the instance is stopped. 
+
+During the close phase, all sessions are terminated - active transactions are rolled back by PMON, completed transactions are flushed to disk by DBWRn (from the database buffer cache to the datafiles) and the datafiles and redo logs are closed. Then the instance is stopped by deallocatting the SGA and terminating the background processes. 
+
+There are four options that may be used on the shutdown command: 
+
+NORMAL, 
+IMMEDIATE, 
+TRANSACTIONAa,
+ABORT.
+
+Normal is actually the default; no new connections are permitted,all current connections are allowed to continue until the voluntarily log off. This option is actually rarely used. 
+
+Transactional ensures no new user connections are permitted, existing sessions that asre not in a transaction state will be terminated and any sessions in a transaction state will be allow complete the transaction and then be terminated. Once all sessions are gone - the database will be shut down. 
+
+Immediate (this is the usual option) - no new sessions are permitted, existing sessions are terminated, active transactions are rolled back and the database will then shut down.
+
+Abort - as far as ORACLE is concerned - this is the equivalent of a power cut,  the instance terminates immediately, nothing is written to disk, no attempt to terminate transactions which may be in progress.
+
+The normal, immediate and transactional shutdown modes are usualy referred to as clean shutdowns or consistent shutdown. After all sessions are terminated, PMON will roll back any incomplete transactions, then a checkpoint is issued which will force the DBWRn to write all updated updated data from the database buffer cache out to the datafiles. LGWR will also flush the change vectors from the log buffer cache out to the redo logs. Then the file headers are updated and the files closed. This leaves ther database in a clean/good/consistent state as all committed transactions are contained in the datafiles; there are no uncommitted transactions hanging about which need to be rolled back and all the datafiles and log files are synchronised. Happy days!
+
+
+The abort mode sometimes referred to as a disorderly shutdown, leaves the database in an inconsistent state, and there may be corrections required as part of normal instance recovery. 
+
+SYS @ sandpit > shutdown immediate;
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+SYS @ sandpit >

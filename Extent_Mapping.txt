@@ -1,0 +1,22 @@
+You can check the allocation of extents (grouping of consecutively numbered oracle blocks within a datafile)...
+Every segment consists of one of more extents...
+
+-- Create a new table and then check its current extent setup (for the empty table)
+
+SQL> create table hr.newtab (col1 date) ;
+
+-- check the extents and blocks 
+SQL> select tablespace_name, file_id, extent_id, block_id, blocks, bytes, 
+from dba_extents where owner ='HR' and segment_name = 'NEWTAB'; 
+
+-- grow the table by adding an extent 
+SQL> alter table hr.newtab allocate extent;
+
+-- check again to see the growth 
+SQL> select tablespace_name, file_id, extent_id, block_id, blocks, bytes, 
+from dba_extents where owner ='HR' and segment_name = 'NEWTAB'; 
+
+
+-- Lastly, you can check the data file name corresponding to the tablespace where the table resides 
+-- by plugging in the file_id value from above
+SQL> select tablespace_name, file_name from dba_data_files where file_id=&filenumber ;

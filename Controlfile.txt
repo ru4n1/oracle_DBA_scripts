@@ -1,0 +1,27 @@
+The controlfile contains pointers to the rest of the database. The locations of the redo log files and the data files, and of the more recent archive log files if it is in archive log mode. It also stores information required to maintain database integrity , i.e. various critical sequence numbers and timestamps. Multiplexing the controlfile means to have created multiple copies. If one copy is damaged, the database can survive; oracle itself takes care of ensuring that the controlfile copies are synchronised and its maintenance is automatic. 
+
+SYS @ sandpit > column name format a40 
+SYS @ sandpit > select * from v$controlfile; 
+
+STATUS  NAME                                     IS_ BLOCK_SIZE FILE_SIZE_BLKS
+------- ---------------------------------------- --- ---------- --------------
+        /u01/oradata/sandpit/control01.ctl       NO       16384            594
+        /u02/oradata/sandpit/control02.ctl       NO       16384            594
+        /u03/oradata/sandpit/control03.ctl       NO       16384            594
+
+If a control file is removed or deleted - the instance will stop or not start displaying the below.
+
+alter database mount
+Sun Feb 16 01:55:35 2014
+ORA-00210: cannot open the specified control file
+ORA-00202: control file: '/u03/oradata/sandpit/control03.ctl'
+ORA-27037: unable to obtain file status
+Solaris-AMD64 Error: 2: No such file or directory
+
+You can recover the situation by copying an existing control file into place as neccessary.
+
+You need to locate the location of the missing file and one of the existing files. E.g.
+bash-4.1$ strings spfilesandpit.ora | grep -i ctl 
+files='/u01/oradata/sandpit/control01.ctl','/u02/oradata/sandpit/control02.ctl','/u03/oradata/sandpit/control03.ctl'
+
+Then copy any of the existing control files to overwrite the missing copy.

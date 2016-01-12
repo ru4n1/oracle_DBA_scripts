@@ -1,0 +1,92 @@
+Memory usage in Oracle falls into two categories: Program Global Area and System Global Area
+PGAs are private to each session and SHGA that is shared by all oracle processes. 10g - it is possible to automate the management of the SGA and PGA , in 11g it is possible to automate the management of both.
+
+PGA Memory management: A user sesssion against an oracle instance consists of a user process connected to a server process. The user process generates SQL statements and send them to the server process for execution. Associated with the server process is a block of non shareable memory known as the PGA. When executing SQL, the server process makes use of the PGA to store specific data such as 
+- variables
+- sorting rows
+- temporary tables
+- call stack
+
+Managing PGA can be automatic and oracle reccomends this. To implement automatic PGA management, you set a target for the total PGA memory allocation, summed up for all sessions. To instance parameters need to be set:
+WORKAREA_SIZE_POLICY
+PGA_AGGREGATE_TARGET
+
+
+SGA Memory management: The SGA contains several memory structures which can be sized independently:
+- Shared pool
+- database buffer cache
+- large pool
+- streams pool
+- java pool 
+- log buffer
+
+As a general rule, the memory allocation to the large pool, java pool and streams pool is not a matter for discussion, it is either needed or not. The memory allocation to the shared pool, the database buffer cache, the log buffer is negotiable. 
+
+SGA management can be automatci with the exception of the log buffer. The DBA sets a total size for the SGA and the instance will aportion this total to the various structures. The components will be resized on demand if there is need for allocation where it will do most good. The log buffer is the one area where size is fixed at instance startup and cannot be automatically managed. 
+
+The parameters for "manual" management of the SGA are:
+SHARED_POOL_SIZE
+DB_CACHE_SIZE
+LAREG_POOL_SIZE
+STREAMS_POOL_SIZE
+JAVA_POOL_SIZE
+
+To enabled automatic memory management - leave all these items at default or set to zero, and enable one instance parameter SGA_TARGET. This will enabled ASSM, automatic shared memory management. 
+
+
+
+----- AUTOMATIC MEMORY MANAGEMEMT -----
+The automatic memory management which takes things a step further and lets oracle manage the the server memory as a whole, by setting one parameter MEMORY_TARGET. This type of memory management allows oracle to transfer meomry between not only the components but also between the sga and pga top optimise performance within an overall mmemory constraint. 
+The memory_target parameter is dynamic and can be adjusted without shutting down the instance but only within a limit set by another parameter: MEMORY_MAX_TARGET(this is a static parameter). 
+
+
+You can disable automatic memory management and manually set the values if you so wish.
+
+alter system set db_cache_size=0 scope=memory;
+alter system set shared_pool_size=0 scope=memory;
+alter system set large_pool_size=0 scope=memory;
+alter system set java_pool_size=0 scope=memory;
+
+now turn off automatic memory management:
+alter system set memory_target=0 scope=memory; 
+
+Now manually set the PGA size and SGA size independently...
+SYS @ sandpit > alter system set pga_aggregate_target=50M scope=spfile;
+SYS @ sandpit > alter system set sga_target=100M scope=spfile;
+
+
+
+
+
+The oracle instance collects a vast amount of infomration regarding activity and performance - these staistics are flushed out to the AWR after being accumulated in memmory on a regular basis by the MMON process. These sttistics enable the memomry advisors. 
+You can manually query some of these views to get an indication of estimate settings to increase/decrease projected values.
+
+-- this provides indications if you were to increase / decrease pga memory settings the affect of the benefit.
+ select pga_target_for_estimate/1024/1024, pga_target_factor, estd_extra_bytes_rw
+  2* from v$pga_target_advice
+
+This query relates to overall size of the SGA in comparison to DB_TIME which is an overall figure for execution of SQL within the database. 
+SYS @ sandpit > select sga_size, sga_size_factor,estd_db_time from v$sga_target_advice;
+  SGA_SIZE SGA_SIZE_FACTOR ESTD_DB_TIME
+---------- --------------- ------------
+       216             .75          530
+       288               1          526
+       360            1.25          526
+       432             1.5          526
+       504            1.75          526
+       576               2          526
+
+
+
+-- if memory_target (automatic memory management) is set then you can query the view below for advisor info
+SYS @ sandpit > select memory_size, memory_size_factor, estd_db_time from v$memory_target_advice;
+MEMORY_SIZE MEMORY_SIZE_FACTOR ESTD_DB_TIME
+----------- ------------------ ------------
+        226                 .5           40
+        339                .75           40
+        452                  1           40
+        565               1.25           40
+        678                1.5           40
+        791               1.75           40
+        904                  2           40
+

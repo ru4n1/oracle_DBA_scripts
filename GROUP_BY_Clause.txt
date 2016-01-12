@@ -1,0 +1,47 @@
+The column or expression in the group by clause is also know as the grouping attribute and is the component that rows are grouped by. 
+HR @ sandpit > select avg(salary), department_id
+from emp  2  ^R    
+from employees
+  3  group by department_id;
+AVG(SALARY) DEPARTMENT_ID
+----------- -------------
+ 8601.33333           100
+       4150            30
+       7000
+       9500            20
+      10000            70
+ 19333.3333            90
+      10154           110
+ 3475.55556            50
+       6500            40
+ 8955.88235            80
+       4400            10
+       5760            60
+
+
+A dataset is divided into groups using the group by clause. The grouping attribute is the common key shared by members of each group. Note that only grouping functions and group attributes are permitted in the select clause when using a GROUP BY.
+
+HR @ sandpit > select department_id, sum(commission_pct) 
+  2  from employees
+  3  where commission_pct is not null 
+  4  group by department_id; 
+
+DEPARTMENT_ID SUM(COMMISSION_PCT)
+------------- -------------------
+                              .15
+           80                7.65
+
+2 rows selected.
+
+HR @ sandpit > select department_id, job_id, sum(commission_pct)
+  2  from employees
+  3  where commission_pct is not null 
+  4  group by department_id, job_id; 
+
+DEPARTMENT_ID JOB_ID     SUM(COMMISSION_PCT)
+------------- ---------- -------------------
+           80 SA_REP                    6.15
+           80 SA_MAN                     1.5
+              SA_REP                     .15
+
+3 rows selected.

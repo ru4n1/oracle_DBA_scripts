@@ -1,0 +1,23 @@
+#!/bin/ksh
+
+# --------------------------------
+# Environment Varaiable Definition 
+# --------------------------------
+export ORACLE_SID=sandpit
+export ORACLE_BASE=/u01/app/oracle/product/11.2.0
+export ORACLE_HOME=${ORACLE_BASE}/db_1
+export PATH=$ORACLE_HOME/bin:$PATH
+
+# --------------------------------
+# Listener optional startup 
+# --------------------------------
+lsnrctl stop LISTENER
+
+# --------------------------------
+# Sqlplus block for commands
+# --------------------------------
+sqlplus /nolog << EOI
+connect / as sysdba
+shutdown immediate 
+host echo " DB shut "
+EOI

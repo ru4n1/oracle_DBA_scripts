@@ -1,0 +1,95 @@
+
+First find out your current logfile group makeup:
+
+SYS @ sandpit > select * from v$logfile;
+
+    GROUP# STATUS  TYPE    MEMBER                                   IS_
+---------- ------- ------- ---------------------------------------- ---
+         3         ONLINE  /u03/oradata/sandpit/redo03.log          NO
+         2         ONLINE  /u02/oradata/sandpit/redo02.log          NO
+         1         ONLINE  /u01/oradata/sandpit/redo01.log          NO
+
+SYS @ sandpit > select * from v$log;
+
+    GROUP#    THREAD#  SEQUENCE#      BYTES  BLOCKSIZE    MEMBERS ARC STATUS           FIRST_CHANGE# FIRST_TIM NEXT_CHANGE# NEXT_TIME
+---------- ---------- ---------- ---------- ---------- ---------- --- ---------------- ------------- --------- ------------ ---------
+         1          1         13   52428800        512          1 NO  CURRENT                1053964 15-FEB-14   2.8147E+14
+         2          1         11   52428800        512          1 YES INACTIVE               1053627 15-FEB-14      1053783 15-FEB-14
+         3          1         12   52428800        512          1 YES INACTIVE               1053783 15-FEB-14      1053964 15-FEB-14
+
+The redo log groups must be dropped and recreated for changing the redo log size. You must make sure that the redo log group your dropping is INACTIVE 
+when you do this. 
+
+If you perform a checkpoint operations - it will write out all dirty database buffer cache blocks to the datafiles and signal LGWR to flush out the redo log buffer to the redo log which will mean that all redo log groups other than the current will become INACTIVE (means no longer needed for instance recovery).
+
+SYS @ sandpit > alter database drop logfile group 3;
+
+Database altered.
+
+SYS @ sandpit > select * from v$log; 
+
+    GROUP#    THREAD#  SEQUENCE#      BYTES  BLOCKSIZE    MEMBERS ARC STATUS           FIRST_CHANGE# FIRST_TIM NEXT_CHANGE# NEXT_TIME
+---------- ---------- ---------- ---------- ---------- ---------- --- ---------------- ------------- --------- ------------ ---------
+         1          1         13   52428800        512          1 NO  CURRENT                1053964 15-FEB-14   2.8147E+14
+         2          1         11   52428800        512          1 YES INACTIVE               1053627 15-FEB-14      1053783 15-FEB-14
+
+SYS @ sandpit > alter database add logfile group 3  ('/u03/oradata/sandpit/redo03a.log','/u03/oradata/sandpit/redo03b.log') size 50M; 
+
+Database altered.
+
+SYS @ sandpit > select * from v$log; 
+
+    GROUP#    THREAD#  SEQUENCE#      BYTES  BLOCKSIZE    MEMBERS ARC STATUS           FIRST_CHANGE# FIRST_TIM NEXT_CHANGE# NEXT_TIME
+---------- ---------- ---------- ---------- ---------- ---------- --- ---------------- ------------- --------- ------------ ---------
+         1          1         13   52428800        512          1 NO  CURRENT                1053964 15-FEB-14   2.8147E+14
+         2          1         11   52428800        512          1 YES INACTIVE               1053627 15-FEB-14      1053783 15-FEB-14
+         3          1          0   52428800        512          2 YES UNUSED                       0                      0
+
+
+Note the new group has two member files... and is as yet unused.
+
+Now drop the next logfile group ( greoup number 2) and then recreate it as desired size and member wise...
+
+SYS @ sandpit > alter database drop logfile group 2;
+
+Database altered.
+
+SYS @ sandpit > alter database add logfile group 2 ('/u02/oradata/sandpit/redo02a.log','/u02/oradata/sandpit/redo02b.log') size 50M; 
+
+Database altered.
+
+
+Continue on and drop the third and last 'OLD' logfile group...
+Then recreate it once more...
+
+SYS @ sandpit > alter database drop logfile group 1;
+
+Database altered.
+
+SYS @ sandpit > alter database add logfile group 1 ('/u01/oradata/sandpit/redo01a.log','/u01/oradata/sandpit/redo01b.log') size 50M; 
+
+Database altered.
+
+
+Finally, check on your progress, new files created with new sizes and three logfile groups each having two members...
+
+SYS @ sandpit > select * from v$logfile order by 4;
+
+    GROUP# STATUS  TYPE    MEMBER                                   IS_
+---------- ------- ------- ---------------------------------------- ---
+         1         ONLINE  /u01/oradata/sandpit/redo01a.log         NO
+         1         ONLINE  /u01/oradata/sandpit/redo01b.log         NO
+         2         ONLINE  /u02/oradata/sandpit/redo02a.log         NO
+         2         ONLINE  /u02/oradata/sandpit/redo02b.log         NO
+         3         ONLINE  /u03/oradata/sandpit/redo03a.log         NO
+         3         ONLINE  /u03/oradata/sandpit/redo03b.log         NO
+
+6 rows selected.
+
+SYS @ sandpit > select * from v$log;
+
+    GROUP#    THREAD#  SEQUENCE#      BYTES  BLOCKSIZE    MEMBERS ARC STATUS           FIRST_CHANGE# FIRST_TIM NEXT_CHANGE# NEXT_TIME
+---------- ---------- ---------- ---------- ---------- ---------- --- ---------------- ------------- --------- ------------ ---------
+         1          1         15   52428800        512          2 YES ACTIVE                 1054922 15-FEB-14      1054926 15-FEB-14
+         2          1         16   52428800        512          2 NO  CURRENT                1054926 15-FEB-14   2.8147E+14
+         3          1         14   52428800        512          2 YES ACTIVE                 1054533 15-FEB-14      1054922 15-FEB-14

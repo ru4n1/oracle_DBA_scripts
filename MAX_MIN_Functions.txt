@@ -1,0 +1,20 @@
+- MAX - 
+MAX operates on a number, date, char or varchar data type. It will return a value of the same data type as their input. When, applied to Dates MAX returns the latest and MIN the least recent date.
+
+HR @ sandpit > select max(salary) from employees;
+MAX(SALARY)
+-----------
+      24000
+
+- MIN -
+ 1* select min(salary) from employees
+HR @ sandpit > /
+MIN(SALARY)
+-----------
+       2100
+
+
+HR @ sandpit > select min(commission_pct), max(commission_pct) from employees;
+MIN(COMMISSION_PCT) MAX(COMMISSION_PCT)
+------------------- -------------------
+                 .1                  .4

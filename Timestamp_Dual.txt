@@ -1,0 +1,15 @@
+ @ sandpit > select systimestamp from dual;
+
+SYSTIMESTAMP
+---------------------------------------------------------------------------
+26-MAR-14 09.00.36.637006 PM +00:00
+
+1 row selected.
+
+HR @ sandpit > select sysdate from dual;
+
+SYSDATE
+---------
+26-MAR-14
+
+1 row selected.

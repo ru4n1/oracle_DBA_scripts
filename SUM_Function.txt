@@ -1,0 +1,8 @@
+- SUM - 
+The SUM function returns the aggregated total of the nonnull numeric expression values in a group. 
+select SUM(distinct expr)
+SUM (distinct) provides a total by adding all the unique values returned and providing a total for each row in the group. 
+HR @ sandpit > select sum(salary) from employees;
+SUM(SALARY)
+-----------
+     691416
